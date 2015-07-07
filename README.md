@@ -1,18 +1,11 @@
 Clover Cloud Web Socket Connection Web Application
 ====================================================
-This produces a runnable jar that will serve a web application.  Note that this is currently in progress, and contains 
-very unsightly code, and some hardcoded values in anticipation of further supporting development.  Specifically:
-
-1.  The websocket addresses of the device are hardcoded. (index.jsp)
-2.  The device id is hardcoded when assigning the websocket addresses. (index.jsp)
-3.  Tax values, and item values are hardcoded in the transaction flow.  (index.jsp)
-
-
+This produces a runnable jar that will serve a web application.  The purpose of this repository is to
+illustrate the communication to the device, and stand as a starting point for the protocol integration library.
 
 There are several prerequisites that must be set up for this to work.
 
 The web application is served by Jetty, so you need a JDK installed.
-
 
 The web application uses javascript WebSocket objects, so the browser you use must support WebSockets. 
 
@@ -109,22 +102,17 @@ and fix getEmployee();
 ***Working on this...***
 
 Make sure the web socket app is installed for your merchant on your device.
-Log in as cloverdev@clover.com - http://192.168.0.52:9001/developers/CLOVERDEV
-Find the Customer Display (Web Sockets) app, select edit pricing.  Add countries for the FREE pricing level.
-Log out
 
-Log in as cloverdev@clover.com - http://192.168.0.52:9001/newinternal/merchants
-Go to the 'apps' tab.
-Find the Customer Display (Web Sockets) app
-Select it.
-At the bottom of the page, find your merchant
-Select "Install FREE to 1 Merchant"
-
-On your device, go to app market.
-The app should say 'installed, but...
-I have had to debug it on the device to get this to work.  I have also had to debug the Terminal kiosk 
-to get it to install (A requirement of the Web Socket Remote Pay).
-
+Use the following to install on the device
+```
+cd /Users/michaelhampton/code/apps/remote-pay/remote-pay/remote-protocol-websocket
+```
+Increment the version (10 to 11, etc) in both the 3rd argument and in the version
+```
+gradle -PversionCode=10 assembleReleaseSigned
+~/code/apps/android-build/deploy/deploy_app.sh -s true com.clover.remote.protocol.websocket 10 ./build/outputs/apk/com.clover.remote.protocol.websocket-1.0-10-releaseSigned.apk
+adb install /Users/michaelhampton/Downloads/com.clover.remote.protocol.websocket-10.apk
+```
     
 ## Build and run the Example Application
     
