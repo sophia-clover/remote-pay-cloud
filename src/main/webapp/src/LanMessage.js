@@ -1,0 +1,20 @@
+/**
+ * @see com.clover.remote.protocol.LanMethod
+ * @constructor
+ */
+var LanMethod = {};
+LanMethod.TX_START = "TX_START";
+LanMethod.KEY_PRESS = "KEY_PRESS";
+LanMethod.UI_STATE = "UI_STATE";
+LanMethod.TX_STATE = "TX_STATE";
+LanMethod.FINISH_OK = "FINISH_OK";
+LanMethod.FINISH_CANCEL = "FINISH_CANCEL";
+LanMethod.DISCOVERY_REQUEST = "DISCOVERY_REQUEST";
+LanMethod.DISCOVERY_RESPONSE = "DISCOVERY_RESPONSE";
+LanMethod.ORDER_UPDATE = "ORDER_UPDATE";
+LanMethod.TIP_ADDED = "TIP_ADDED";
+LanMethod.VERIFY_SIGNATURE = "VERIFY_SIGNATURE";
+LanMethod.SIGNATURE_VERIFIED = "SIGNATURE_VERIFIED";
+LanMethod.PAYMENT_VOIDED = "PAYMENT_VOIDED";
+LanMethod.PRINT = "PRINT";
+
