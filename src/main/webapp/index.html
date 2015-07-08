@@ -110,6 +110,14 @@
 <div id="process_flow" style="display:none">
     <p id="create_order" >
         <button onclick="createNewOrder()">Create an Order</button>
+
+        <button onclick="sendFinishCancel()">Cancel</button>
+
+        <button onclick="sendShowThankYouScreen()">Show Thank You</button>
+
+        <button onclick="sendShowWelcomeScreen()">Show Welcome</button>
+
+        <button onclick="sendShowReceiptScreen()">Show Receipt</button>
     </p>
 
     <p id="add_item" style="display:none">
@@ -159,6 +167,7 @@
     // the map of available devices
     var deviceBySerial;
 
+    var remoteMessageBuilder = new RemoteMessageBuilder("com.clover.remote.protocol.websocket");
     //******************************************************
     /**
      * This defines the reaction to messages received
@@ -168,7 +177,7 @@
      * to handle particular messages that are transferred to and
      * from the device.
      */
-    var protocolAdaptor = new ProtocolAdaptor();
+    var protocolAdaptor = new ProtocolAdaptor(remoteMessageBuilder);
 
     // Do not echo the pong message to the console
     protocolAdaptor.handlePongMessage = function (message) {
@@ -218,6 +227,16 @@
         paymentDetails = payment;
     }
 
+    // When the device responds to our discovery request message (see below) then we will assume we are paired.
+    protocolAdaptor.onDiscoveryResponse = function(message) {
+        clearInterval(protocolAdaptor.discoveryTimerId);
+        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
+        enable('unpair_button');
+        enable('process_flow');
+        disable('pair_button');
+        console.log(message);
+    }
+
     // What do we do with messages we have not specifically handled?
     protocolAdaptor.defaultMessageHandle = function (message) {
         displayRawMessage(message);
@@ -242,6 +261,8 @@
         disable('unpair_button');
         disable('process_flow');
         enable('pair_button');
+        // Try to get the device to respond again.
+        device.sendMessage(protocolAdaptor.messageBuilder.buildDiscoveryRequest());
         console.log('device connection error');
     }
 
@@ -254,14 +275,19 @@
     // The device connection is ok
     device.connectionOK = function () {
         document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
+        console.log('device connection ok');
     }
 
     // The device connection has been opened
     device.onopen = function () {
-        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
-        enable('unpair_button');
-        enable('process_flow');
-        disable('pair_button');
+        // The connection to the device is open, but we do not yet know if there is anyone at the other end.
+        // Send discovery request messages until we get a discovery response.
+        protocolAdaptor.discoveryTimerId =
+            setInterval(
+                function () {
+                    device.sendMessage(protocolAdaptor.messageBuilder.buildDiscoveryRequest());
+                }, 3000
+            );
         console.log('device opened');
     }
 
@@ -335,7 +361,8 @@
                 // Use this data to build the web socket url
                 var url = data.host + '/support/cs?token=' + data.token;
 
-                // The response to this will be reflected in the device.onopen method (or on error)
+                // The response to this will be reflected in the device.onopen method (or on error),
+                // That function will attempt the discovery.
                 device.contactDevice(url);
             },
             function(error) {
@@ -421,6 +448,22 @@
 
         }
         document.getElementById("id01").innerHTML = out;
+    }
+
+    // Show a signature so the user can ask for a credit card and verify it.
+    function displaySignature(signature) {
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+
+        for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
+            var stroke = signature.strokes[strokeIndex];
+            ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+            for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
+                ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
+                ctx.stroke();
+            }
+        }
+        document.getElementById("signaturePane").style.display = 'block';
     }
 
     function deviceClicked(element) {
@@ -549,51 +592,25 @@
             }, console.log);
     }
 
-    // Send an update to the order to the device.  No idea what the update is,
-    // this is just the comms
-    function sendOrderUpdateToDevice(order) {
-        var lanMessage = {};
-        lanMessage.method = "ORDER_UPDATE";
-        lanMessage.packageName = "";
-        // This is how they are doing the payload...
-        lanMessage.payload = JSON.stringify(
-            {
-                "order": JSON.stringify(order),
-                "method": "ORDER_UPDATE"
-            }
-        );
-        lanMessage.type = "COMMAND";
-        device.sendMessage(lanMessage);
-    }
-
-    // Noy even sure this is required.
-    function sendDiscoveryRequestToDevice() {
-        var lanMessage = {}
-
-        lanMessage.method = "DISCOVERY_REQUEST";
-        lanMessage.packageName = "";
-        // This is how they are doing the payload...
-        lanMessage.payload = JSON.stringify(
-            {
-                "method": "DISCOVERY_REQUEST"
-            }
-        );
-        lanMessage.type = "COMMAND";
-        device.sendMessage(lanMessage);
-    }
-
     function getTransactionNo() {
         return "300010";
     }
 
+    // Send an update to the order to the device.  No idea what the update is,
+    // this is just the comms
+    function sendOrderUpdateToDevice(order) {
+        var payload = {
+            "order": JSON.stringify(order)
+        };
+        var lanMessage = protocolAdaptor.messageBuilder.buildShowOrderScreen(payload);
+        device.sendMessage(lanMessage);
+    }
+
     // Send a message to start a transaction
     function sendTXStartToDevice() {
-        var lanMessage = {}
 
-        lanMessage.method = "TX_START";
-        lanMessage.packageName = "";
         // This is how they are doing the payload...
-        lanMessage.payload = JSON.stringify(
+        var payload =
             {
                 "payIntent": {
                     "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
@@ -618,47 +635,49 @@
                     "isCardNotPresent": false,
                     "cardEntryMethods": 15
                 },
-                "method": "TX_START"
-            }
-        );
-        lanMessage.type = "COMMAND";
+            };
+
+        var lanMessage = protocolAdaptor.messageBuilder.buildTxStart(payload);
         device.sendMessage(lanMessage);
-    }
-
-    // Show a signature so the user can ask for a credit card and verify it.
-    function displaySignature(signature) {
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-
-        for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
-            var stroke = signature.strokes[strokeIndex];
-            ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-            for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
-                ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
-                ctx.stroke();
-            }
-        }
-        document.getElementById("signaturePane").style.display = 'block';
     }
 
     // Verify that the signature is valid
     function sendSignatureVerified(payment) {
-        var lanMessage = {}
-
-        lanMessage.method = "SIGNATURE_VERIFIED";
-        lanMessage.packageName = "";
-
-
         var payload = {};
         payload.verified = true;
-        payload.method = "SIGNATURE_VERIFIED";
         payload.payment = JSON.stringify(payment);
 
-        // This is how they are doing the payload...
-        lanMessage.payload = JSON.stringify(payload);
-        lanMessage.type = "COMMAND";
+        var lanMessage = protocolAdaptor.messageBuilder.buildSignatureVerified(payload);
+
         device.sendMessage(lanMessage);
         document.getElementById("signaturePane").style.display = 'none';
+    }
+
+    function sendFinishCancel() {
+        var lanMessage = protocolAdaptor.messageBuilder.buildFinishCancel();
+        device.sendMessage(lanMessage);
+
+        currentOrder = null;
+        paymentDetails = null;
+        enable('create_order'); // Just a GUI thing
+        disable('add_item'); // Just a GUI thing
+        disable('check_out'); // Just a GUI thing
+        disable('signaturePane'); // Just a GUI thing
+    }
+
+    function sendShowThankYouScreen() {
+        var lanMessage = protocolAdaptor.messageBuilder.buildShowThankYouScreen();
+        device.sendMessage(lanMessage);
+    }
+
+    function sendShowWelcomeScreen() {
+        var lanMessage = protocolAdaptor.messageBuilder.buildShowWelcomeScreen();
+        device.sendMessage(lanMessage);
+    }
+
+    function sendShowReceiptScreen() {
+        var lanMessage = protocolAdaptor.messageBuilder.buildShowReceiptScreen();
+        device.sendMessage(lanMessage);
     }
 
 </script>

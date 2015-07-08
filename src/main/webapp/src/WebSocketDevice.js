@@ -30,8 +30,6 @@ function WebSocketDevice(protocolAdaptor) {
     this.timebetweenReconnectAttempts = 3000;
     // A queue of messages that may be populated while we attempt to reconnect.
     this.resendQueue = [];
-    // The ping message format
-    this.pingMessage = {"type": "PING"};
 
     if(protocolAdaptor) {
         this.protocolAdaptor = protocolAdaptor;
@@ -198,7 +196,7 @@ function WebSocketDevice(protocolAdaptor) {
             console.log("receive message:" + stringMessage)
         }
         if(message.hasOwnProperty("type")) {
-            if(message["type"] == "PONG") {
+            if(message["type"] == RemoteMessageBuilder.PONG) {
                 this.pong(message);
             }
         }
@@ -211,6 +209,6 @@ function WebSocketDevice(protocolAdaptor) {
     }
     this.ping = function() {
         this.pingSentMillis = new Date().getTime();
-        this.sendMessage(this.pingMessage);
+        this.sendMessage(this.protocolAdaptor.messageBuilder.buildPing());
     }
 }
