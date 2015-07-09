@@ -13,6 +13,9 @@
  */
 function Endpoints(cloverOAuth) {
 
+    // I wrote this thinking that the order objects had to appear on the server before
+    // being sent to the device.  At this point most of this is not used.
+
     /**
      * The object that provides the access token and the configurtion with the domain.
      */

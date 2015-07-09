@@ -43,6 +43,11 @@ function RemoteMessageBuilder(defaultPackageName){
         return this.buildRemoteMessage(LanMethod.SIGNATURE_VERIFIED, RemoteMessageBuilder.COMMAND, payload);
     }
 
+    this.buildTerminalMessage = function(payload) {
+        payload.method = LanMethod.TERMINAL_MESSAGE;
+        return this.buildRemoteMessage(LanMethod.TERMINAL_MESSAGE, RemoteMessageBuilder.COMMAND, payload);
+    }
+
     this.buildShowWelcomeScreen = function() {
         return this.buildRemoteMessage(LanMethod.SHOW_WELCOME_SCREEN, RemoteMessageBuilder.COMMAND);
     }

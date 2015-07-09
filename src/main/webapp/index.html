@@ -1,102 +1,62 @@
 <html>
 <head>
 
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
 
 
-    <script src="src/CloverOAuth.js"></script>
-    <script src="src/WebSocketDevice.js"></script>
-    <script src="src/xmlHttpSupport.js"></script>
-    <script src="src/Endpoints.js"></script>
-    <script src="src/ids.js"></script>
-    <script src="src/ProtocolAdaptor.js"></script>
-    <script src="src/LanMessage.js"></script>
-    <script type="text/javascript">
-    </script>
+  <script src="src/CloverOAuth.js"></script>
+  <script src="src/WebSocketDevice.js"></script>
+  <script src="src/xmlHttpSupport.js"></script>
+  <script src="src/Endpoints.js"></script>
+  <script src="src/ids.js"></script>
+  <script src="src/ProtocolAdaptor.js"></script>
+  <script src="src/LanMessage.js"></script>
+  <script type="text/javascript">
+  </script>
 
-    <style>
-        button {
-            -moz-box-shadow: 9px 8px 22px -1px #1b5ec2;
-            -webkit-box-shadow: 9px 8px 22px -1px #1b5ec2;
-            box-shadow: 9px 8px 22px -1px #1b5ec2;
-            background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #5042b8), color-stop(1, #b2b5f0));
-            background:-moz-linear-gradient(top, #5042b8 5%, #b2b5f0 100%);
-            background:-webkit-linear-gradient(top, #5042b8 5%, #b2b5f0 100%);
-            background:-o-linear-gradient(top, #5042b8 5%, #b2b5f0 100%);
-            background:-ms-linear-gradient(top, #5042b8 5%, #b2b5f0 100%);
-            background:linear-gradient(to bottom, #5042b8 5%, #b2b5f0 100%);
-            filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#5042b8', endColorstr='#b2b5f0',GradientType=0);
-            background-color:#5042b8;
-            -moz-border-radius:12px;
-            -webkit-border-radius:12px;
-            border-radius:12px;
-            border:3px solid #6d6ab5;
-            display:inline-block;
-            cursor:pointer;
-            color:#d3d7ed;
-            font-family:Arial;
-            font-size:20px;
-            padding:7px 11px;
-            text-decoration:none;
-            text-shadow:0px 1px 7px #2e2e30;
-        }
-        button:hover {
-            background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #b2b5f0), color-stop(1, #5042b8));
-            background:-moz-linear-gradient(top, #b2b5f0 5%, #5042b8 100%);
-            background:-webkit-linear-gradient(top, #b2b5f0 5%, #5042b8 100%);
-            background:-o-linear-gradient(top, #b2b5f0 5%, #5042b8 100%);
-            background:-ms-linear-gradient(top, #b2b5f0 5%, #5042b8 100%);
-            background:linear-gradient(to bottom, #b2b5f0 5%, #5042b8 100%);
-            filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#b2b5f0', endColorstr='#5042b8',GradientType=0);
-            background-color:#b2b5f0;
-        }
-        button:active {
-            position:relative;
-            top:1px;
-        }
-
-
-
-
-        .device_disabled {
-            color: #dddddd;
-            font-style: italic;
-        }
-        .device_enabled {
-        }
-        #device_box {
-            border-radius: 25px;
-            border: 2px solid #080808;
-            padding: 20px;
-        }
-    </style>
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
 
 <body>
 <h1>Web Socket Cloud Remote API Example</h1>
+
 <p>
-    The intention of this page is to illustrate the use of the 'Clover Cloud-POS API' from within a web application
-    that is entirely html/javascript.
-<br/>
-    With the exception of Clover specific javascript libraries, there are no third party javascript libraries used
-    in this example.
+  The intention of this page is to illustrate the use of the 'Clover Cloud-POS API' from within a web application
+  that is entirely html/javascript.
 </p>
+
+<p>
+  With the exception of Clover specific javascript libraries, there are no third party javascript libraries used
+  in this example.
+</p>
+
+<!-- this is a place to telk about what is happening while the example is being run -->
+<div id="uiFeedback" style="">
+  First you need to select the device to communicate with.
+</div>
 
 <!-- A container to put the device(s) into to allow the user to select one for use -->
 <div id="device_box" style="">
-    First you need to select the device to communicate with.<br/>
-    <h2>Devices For Your Merchant</h2>
-    <form id="deviceForm">
-        <div id="id01"></div>
-    </form>
+  <h2>Devices For Your Merchant</h2>
+
+  <form id="deviceForm">
+    <div id="id01"></div>
+  </form>
 </div>
 
 <!-- controls to 'pair' or 'unpair' the device -->
 <p id="pair_device" style="display:none">
-    <button id="pair_button" onclick="handshakeDevice(getSelectedDevice())">Pair Device</button>
-    <button id="unpair_button" onclick="device.disconnectFromDevice()" style="display:none">Unpair Device</button>
+  <button id="pair_button" onclick="handshakeDevice(getSelectedDevice())">Pair Device</button>
+
+<div id="unpair_button" style="display:none">
+  <button id="unpair_btn" onclick="device.disconnectFromDevice()">Unpair Device</button>
+
+  <button onclick="sendTerminalMessage(document.getElementById('termMsg').value)">Put message on device</button>
+  <input type="text" name="termMsg" id="termMsg" value="Test Message"><br>
+</div>
+
 </p>
 
 <!--
@@ -108,33 +68,35 @@
         the order completes
 -->
 <div id="process_flow" style="display:none">
-    <p id="create_order" >
-        <button onclick="createNewOrder()">Create an Order</button>
+  <p id="create_order">
+    <button onclick="startOrder()">Start an Order checkout</button>
 
-        <button onclick="sendFinishCancel()">Cancel</button>
+    <button onclick="sendShowThankYouScreen()">Show Thank You</button>
 
-        <button onclick="sendShowThankYouScreen()">Show Thank You</button>
+    <button onclick="sendShowWelcomeScreen()">Show Welcome</button>
 
-        <button onclick="sendShowWelcomeScreen()">Show Welcome</button>
+    <button onclick="sendShowReceiptScreen()">Put options for receipt for last order on device</button>
+  </p>
 
-        <button onclick="sendShowReceiptScreen()">Show Receipt</button>
-    </p>
+  <p id="add_item" style="display:none">
+    <button onclick="addBikeToOrder(currentOrder)">Add a Bike to the Order</button>
+    <button onclick="addCustomItemToOrder(currentOrder, 150)">Add a $1.50 custom item to the order</button>
+    <button onclick="if(currentOrder)sendShowOrderScreen(currentOrder)">Show the order screen (if there is a current order)</button>
+  </p>
 
-    <p id="add_item" style="display:none">
-        <button onclick="addBikeToOrder(currentOrder)">Add a Bike to the Order</button>
-    </p>
+  <p id="check_out" style="display:none">
+    <button onclick="payWithCreditCard()">Check Out using a credit card</button>
+  </p>
 
-    <p id="check_out" style="display:none">
-        <button onclick="sendTXStartToDevice()">Check Out using a credit card</button>
-    </p>
+  <div id="signaturePane" style="display:none">
+    <button onclick="sendSignatureVerified(paymentDetails)">Verify the signature</button>
+    <button onclick="sendSignatureRejected(paymentDetails)">Reject the signature</button>
 
-    <div id="signaturePane" style="display:none">
-        <button onclick="sendSignatureVerified(paymentDetails)">Verify the signature</button>
-        <br/>
-        <canvas id="myCanvas" width="799" height="666" style="border:1px solid #d3d3d3;">
-            Your browser does not support the HTML5 canvas tag.
-        </canvas>
-    </div>
+    <br/>
+    <canvas id="myCanvas" width="799" height="666" style="border:1px solid #d3d3d3;">
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
+  </div>
 
 </div>
 
@@ -146,539 +108,619 @@
 
 <script>
 
-    /**
-     * This is the configuration for the app.  These values must be set.
-     *
-     * The clientId is the web app id for your clover application.
-     * The domain is the url to the clover server
-     */
-    var config = {
-        clientId: 'DCNRDRE3A2VME',  // this is the app id
-        domain: 'http://192.168.0.52:9001/'  // this is the url to the clover domain (http://www.clover.com)
-    };
+  /**
+   * This is the configuration for the app.  These values must be set.
+   *
+   * The clientId is the web app id for your clover application.
+   * The domain is the url to the clover server
+   */
+  var config = {
+    clientId: 'DCNRDRE3A2VME',  // this is the app id
+    domain: 'http://192.168.0.52:9001/'  // this is the url to the clover domain (http://www.clover.com)
+  };
 
-    var cloverOAuth = new CloverOAuth(config);
+  /**
+   * This is a utility to make the oauth process simpler.
+   *
+   */
+  var cloverOAuth = new CloverOAuth(config);
 
-    // The current order.  If there is one.
-    var currentOrder = null;
-    // Payment details used during the process
-    var paymentDetails = null;
+  /**
+   * The current order.  If there is one.
+   *
+   * See the createNewOrder() function below for the format/structure of this object
+   */
+  var currentOrder = null;
 
-    // the map of available devices
-    var deviceBySerial;
+  /**
+   * Payment details used during the process.  This object is used during signature verification/rejection.
+   */
+  var paymentDetails = null;
 
-    var remoteMessageBuilder = new RemoteMessageBuilder("com.clover.remote.protocol.websocket");
-    //******************************************************
-    /**
-     * This defines the reaction to messages received
-     *
-     * The functions are called as messages are received.  The
-     * ProtocolAdaptor defines several methods that can be defined
-     * to handle particular messages that are transferred to and
-     * from the device.
-     */
-    var protocolAdaptor = new ProtocolAdaptor(remoteMessageBuilder);
+  // the map of available devices
+  var deviceBySerial;
 
-    // Do not echo the pong message to the console
-    protocolAdaptor.handlePongMessage = function (message) {
-    };
+  // This object is a utility to build the messages that are sent.
+  var remoteMessageBuilder = new RemoteMessageBuilder("com.clover.remote.protocol.websocket");
+  //******************************************************
+  /**
+   * This defines the reaction to messages received
+   *
+   * The functions are called as messages are received.  The
+   * ProtocolAdaptor defines several methods that can be defined
+   * to handle particular messages that are transferred to and
+   * from the device.
+   */
+  var protocolAdaptor = new ProtocolAdaptor(remoteMessageBuilder);
 
-    // What do we do when we get a 'Finish ok' message?
-    // This means that the transaction is complete except for
-    // an acknowledgement
-    protocolAdaptor.onFinishOk = function (message) {
-        var payload = JSON.parse(message.payload);
-        var payment = JSON.parse(payload.payment);
+  // Do not echo the pong message to the console
+  protocolAdaptor.handlePongMessage = function (message) {
+  };
 
-        displayPaymentDetails(payment);
+  protocolAdaptor.onFinishCancel = function (message) {
+    displayUIFeedBack("The user canceled the transaction");
+  }
 
-        currentOrder.modifiedTime = new Date().getTime();
-        currentOrder.state = "locked";
-        currentOrder.payments = {};
-        currentOrder.payments.elements = [];
-        currentOrder.payments.elements[0] = payment;
 
-        sendOrderUpdateToDevice(currentOrder);
+  // What do we do when we get a 'Finish ok' message?
+  // This means that the transaction is complete except for
+  // an acknowledgement
+  protocolAdaptor.onFinishOk = function (message) {
+    var payload = JSON.parse(message.payload);
+    var payment = JSON.parse(payload.payment);
 
-        // this will clear the mini screen
-        setTimeout(
+    displayPaymentDetails(payment);
+
+    sendShowThankYouScreen();
+
+    displayUIFeedBack("Say thanks...for 3 seconds or so");
+
+    // this will clear the mini screen
+    setTimeout(
+        function () {
+          currentOrder = null;
+          paymentDetails = null;
+          sendShowWelcomeScreen();
+          enable('create_order'); // Just a GUI thing
+          disable('add_item'); // Just a GUI thing
+          disable('check_out'); // Just a GUI thing
+          disable('signaturePane'); // Just a GUI thing
+          document.getElementById("message_display").innerHTML = "";
+          displayUIFeedBack("Go back to the welcome screen");
+        }, 3000
+    );
+  }
+
+  // The device got a signature, and the user needs to verify it
+  protocolAdaptor.onVerifySignature = function (message) {
+    var payload = JSON.parse(message.payload);
+    var payment = JSON.parse(payload.payment);
+    // Already an object...hmmm
+    var signature = payload.signature;
+
+    // Display the info
+    displaySignature(signature);
+    displayPaymentDetails(payment);
+
+    paymentDetails = payment;
+  }
+
+  // When the device responds to our discovery request message (see below) then we will assume we are paired.
+  protocolAdaptor.onDiscoveryResponse = function (message) {
+    clearInterval(protocolAdaptor.discoveryTimerId);
+    document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
+    enable('unpair_button');
+    enable('process_flow');
+    disable('pair_button');
+    displayUIFeedBack("Device has responded. You can unpair the device, which ends communication with it, " +
+        "or begin an order.");
+    console.log(message);
+  }
+
+  protocolAdaptor.onPrintPayment = function (message) {
+    displayUIFeedBack("Customer asked for a payment receipt to be printed.");
+  }
+
+  protocolAdaptor.onUIState = function (message) {
+    var payload = JSON.parse(message.payload);
+    displayUIFeedBack(payload.uiDirection + "-" + payload.uiState + ":" + payload.uiText);
+  }
+
+  // What do we do with messages we have not specifically handled?
+  protocolAdaptor.defaultMessageHandle = function (message) {
+    displayRawMessage(message);
+  }
+
+  //******************************************************
+  /**
+   * How we communicate with the device
+   *
+   * We pass the protocolAdaptor to this object to allow it to call the
+   * ProtocolAdaptor.onMessage function when it receives messages.
+   *
+   * The redefinition of the methods we do below are not required, and are
+   * used only to indicate the status of the connection.
+   */
+  // The device delivers messages to the protocol adaptor
+  var device = new WebSocketDevice(protocolAdaptor);
+
+  // The device is used by the protocol adaptor to send messages
+  protocolAdaptor.setMessageSender(device);
+
+  // There is a problem with the connection.  A long time has gone by without expected communication
+  // with the device.
+  device.connectionError = function (lag) {
+    document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
+    disable('unpair_button');
+    disable('process_flow');
+    enable('pair_button');
+    // Try to get the device to respond again.
+    device.sendMessage(protocolAdaptor.messageBuilder.buildDiscoveryRequest());
+    console.log('device connection error');
+    displayUIFeedBack("There is a problem with the connection.  A long time has gone by without " +
+        "expected communication with the device.");
+
+  }
+
+  // There is a problem with the connection. Some time has gone by without expected communication
+  // with the device.
+  device.connectionWarning = function (lag) {
+    document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'yellow';
+  }
+
+  // The device connection is ok
+  device.connectionOK = function () {
+    document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
+    console.log('device connection ok');
+  }
+
+  // The device connection has been opened
+  device.onopen = function () {
+    // The connection to the device is open, but we do not yet know if there is anyone at the other end.
+    // Send discovery request messages until we get a discovery response.
+    protocolAdaptor.dicoveryMessagesSent = 0;
+    protocolAdaptor.discoveryTimerId =
+        setInterval(
             function () {
-                createNewOrder()
-                enable('create_order'); // Just a GUI thing
-                disable('add_item'); // Just a GUI thing
-                disable('check_out'); // Just a GUI thing
-                disable('signaturePane'); // Just a GUI thing
-                document.getElementById("message_display").innerHTML = "";
+              displayUIFeedBack("Sending 'discovery' message to device.");
+              device.sendMessage(protocolAdaptor.messageBuilder.buildDiscoveryRequest());
+              protocolAdaptor.dicoveryMessagesSent++;
+
+              if(protocolAdaptor.dicoveryMessagesSent > 10) {
+                displayUIFeedBack("Something is wrong.  we are getting pong messages, but no discovery response." +
+                    "  Shutting down the connection.");
+                device.disconnectFromDevice();
+                clearInterval(protocolAdaptor.discoveryTimerId);
+              }
             }, 3000
         );
+    console.log('device opened');
+    displayUIFeedBack("Communication channel open.  Pausing for 3 seconds before trying to talk to device. ");
+  }
+
+  // The device connection has been closed
+  device.onclose = function () {
+    document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
+    enable('pair_button');
+    disable('unpair_button');
+    disable('process_flow');
+    console.log('device closed');
+    displayUIFeedBack("The device connection has been closed");
+
+  }
+
+  // There has been an error on the device connection
+  device.onerror = function () {
+    document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
+    enable('pair_button');
+    disable('unpair_button');
+    disable('process_flow');
+    console.log('device error');
+    displayUIFeedBack("There has been an error on the device connection");
+  }
+
+  //******************************************************
+  /**
+   * Trying to avoid third party javascript.  This is a simple interface used to make the rest calls.
+   *
+   * It is a wrapper over a XMLHTTP instance.
+   */
+  var xmlHttpSupport = new XmlHttpSupport();
+  //******************************************************
+
+  // Endpoints for the REST sefvices
+  var endpoints = new Endpoints(cloverOAuth);
+
+  // Load the devices for the merchant
+  var url = endpoints.getDevicesEndpoint(cloverOAuth.getURLParams()["merchant_id"]);
+  xmlHttpSupport.getData(url, displayDevices, console.log);
+
+  /**
+   * Initiate contact with the device.
+   *
+   * This involves a post to the clover server REST endpoint, which will provide us with
+   * the websocket connection information.
+   */
+  function handshakeDevice(selectedDevice) {
+    // The id of the device does not have dashes in this communication.  Remove them.
+    var noDashesDeviceId = selectedDevice.id.replace(/-/g, "");
+
+    // This is the data posted to tell the server we want to create a connection
+    // to the device
+    var deviceContactInfo = {
+      deviceId: noDashesDeviceId,
+      isSilent: true
+    };
+
+    var merchantId = cloverOAuth.getURLParams()["merchant_id"];
+
+    displayUIFeedBack("Contacting the clover server with a request to talk to the device...");
+
+    // Do a REST call to tell the server we want to open comms to the device.  This requires
+    // the device contact info above.
+    xmlHttpSupport.postData(endpoints.getAlertDeviceEndpoint(merchantId),
+        function (data) {
+          // The format of the data received is:
+          //{
+          //    'host': web_socket_host,
+          //    'token': token_to_link_to_the_device
+          //}
+          // Use this data to build the web socket url
+          var url = data.host + '/support/cs?token=' + data.token;
+
+          displayUIFeedBack("Server responded with information on how to contact device. " +
+              "Opening communication channel...");
+
+          // The response to this will be reflected in the device.onopen method (or on error),
+          // That function will attempt the discovery.
+          device.contactDevice(url);
+        },
+        function (error) {
+          console.log(error);
+        }, deviceContactInfo
+    );
+  }
+
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  // UI Stuff - Sow the user what is going on
+  function displayUIFeedBack(infoMessage) {
+    var orig = document.getElementById("uiFeedback").innerHTML;
+
+    document.getElementById("uiFeedback").innerHTML = infoMessage + "<br/>" + orig;
+  }
+
+  //*********************************************
+  // Dump a message to the message pane
+  //*********************************************
+  function displayRawMessage(message) {
+    var messageText = "<table>";
+    messageText += "<tr><td>type:</td><td>" + message.type + "</td></tr>";
+    messageText += "<tr><td>method:</td><td>" + message.method + "</td></tr>";
+    messageText += "<tr><td>payload:</td><td>" + message.payload + "</td></tr>";
+    messageText += "</table>";
+
+    document.getElementById("message_display").innerHTML = messageText;
+
+    console.log(JSON.stringify(message));
+  }
+
+  // Show the payment details
+  function displayPaymentDetails(payment) {
+    var messageText = "<table>";
+    messageText += "<tr><td>result:</td><td>" + payment.result + "</td></tr>";
+    messageText += "<tr><td>authcode:</td><td>" + payment.cardTransaction.authCode + "</td></tr>";
+    messageText += "<tr><td>entryType:</td><td>" + payment.cardTransaction.entryType + "</td></tr>";
+    messageText += "<tr><td>cvmResult:</td><td>" + payment.cardTransaction.extra.cvmResult + "</td></tr>";
+    messageText += "<tr><td>last4:</td><td>" + payment.cardTransaction.last4 + "</td></tr>";
+    messageText += "<tr><td>cardType:</td><td>" + payment.cardTransaction.cardType + "</td></tr>";
+    messageText += "</table>";
+
+    document.getElementById("message_display").innerHTML = messageText;
+  }
+
+  /**
+   * Display a set of devices
+   * @param devicesVX
+   */
+  function displayDevices(devicesVX) {
+    var devices = null;
+    deviceBySerial = {};
+    // depending on the version of the call, the devices might be in a slightly different format.
+    // We would need to determine what devices were capable of doing what we want.  This means we
+    // need to know if the device has the websocket connection enabled.  The best way to do this is
+    // to make a different REST call, but we could filter the devices here.
+    if (devicesVX.hasOwnProperty('devices')) {
+      devices = devicesVX.devices;
     }
-
-    // The device got a signature, and the user needs to verify it
-    protocolAdaptor.onVerifySignature = function (message) {
-        var payload = JSON.parse(message.payload);
-        var payment = JSON.parse(payload.payment);
-        // Already an object...hmmm
-        var signature = payload.signature;
-
-        // Display the info
-        displaySignature(signature);
-        displayPaymentDetails(payment);
-
-        paymentDetails = payment;
+    else if (devicesVX.hasOwnProperty('elements')) {
+      devices = devicesVX.elements;
     }
-
-    // When the device responds to our discovery request message (see below) then we will assume we are paired.
-    protocolAdaptor.onDiscoveryResponse = function(message) {
-        clearInterval(protocolAdaptor.discoveryTimerId);
-        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
-        enable('unpair_button');
-        enable('process_flow');
-        disable('pair_button');
-        console.log(message);
+    var out = "";
+    var i;
+    for (i = 0; i < devices.length; i++) {
+      var style = 'device_enabled';
+      out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
+          '<input type="radio" name="device" value="' +
+          devices[i].serial + '"  ' +
+          ' onclick="deviceClicked(this)"/>' +
+          devices[i].model + " " + devices[i].serial +
+          '</div><br>';
+      deviceBySerial[devices[i].serial] = devices[i];
     }
+    document.getElementById("id01").innerHTML = out;
+  }
 
-    // What do we do with messages we have not specifically handled?
-    protocolAdaptor.defaultMessageHandle = function (message) {
-        displayRawMessage(message);
+  // Show a signature so the user can ask for a credit card and verify it.
+  function displaySignature(signature) {
+    var canvas = document.getElementById("myCanvas");
+    // reset the canvas
+    canvas.width = canvas.width;
+    var ctx = canvas.getContext("2d");
+
+    for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
+      var stroke = signature.strokes[strokeIndex];
+      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
+        ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
+        ctx.stroke();
+      }
     }
+    enable("signaturePane");
+    displayUIFeedBack("Verify or reject the signature");
+  }
 
-    //******************************************************
-    /**
-     * How we communicate with the device
-     *
-     * We pass the protocolAdaptor to this object to allow it to call the
-     * ProtocolAdaptor.onMessage function when it receives messages.
-     *
-     * The redefinition of the methods we do below are not required, and are
-     * used only to indicate the status of the connection.
-     */
-    var device = new WebSocketDevice(protocolAdaptor);
+  function deviceClicked(element) {
+    enable('pair_device');
+    displayUIFeedBack("Now you 'pair' the device");
+  }
 
-    // There is a problem with the connection.  A long time has gone by without expected communication
-    // with the device.
-    device.connectionError = function (lag) {
-        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
-        disable('unpair_button');
-        disable('process_flow');
-        enable('pair_button');
-        // Try to get the device to respond again.
-        device.sendMessage(protocolAdaptor.messageBuilder.buildDiscoveryRequest());
-        console.log('device connection error');
+  /**
+   * Find the device that is currently selected
+   */
+  function getSelectedDevice() {
+    var radios = document.getElementsByName('device');
+
+    for (var i = 0, length = radios.length; i < length; i++) {
+      if (radios[i].checked) {
+        // do whatever you want with the checked radio
+        return deviceBySerial[radios[i].value];
+      }
     }
+    return null;
+  }
 
-    // There is a problem with the connection. Some time has gone by without expected communication
-    // with the device.
-    device.connectionWarning = function (lag) {
-        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'yellow';
-    }
+  //*********************************************
+  //
+  //*********************************************
+  /**
+   * A hardcoded tax rate for the order
+   */
+  function getTaxRate() {
 
-    // The device connection is ok
-    device.connectionOK = function () {
-        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
-        console.log('device connection ok');
-    }
+    return {
+      "id": "S00VR686JF5CR", // id for tax
+      "isDefault": false,
+      "rate": 0,
+      "name": "NO_TAX_APPLIED"
+    };
+  }
 
-    // The device connection has been opened
-    device.onopen = function () {
-        // The connection to the device is open, but we do not yet know if there is anyone at the other end.
-        // Send discovery request messages until we get a discovery response.
-        protocolAdaptor.discoveryTimerId =
-            setInterval(
-                function () {
-                    device.sendMessage(protocolAdaptor.messageBuilder.buildDiscoveryRequest());
-                }, 3000
-            );
-        console.log('device opened');
-    }
+  function getBikeLineItem() {
+    var lineItem = {
+      "createdTime": new Date().getTime(),
+      "taxRates": {
+        "elements": [getTaxRate()]
+      },
+      "userData": null,
+      "alternateName": "",
+      "exchanged": false,
+      "id": getNewId(),
+      "refunded": false,
+      "price": 20000,
+      "binName": null,
+      "isRevenue": true,
+      "name": "Dawes Touring 20\" Brown",
+      "item": {"id": "YHF0PW2E69K9W"}, // bike item id
+      "printed": false,
+      "itemCode": "dawes1"
+    };
+    return lineItem;
+  }
 
-    // The device connection has been closed
-    device.onclose = function () {
-        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
-        enable('pair_button');
-        disable('unpair_button');
-        disable('process_flow');
-        console.log('device closed');
-    }
+  function getCustomLineItem(amt) {
+    var lineItem = {
+      "exchanged": false,
+      "id": getNewId(),
+      "refunded": false,
+      "price": amt,
+      "binName": null,
+      "createdTime": new Date().getTime(),
+      "name": "Custom Item",
+      "printed": false,
+      "userData": null,
+      "note": null,
+      "alternateName": ""
+    };
+    return lineItem;
+  }
 
-    // There has been an error on the device connection
-    device.onerror = function () {
-        document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
-        enable('pair_button');
-        disable('unpair_button');
-        disable('process_flow');
-        console.log('device error');
-    }
+  function createNewOrder() {
+    var orderId = getNewId();
+    var merchantId = cloverOAuth.getURLParams()["merchant_id"];
+    var employeeId = cloverOAuth.getURLParams()["employee_id"];
 
-    //******************************************************
-    /**
-     * Trying to avoid third party javascript.  This is a simple interface used to make the rest calls.
-     *
-     * It is a wrapper over a XMLHTTP instance.
-     */
-    var xmlHttpSupport = new XmlHttpSupport();
+    return  {
+      "href": "http://192.168.0.52:9001/v3/merchants/" + merchantId + "/orders/" + orderId,
+      "id": orderId,
+      "currency": "USD",
+      "employee": {
+        "id": employeeId
+      },
+      "taxRemoved": false,
+      "isVat": false,
+      "manualTransaction": false,
+      "groupLineItems": true,
+      "testMode": false,
+      "createdTime": new Date().getTime(),
+      "clientCreatedTime": new Date().getTime(),
+      "modifiedTime": new Date().getTime()
+    };
+  }
 
-    //******************************************************
-    // Attempt to get the security token
-    // This function attempts to extract an OAuth token from the
-    // request/response.
-    // It will create/set the userInfo object with associated keys.
-    // If no token is present, this will redirect.  This is part of the oauth
-    var token = cloverOAuth.getAccessToken();
-
-    var endpoints = new Endpoints(cloverOAuth);
-
-    // We have a security token.  Load the devices
-    var url = endpoints.getDevicesEndpoint(cloverOAuth.getURLParams()["merchant_id"]);
-    xmlHttpSupport.getData(url, displayDevices, console.log);
-
-    /**
-     * Initiate contact with the device.
-     *
-     *
-     */
-    function handshakeDevice(selectedDevice) {
-        // The id of the device does not have dashes in this communication.  Remove them.
-        var noDashesDeviceId = selectedDevice.id.replace(/-/g, "");
-
-        // This is the data posted to tell the server we want to create a connection
-        // to the device
-        var deviceContactInfo = {
-            deviceId: noDashesDeviceId,
-            isSilent: true
-        };
-
-        var merchantId = cloverOAuth.getURLParams()["merchant_id"];
-
-        // Do a REST call to tell the server we want to open comms to the device.  This requires
-        // the device contact info above.
-        xmlHttpSupport.postData( endpoints.getAlertDeviceEndpoint(merchantId),
-            function(data) {
-                // The format of the data received is:
-                //{
-                //    'host': web_socket_host,
-                //    'token': token_to_link_to_the_device
-                //}
-                // Use this data to build the web socket url
-                var url = data.host + '/support/cs?token=' + data.token;
-
-                // The response to this will be reflected in the device.onopen method (or on error),
-                // That function will attempt the discovery.
-                device.contactDevice(url);
-            },
-            function(error) {
-                console.log(error);
-            }, deviceContactInfo
-        );
-    }
-
-    //*********************************************
-    // Dump a message to the message pane
-    //*********************************************
-    function enable(id){
-        document.getElementById(id).style.display = 'block';
-    }
-    function disable(id){
-        document.getElementById(id).style.display = 'none';
-    }
-
-    function displayRawMessage(message) {
-        var messageText = "<table>";
-        messageText += "<tr><td>type:</td><td>" + message.type + "</td></tr>";
-        messageText += "<tr><td>method:</td><td>" + message.method + "</td></tr>";
-        messageText += "<tr><td>payload:</td><td>" + message.payload + "</td></tr>";
-        messageText += "</table>";
-
-        document.getElementById("message_display").innerHTML = messageText;
-
-        console.log(JSON.stringify(message));
-    }
-
-    // Show the payment details
-    function displayPaymentDetails(payment) {
-        var messageText = "<table>";
-        messageText += "<tr><td>result:</td><td>" + payment.result + "</td></tr>";
-        messageText += "<tr><td>authcode:</td><td>" + payment.cardTransaction.authCode + "</td></tr>";
-        messageText += "<tr><td>entryType:</td><td>" + payment.cardTransaction.entryType + "</td></tr>";
-        messageText += "<tr><td>cvmResult:</td><td>" + payment.cardTransaction.extra.cvmResult + "</td></tr>";
-        messageText += "<tr><td>last4:</td><td>" + payment.cardTransaction.last4 + "</td></tr>";
-        messageText += "<tr><td>cardType:</td><td>" + payment.cardTransaction.cardType + "</td></tr>";
-        messageText += "</table>";
-
-        document.getElementById("message_display").innerHTML = messageText;
-    }
-
-    /**
-     * Display a set of devices
-     * @param devicesVX
-     */
-    function displayDevices(devicesVX) {
-        var devices = null;
-        deviceBySerial = {};
-        // depending on the version of the call, the devices might be in a slightly different format.
-        // We would need to determine what devices were capable of doing what we want.  This means we
-        // need to know if the device has the websocket connection enabled.  The best way to do this is
-        // to make a different REST call, but we could filter the devices here.
-        if (devicesVX.hasOwnProperty('devices')) {
-            devices = devicesVX.devices;
-        }
-        else if (devicesVX.hasOwnProperty('elements')) {
-            devices = devicesVX.elements;
-        }
-        var out = "";
-        var i;
-        for (i = 0; i < devices.length; i++) {
-            var enabled = ' disabled="disabled" ';
-            var style='device_disabled';
-            // Hack in some values for now.  If a device has a websocket
-            // connection then it would be enabled
-            if (devices[i].serial == "C030UQ50550081") {
-                devices[i].websocket_direct = "ws://192.168.0.56:49152";
-                devices[i].websocket_proxy = "ws://192.168.0.52:18000/C030UQ50550081";
-                enabled = '';
-                style='device_enabled';
-            }
-            out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
-                '<input type="radio" name="device" value="' +
-                devices[i].serial + '"  ' +
-                enabled +
-                ' onclick="deviceClicked(this)"/>' +
-                devices[i].model + " " + devices[i].serial +
-                '</div><br>';
-            deviceBySerial[devices[i].serial] = devices[i];
-
-        }
-        document.getElementById("id01").innerHTML = out;
-    }
-
-    // Show a signature so the user can ask for a credit card and verify it.
-    function displaySignature(signature) {
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-
-        for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
-            var stroke = signature.strokes[strokeIndex];
-            ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-            for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
-                ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
-                ctx.stroke();
-            }
-        }
-        document.getElementById("signaturePane").style.display = 'block';
-    }
-
-    function deviceClicked(element) {
-        enable('pair_device');
-    }
-
-    /**
-     * Find the device that is currently selected
-     */
-    function getSelectedDevice() {
-        var radios = document.getElementsByName('device');
-
-        for (var i = 0, length = radios.length; i < length; i++) {
-            if (radios[i].checked) {
-                // do whatever you want with the checked radio
-                return deviceBySerial[radios[i].value];
-            }
-        }
-        return null;
-    }
-
-    function getTaxRate() {
-
-        return {
-            "id": "S00VR686JF5CR", // id for tax
-            "isDefault": false,
-            "rate": 0,
-            "name": "NO_TAX_APPLIED"
-        };
-    }
-
-    function getLineItem() {
-        var lineItem = {
-            "createdTime": new Date().getTime(),
-            "taxRates": {
-                "elements": [getTaxRate()]
-            },
-            "userData": null,
-            "alternateName": "",
-            "exchanged": false,
-            "id": getNewId(),
-            "refunded": false,
-            "price": 20000,
-            "binName": null,
-            "isRevenue": true,
-            "name": "Dawes Touring 20\" Brown",
-            "item": {"id": "YHF0PW2E69K9W"}, // bike item id
-            "printed": false,
-            "itemCode": "dawes1"
-        };
-        return lineItem;
-    }
-
-    function getEmployee() {
-        return {"id": "PDM27H07XM1K8"};
-    }
-
-    //*********************************************
-    //
-    //*********************************************
-    function addBikeToOrder(order) {
-        var lineItem = getLineItem();
-
-        var merchantId = cloverOAuth.getURLParams()["merchant_id"];
-
-        order.lineItems = {};
-        order.lineItems["elements"] = [];
-        order.lineItems["elements"][0] = lineItem;
-
-        xmlHttpSupport.putData(endpoints.getLineItemEndpoint(merchantId, order.id, lineItem.id),
-            function (data) {
-//        // This is the format of what should come back
-//        var expectedReturn =
-//        {
-//            "id": "MESKH6CHYVKQP",
-//            "orderRef": {"id": "HNWSDNAZ38RQ8"},
-//            "item": {"id": "T2Y6BC3B6V89W"},
-//            "name": "Dawes Blue 20\"",
-//            "alternateName": "",
-//            "price": 20000,
-//            "printed": false,
-//            "createdTime": 1435194444000,
-//            "orderClientCreatedTime": 1435193815000,
-//            "exchanged": false,
-//            "refunded": false,
-//            "isRevenue": true
-//        };
-                // order["total"] += data.price;
-                order["total"] = data.price;
-                var tempOrder = {
-                    "state": "open",
-                    "total": order["total"],
-                    "clientCreatedTime": order.clientCreatedTime,
-                    "employee": getEmployee(),
-                    "createdTime": order.createdTime
-                };
-                xmlHttpSupport.postData(endpoints.getOrderEndpoint(merchantId, order.id),
-                    function (data) {
-                        sendOrderUpdateToDevice(order);
-                        console.log("Call resulted in " + JSON.stringify(data));
-                        enable('check_out');
-                    }, console.log, tempOrder);
-
-
-                console.log("Call resulted in " + JSON.stringify(data));
-            }, console.log, lineItem);
-
-    }
-
-    /**
-     * Create an order on the server
-     *
-     */
-    function createNewOrder() {
-        var orderId = getNewId();
-
-        var merchantId = cloverOAuth.getURLParams()["merchant_id"];
-
-        xmlHttpSupport.putData(endpoints.getOrderEndpoint(merchantId, orderId),
-            function (data) {
-                currentOrder = data;
-                paymentDetails = null;
-                sendOrderUpdateToDevice(currentOrder);
-                console.log("Call resulted in " + JSON.stringify(data));
-                enable('add_item');
-            }, console.log);
-    }
-
-    function getTransactionNo() {
-        return "300010";
-    }
-
-    // Send an update to the order to the device.  No idea what the update is,
-    // this is just the comms
-    function sendOrderUpdateToDevice(order) {
-        var payload = {
-            "order": JSON.stringify(order)
-        };
-        var lanMessage = protocolAdaptor.messageBuilder.buildShowOrderScreen(payload);
-        device.sendMessage(lanMessage);
-    }
-
-    // Send a message to start a transaction
-    function sendTXStartToDevice() {
-
-        // This is how they are doing the payload...
-        var payload =
+  function getCCPayIntent() {
+    return  {
+      "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+      "amount": currentOrder.total,
+      "transactionType": "PAYMENT",
+      "transactionNo": 300010,
+      "orderId": currentOrder.id,
+      "taxableAmountRateList": [
+        JSON.stringify(
             {
-                "payIntent": {
-                    "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
-                    "amount": currentOrder.total,
-                    "transactionType": "PAYMENT",
-                    "transactionNo": getTransactionNo(),
-                    "orderId": currentOrder.id,
-                    "taxableAmountRateList": [
-                        JSON.stringify(
-                            {
-                                "id": getTaxRate().id,
-                                "taxableAmount": currentOrder.total,
-                                "rate": 0,
-                                "name": getTaxRate().name
-                            }
-                        )
-                    ],
-                    "taxAmount": 0,
-                    "remotePrint": true,
-                    "isTesting": false,
-                    "isDisableCashBack": false,
-                    "isCardNotPresent": false,
-                    "cardEntryMethods": 15
-                },
-            };
+              "id": getTaxRate().id,
+              "taxableAmount": currentOrder.total,
+              "rate": 0,
+              "name": getTaxRate().name
+            }
+        )
+      ],
+      "taxAmount": 0,
+      "remotePrint": true,
+      "isTesting": false,
+      "isDisableCashBack": false,
+      "isCardNotPresent": false,
+      "cardEntryMethods": 15
+    };
+  }
 
-        var lanMessage = protocolAdaptor.messageBuilder.buildTxStart(payload);
-        device.sendMessage(lanMessage);
+  function getCCPayIntent() {
+    return  {
+      "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+      "amount": currentOrder.total,
+      "transactionType": "PAYMENT",
+      "transactionNo": 300010,
+      "orderId": currentOrder.id,
+      "taxableAmountRateList": [
+        JSON.stringify(
+            {
+              "id": getTaxRate().id,
+              "taxableAmount": currentOrder.total,
+              "rate": 0,
+              "name": getTaxRate().name
+            }
+        )
+      ],
+      "taxAmount": 0,
+      "remotePrint": true,
+      "isTesting": false,
+      "isDisableCashBack": false,
+      "isCardNotPresent": false,
+      "cardEntryMethods": 15
+    };
+  }
+
+  //*********************************************
+  //
+  //*********************************************
+  /**
+   * Create an order, send it to the device
+   *
+   */
+  function startOrder() {
+    currentOrder = createNewOrder();
+
+    paymentDetails = null;
+    sendShowOrderScreen(currentOrder);
+    enable('add_item');
+    displayUIFeedBack("Now you can add the item to the order");
+  }
+
+  function addBikeToOrder(order) {
+    var lineItem = getBikeLineItem();
+    addLineItemToOrder(order,lineItem);
+  }
+
+  function addCustomItemToOrder(order, amt) {
+    var lineItem = getCustomLineItem(amt);
+    addLineItemToOrder(order,lineItem);
+  }
+
+  function addLineItemToOrder(order, lineItem) {
+    if(!order.hasOwnProperty("lineItems")) {
+      order.lineItems = {};
+      order.lineItems["elements"] = [];
+      order["total"] = 0;
     }
+    order.lineItems["elements"].push(lineItem);
+    order["total"] += lineItem.price;
 
-    // Verify that the signature is valid
-    function sendSignatureVerified(payment) {
-        var payload = {};
-        payload.verified = true;
-        payload.payment = JSON.stringify(payment);
+    sendShowOrderScreen(order);
+    enable('check_out');
+    displayUIFeedBack("Now the customer can tell you that - 'Yes, that is all', so you can initiate payment.");
+  }
 
-        var lanMessage = protocolAdaptor.messageBuilder.buildSignatureVerified(payload);
+  function payWithCreditCard() {
+    var payIntent = getCCPayIntent();
+    sendTXStart(payIntent)
+  }
 
-        device.sendMessage(lanMessage);
-        document.getElementById("signaturePane").style.display = 'none';
-    }
+  function payWithCash() {
+    var payIntent = getPayIntent();
+    sendTXStart(payIntent)
+  }
 
-    function sendFinishCancel() {
-        var lanMessage = protocolAdaptor.messageBuilder.buildFinishCancel();
-        device.sendMessage(lanMessage);
 
-        currentOrder = null;
-        paymentDetails = null;
-        enable('create_order'); // Just a GUI thing
-        disable('add_item'); // Just a GUI thing
-        disable('check_out'); // Just a GUI thing
-        disable('signaturePane'); // Just a GUI thing
-    }
+  //*******************************************
+  //*******************************************
+  //*******************************************
 
-    function sendShowThankYouScreen() {
-        var lanMessage = protocolAdaptor.messageBuilder.buildShowThankYouScreen();
-        device.sendMessage(lanMessage);
-    }
+  // Send an update to the order to the device.  No idea what the update is,
+  // this is just the comms
+  function sendShowOrderScreen(order) {
+    protocolAdaptor.sendShowOrderScreen(order);
+  }
 
-    function sendShowWelcomeScreen() {
-        var lanMessage = protocolAdaptor.messageBuilder.buildShowWelcomeScreen();
-        device.sendMessage(lanMessage);
-    }
+  // Send a message to start a transaction
+  function sendTXStart(payIntent) {
+    // This is how they are doing the payload...
+    protocolAdaptor.sendTXStart(payIntent);
+  }
 
-    function sendShowReceiptScreen() {
-        var lanMessage = protocolAdaptor.messageBuilder.buildShowReceiptScreen();
-        device.sendMessage(lanMessage);
-    }
+  // Verify that the signature is valid
+  function sendSignatureVerified(payment) {
+    protocolAdaptor.sendSignatureVerified(payment);
+    document.getElementById("signaturePane").style.display = 'none';
+  }
+
+  // Reject the signature - this causes a void
+  function sendSignatureRejected(payment) {
+    protocolAdaptor.sendSignatureRejected(payment);
+    document.getElementById("signaturePane").style.display = 'none';
+  }
+
+  function sendShowThankYouScreen() {
+    protocolAdaptor.sendShowThankYouScreen();
+  }
+
+  function sendShowWelcomeScreen() {
+    protocolAdaptor.sendShowWelcomeScreen();
+  }
+
+  function sendShowReceiptScreen() {
+    protocolAdaptor.sendShowReceiptScreen();
+  }
+
+  function sendTerminalMessage(message) {
+    protocolAdaptor.sendTerminalMessage(message);
+  }
 
 </script>
 </body>

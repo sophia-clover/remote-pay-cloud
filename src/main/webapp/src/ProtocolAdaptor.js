@@ -10,8 +10,12 @@
 function ProtocolAdaptor(messageBuilder) {
     this.messageFunctions = null;
     this.messageBuilder = messageBuilder;
+    this.messageSender = null;
 }
 
+//**************************************************************
+// Functionality to deal with received messages
+//**************************************************************
 /**
  * Map messages to functions based on their 'type' and 'method'
  *
@@ -132,3 +136,103 @@ ProtocolAdaptor.prototype.onBreak = function(message){ this.defaultMessageHandle
 ProtocolAdaptor.prototype.handlePongMessage = function(message){ this.defaultMessageHandle(message);}
 ProtocolAdaptor.prototype.handlePingMessage = function(message){ this.defaultMessageHandle(message);}
 
+//**************************************************************
+// Functionality to deal with sending messages
+//**************************************************************
+
+/**
+ * Set the object that will actually send the messages - basic delegate
+ * @param sender - object with a function "sendMessage(jsonObject)"
+ */
+ProtocolAdaptor.prototype.setMessageSender = function(sender) {
+    this.messageSender = sender;
+}
+
+/**
+ * Delegates to the message sender
+ * @param message a json message.  Typically this function is called by others in this object.
+ */
+ProtocolAdaptor.prototype.sendMessage = function(message) {
+    if(this.messageSender) {
+        this.messageSender.sendMessage(message);
+    } else {
+        console.log("Attempt made to send message, but message sender is not set.");
+    }
+}
+
+
+
+// Send an update to the order to the device.  No idea what the update is,
+// this is just the comms
+/**
+ * Sends an update to the order to the device, and causes it to displ ay the change.
+ *
+ * @param order - the entire order json object
+ */
+ProtocolAdaptor.prototype.sendShowOrderScreen = function(order) {
+    var payload = {
+        "order": JSON.stringify(order)
+    };
+    var lanMessage = protocolAdaptor.messageBuilder.buildShowOrderScreen(payload);
+    this.sendMessage(lanMessage);
+}
+
+// Send a message to start a transaction
+ProtocolAdaptor.prototype.sendTXStart = function(payIntent) {
+
+    // This is how they are doing the payload...
+    var payload = {
+        "payIntent": payIntent
+    };
+
+    var lanMessage = protocolAdaptor.messageBuilder.buildTxStart(payload);
+    this.sendMessage(lanMessage);
+}
+
+// Verify that the signature is valid
+ProtocolAdaptor.prototype.sendSignatureVerified = function(payment) {
+    var payload = {};
+    payload.verified = true;
+    payload.payment = JSON.stringify(payment);
+
+    var lanMessage = protocolAdaptor.messageBuilder.buildSignatureVerified(payload);
+
+    this.sendMessage(lanMessage);
+}
+
+// Reject the signature
+ProtocolAdaptor.prototype.sendSignatureRejected = function(payment) {
+    var payload = {};
+    payload.verified = false;
+    payload.payment = JSON.stringify(payment);
+
+    var lanMessage = protocolAdaptor.messageBuilder.buildSignatureVerified(payload);
+
+    this.sendMessage(lanMessage);
+}
+
+ProtocolAdaptor.prototype.sendFinishCancel = function() {
+    var lanMessage = protocolAdaptor.messageBuilder.buildFinishCancel();
+    this.sendMessage(lanMessage);
+}
+
+ProtocolAdaptor.prototype.sendShowThankYouScreen = function() {
+    var lanMessage = protocolAdaptor.messageBuilder.buildShowThankYouScreen();
+    this.sendMessage(lanMessage);
+}
+
+ProtocolAdaptor.prototype.sendShowWelcomeScreen = function() {
+    var lanMessage = protocolAdaptor.messageBuilder.buildShowWelcomeScreen();
+    this.sendMessage(lanMessage);
+}
+
+ProtocolAdaptor.prototype.sendShowReceiptScreen = function() {
+    var lanMessage = protocolAdaptor.messageBuilder.buildShowReceiptScreen();
+    this.sendMessage(lanMessage);
+}
+
+ProtocolAdaptor.prototype.sendTerminalMessage = function(message) {
+    var payload = {"text" : message};
+    var lanMessage = protocolAdaptor.messageBuilder.buildTerminalMessage(payload);
+    this.sendMessage(lanMessage);
+}

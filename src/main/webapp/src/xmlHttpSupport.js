@@ -17,7 +17,7 @@ function XmlHttpSupport() {
                 }
                 else {
                     // console.log("error");
-                    onError(xmlhttp);
+                    onError("status returned was not 200");
                 }
         }
     }
