@@ -120,7 +120,7 @@
    */
   var config = {
     clientId: 'DCNRDRE3A2VME',  // this is the app id
-    domain: 'http://192.168.0.52:9001/'  // this is the url to the clover domain (http://www.clover.com)
+    domain: 'http://10.249.3.69:9001/'  // this is the url to the clover domain (http://www.clover.com)
   };
 
   /**
@@ -158,10 +158,11 @@
   var protocolAdaptor = new ProtocolAdaptor(remoteMessageBuilder);
 
   // Do not echo the pong message to the console
-  protocolAdaptor.handlePongMessage = function (message) {
-  };
+  //protocolAdaptor.handlePongMessage = function (message) {
+  //};
 
   protocolAdaptor.onFinishCancel = function (message) {
+    ProtocolAdaptor.prototype.onFinishCancel.call(this, message);
     displayUIFeedBack("The user canceled the transaction");
   }
 
@@ -170,6 +171,7 @@
   // This means that the transaction is complete except for
   // an acknowledgement
   protocolAdaptor.onFinishOk = function (message) {
+    ProtocolAdaptor.prototype.onFinishOk.call(this, message);
     var payload = JSON.parse(message.payload);
     var payment = JSON.parse(payload.payment);
 
@@ -197,6 +199,7 @@
 
   // The device got a signature, and the user needs to verify it
   protocolAdaptor.onVerifySignature = function (message) {
+    ProtocolAdaptor.prototype.onVerifySignature.call(this, message);
     var payload = JSON.parse(message.payload);
     var payment = JSON.parse(payload.payment);
     // Already an object...hmmm
@@ -211,6 +214,7 @@
 
   // When the device responds to our discovery request message (see below) then we will assume we are paired.
   protocolAdaptor.onDiscoveryResponse = function (message) {
+    ProtocolAdaptor.prototype.onDiscoveryResponse.call(this, message);
     clearInterval(protocolAdaptor.discoveryTimerId);
     document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
     enable('unpair_button');
@@ -222,16 +226,19 @@
   }
 
   protocolAdaptor.onPrintPayment = function (message) {
+    ProtocolAdaptor.prototype.onPrintPayment.call(this, message);
     displayUIFeedBack("Customer asked for a payment receipt to be printed.");
   }
 
   protocolAdaptor.onUIState = function (message) {
+    ProtocolAdaptor.prototype.onUIState.call(this, message);
     var payload = JSON.parse(message.payload);
     displayUIFeedBack(payload.uiDirection + "-" + payload.uiState + ":" + payload.uiText);
   }
 
   // What do we do with messages we have not specifically handled?
   protocolAdaptor.defaultMessageHandle = function (message) {
+    ProtocolAdaptor.prototype.defaultMessageHandle.call(this, message);
     displayRawMessage(message);
   }
 
@@ -508,13 +515,23 @@
   /**
    * A hardcoded tax rate for the order
    */
-  function getTaxRate() {
+  function getNoTaxRate() {
 
     return {
       "id": "S00VR686JF5CR", // id for tax
       "isDefault": false,
       "rate": 0,
       "name": "NO_TAX_APPLIED"
+    };
+  }
+
+  function getTaxRate() {
+
+    return {
+      "id": "S00VR686JF5CS", // id for tax
+      "isDefault": false,
+      "rate": 10,
+      "name": "10_PCT_TAX_APPLIED"
     };
   }
 
