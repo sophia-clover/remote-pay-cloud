@@ -6,7 +6,7 @@
  * @param protocolAdaptor - must have a function onMessage(message) that expects a json object
  * @constructor
  */
-function WebSocketDevice(protocolAdaptor) {
+function WebSocketDevice() {
     // This is the websocket connection
     this.deviceSocket = null;
     // The id for the ping interval timer so we can stop it
@@ -31,12 +31,7 @@ function WebSocketDevice(protocolAdaptor) {
     // A queue of messages that may be populated while we attempt to reconnect.
     this.resendQueue = [];
 
-    if(protocolAdaptor) {
-        this.protocolAdaptor = protocolAdaptor;
-    }
-    else {
-        this.protocolAdaptor = new ProtocolAdaptor();
-    }
+    this.eventEmitter = new EventEmitter();
 
     this.contactDevice = function(ws_address) {
         var me = this;
@@ -200,15 +195,107 @@ function WebSocketDevice(protocolAdaptor) {
                 this.pong(message);
             }
         }
-        this.protocolAdaptor.onMessage(message);
+        this.eventEmitter.emit(message.method, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
 
+    this.on = function (eventName, callback) {
+        this.eventEmitter.on(eventName, callback);
+    }
 
     this.pong = function() {
         this.pongReceivedMillis = new Date().getTime();
     }
     this.ping = function() {
         this.pingSentMillis = new Date().getTime();
-        this.sendMessage(this.protocolAdaptor.messageBuilder.buildPing());
+        this.sendMessage(this.messageBuilder.buildPing());
     }
+}
+
+WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
+
+
+//**************************************************************
+// Functionality to deal with sending messages
+//**************************************************************
+
+
+// Send an update to the order to the device.  No idea what the update is,
+// this is just the comms
+/**
+ * Sends an update to the order to the device, and causes it to displ ay the change.
+ *
+ * @param order - the entire order json object
+ */
+WebSocketDevice.prototype.sendShowOrderScreen = function(order) {
+    var payload = {
+        "order": JSON.stringify(order)
+    };
+    var lanMessage = this.messageBuilder.buildShowOrderScreen(payload);
+    this.sendMessage(lanMessage);
+}
+
+// Send a message to start a transaction
+WebSocketDevice.prototype.sendTXStart = function(payIntent) {
+
+    // This is how they are doing the payload...
+    var payload = {
+        "payIntent": payIntent
+    };
+
+    var lanMessage = this.messageBuilder.buildTxStart(payload);
+    this.sendMessage(lanMessage);
+}
+
+// Verify that the signature is valid
+WebSocketDevice.prototype.sendSignatureVerified = function(payment) {
+    var payload = {};
+    payload.verified = true;
+    payload.payment = JSON.stringify(payment);
+
+    var lanMessage = this.messageBuilder.buildSignatureVerified(payload);
+
+    this.sendMessage(lanMessage);
+}
+
+// Reject the signature
+WebSocketDevice.prototype.sendSignatureRejected = function(payment) {
+    var payload = {};
+    payload.verified = false;
+    payload.payment = JSON.stringify(payment);
+
+    var lanMessage = this.messageBuilder.buildSignatureVerified(payload);
+
+    this.sendMessage(lanMessage);
+}
+
+WebSocketDevice.prototype.sendFinishCancel = function() {
+    var lanMessage = this.messageBuilder.buildFinishCancel();
+    this.sendMessage(lanMessage);
+}
+
+WebSocketDevice.prototype.sendShowThankYouScreen = function() {
+    var lanMessage = this.messageBuilder.buildShowThankYouScreen();
+    this.sendMessage(lanMessage);
+}
+
+WebSocketDevice.prototype.sendShowWelcomeScreen = function() {
+    var lanMessage = this.messageBuilder.buildShowWelcomeScreen();
+    this.sendMessage(lanMessage);
+}
+
+WebSocketDevice.prototype.sendShowReceiptScreen = function() {
+    var lanMessage = this.messageBuilder.buildShowReceiptScreen();
+    this.sendMessage(lanMessage);
+}
+
+WebSocketDevice.prototype.sendTerminalMessage = function(message) {
+    var payload = {"text" : message};
+    var lanMessage = this.messageBuilder.buildTerminalMessage(payload);
+    this.sendMessage(lanMessage);
+}
+
+WebSocketDevice.prototype.sendDiscoveryRequest = function() {
+    var lanMessage = this.messageBuilder.buildDiscoveryRequest();
+    this.sendMessage(lanMessage);
 }

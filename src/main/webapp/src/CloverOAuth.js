@@ -15,21 +15,6 @@
 
 function CloverOAuth(configuration) {
 
-    // Check the configuration for completeness, default the doamin if needed.
-    if(configuration) {
-        if(!configuration.clientId){
-            var error = new Error("Configuration with clientId required for CloverOAuth creation.");
-            throw error;
-        } else if(!configuration.domain){
-            configuration.domain = CloverOAuth.defaultDomain;
-        }
-        this.configuration = configuration;
-    }
-    else {
-        var error = new Error("Configuration required for CloverOAuth creation.");
-        throw error;
-    }
-
     /**
      * Attempt to get the security token
      * This function attempts to extract an OAuth token from the
@@ -37,18 +22,28 @@ function CloverOAuth(configuration) {
      * It will create/set the userInfo object with associated keys.
      */
     this.getAccessToken = function() {
-        this.userInfo = {};
-        var params = window.location.hash.split('&');
-        var i = 0;
-        while (param = params[i++]) {
-            param = param.split("=");
-            this.userInfo[param[0]] = param[1];
-        }
+        this.parseTokens();
         var token = this.userInfo[CloverOAuth.accessTokenKey];
         if (token == null) {
             this.redirect();
         }
         return token;
+    }
+
+
+    /**
+     *
+     */
+    this.parseTokens = function() {
+        if(!this["userInfo"]) {
+            this.userInfo = {};
+            var params = window.location.hash.split('&');
+            var i = 0;
+            while (param = params[i++]) {
+                param = param.split("=");
+                this.userInfo[param[0]] = param[1];
+            }
+        }
     }
 
     /**
@@ -77,6 +72,39 @@ function CloverOAuth(configuration) {
         }
         return urlParamMap;
     }
+
+    /**
+     *
+     * @returns {boolean} true if the token is set
+     */
+    this.hasToken = function() {
+        this.parseTokens();
+        var nullUI = this.userInfo==null;
+        if(!nullUI) var noToken = this.userInfo[CloverOAuth.accessTokenKey];
+        return nullUI || noToken;
+    }
+
+    this.setConfiguration = function() {
+        // Check the configuration for completeness, default the doamin if needed.
+        if(configuration) {
+            if(!configuration.clientId){
+                configuration.clientId = this.getURLParams("client_id");
+                if(!configuration.clientId) {
+                    var error = new Error("Configuration with clientId required for CloverOAuth creation.");
+                    throw error;
+                }
+            } else if(!configuration.domain){
+                configuration.domain = CloverOAuth.defaultDomain;
+            }
+            this.configuration = configuration;
+        }
+        else {
+            var error = new Error("Configuration required for CloverOAuth creation.");
+            throw error;
+        }
+    }
+
+    this.setConfiguration(configuration);
 }
 
 CloverOAuth.defaultDomain = "http://www.clover.com/";
