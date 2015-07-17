@@ -1,7 +1,7 @@
 Clover Cloud Web Socket Connection Web Application
 ====================================================
 
-[Clover Cloud Connector JS Docs](https://github.com/clover/remote-pay-cloud/tree/master/src/main/webapp/docs)
+[Clover Cloud Connector JS Docs](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html)
 
 This produces a runnable jar that will serve a web application.  The purpose of this repository is to
 illustrate the communication to the device, and stand as a starting point for the protocol integration library.
