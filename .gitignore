@@ -12,7 +12,7 @@ target
 *.swp
 local.properties
 gen/
-out/
+docs/out/
 server/src/test/sql/h2-bootstrap.sql
 server/src/test/resources/h2-bootstrap.sql
 testsuite/src/test/resources/h2-bootstrap.sql

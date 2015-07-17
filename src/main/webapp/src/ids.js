@@ -1,15 +1,14 @@
 /**
  * Create/obtain a new id.
+ *
+ * This is not guaranteed to generate unique ids!
+ *
+ * The set size is 32^12, so it is not likely that the ids will repeat,
+ * but this is done with a random generator, so it is possible
+ *
  */
 function getNewId() {
-// Can we just generate this or does it have to come from the server?
-// Appears that we do this...how do I gen an id in this odd format?  the Java method
-// com.clover.base.Ids#nextBase32Id is used on the server, but it seems a bit involved, why
-// was this done? What was wrong with standard uuids?
-//         01234567890123
-// return "NA6NW8ZPGXAFP";
-
-// http://www.crockford.com/wrmg/base32.html
+    // http://www.crockford.com/wrmg/base32.html
     var BASE_32_DIGITS = [
         '0', '1', '2', '3', '4', '5',
         '6', '7', '8', '9', 'A', 'B',
