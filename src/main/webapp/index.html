@@ -44,7 +44,7 @@
 <!-- Let the user enter their app id and the clover server (it might be a dev server, or their own) -->
 <div id="ouauth_config">
   Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
-  Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth" value="http://10.249.3.69:9001/"/><br/>
+  Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth" value="https://dev1.dev.clover.com/"/><br/>
   <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
 </div>
 
@@ -130,8 +130,8 @@
    * The domain is the url to the clover server
    */
   var config = {
-    clientId: document.getElementById("clientId_oauth").value, // 'DCNRDRE3A2VME',  // this is the app id
-    domain: "http://10.249.3.69:9001/" // this is the url to the clover domain (http://www.clover.com)
+    clientId: document.getElementById("clientId_oauth").value, // '3RPTN642FHXTC', 'DCNRDRE3A2VME',  // this is the app id
+    domain: document.getElementById("cloverUrl_oauth").value //"https://dev1.dev.clover.com/" // this is the url to the clover domain (http://www.clover.com)
   };
 
   /**
@@ -188,14 +188,16 @@
     var device = new WebSocketDevice();
     device.messageBuilder = remoteMessageBuilder;
     // Echo all messages sent and received.
-    device.echoAllMessages = true;
+    device.echoAllMessages = false;
 
     //****************************************
     // Very useful for debugging
     //****************************************
     device.on(WebSocketDevice.ALL_MESSAGES,
         function (message) {
-          displayRawMessage(message);
+          if(message['type'] != 'PONG') {
+            displayRawMessage(message);
+          }
         }
     );
     //****************************************
@@ -301,10 +303,10 @@
     }
 
     // The device connection is ok
-    device.connectionOK = function () {
-      document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
-      console.log('device connection ok');
-    }
+    // device.connectionOK = function () {
+    //  document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
+    //  console.log('device connection ok');
+    // }
 
     // The device connection has been opened
     device.onopen = function () {
@@ -349,7 +351,9 @@
       disable('unpair_button');
       disable('process_flow');
       console.log('device error');
-      displayUIFeedBack("There has been an error on the device connection");
+      displayUIFeedBack("There has been an error on the device connection, will attempt handshake again...");
+
+      handshakeDevice(getSelectedDevice());
     }
 
     //******************************************************
