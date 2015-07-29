@@ -7,13 +7,25 @@
 
   <script src="src/xmlHttpSupport.js"></script>
 
+
   <script src="src/CloverOAuth.js"></script>
   <script src="src/WebSocketDevice.js"></script>
   <script src="src/Endpoints.js"></script>
   <script src="src/ids.js"></script>
   <script src="src/eventemitter3_v1_1_1.js"></script>
   <script src="src/RemoteMessageBuilder.js"></script>
+
+
+
+  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/CloverOAuth.js"></script>-->
+  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/WebSocketDevice.js"></script>-->
+  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/Endpoints.js"></script>-->
+  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/ids.js"></script>-->
+  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/eventemitter3_v1_1_1.js"></script>-->
+  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/RemoteMessageBuilder.js"></script>-->
   <script type="text/javascript">
+
+
   </script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
@@ -37,14 +49,17 @@
 
 <!-- this is a place to talk about what is happening while the example is being run -->
 <div id="uiFeedback" style="">
-  You need to enter your client id and the clover server url.  Your client id can be found on the 'Your Apps'
+  You need to enter your client id and the clover server url. Your client id can be found on the 'Your Apps'
   page on the app as "App ID".
 </div>
 
 <!-- Let the user enter their app id and the clover server (it might be a dev server, or their own) -->
 <div id="ouauth_config">
-  Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
-  Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth" value="https://dev1.dev.clover.com/"/><br/>
+  Client ID: <input type="text" id="clientId_oauth" value="3RPTN642FHXTC"/><br/>
+  Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth"
+                            <!--value="http://10.250.0.17:9001/"/>-->
+                            value="http://dev1.dev.clover.com/"/>
+  <br/>
   <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
 </div>
 
@@ -96,7 +111,9 @@
   <p id="add_item" style="display:none">
     <button onclick="addBikeToOrder(currentOrder)">Add a Bike to the Order</button>
     <button onclick="addCustomItemToOrder(currentOrder, 150)">Add a $1.50 custom item to the order</button>
-    <button onclick="if(currentOrder)device.sendShowOrderScreen(currentOrder)">Show the order screen (if there is a current order)</button>
+    <button onclick="if(currentOrder)device.sendShowOrderScreen(currentOrder)">Show the order screen (if there is a
+      current order)
+    </button>
   </p>
 
   <p id="check_out" style="display:none">
@@ -150,7 +167,7 @@
     cloverOAuth.getAccessToken();
   }
 
-  if(!cloverOAuth.hasToken()){
+  if (!cloverOAuth.hasToken()) {
     // Get user to enter clientId and domain
   }
   else {
@@ -195,7 +212,7 @@
     //****************************************
     device.on(WebSocketDevice.ALL_MESSAGES,
         function (message) {
-          if(message['type'] != 'PONG') {
+          if (message['type'] != 'PONG') {
             displayRawMessage(message);
           }
         }
