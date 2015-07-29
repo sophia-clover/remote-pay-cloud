@@ -28,6 +28,7 @@ The web application uses javascript WebSocket objects, so the browser you use mu
     9.  Expand the "Web App" 'App Type' section
     1.  Enter the site url of your app (EX:  http://myserver/myapplication)
     2.  Enter the CORS domain as the same as your app (EX: http://myserver/myapplication)
+    2.  Select "Token" for the oauth response.
     3.  Select an App Icon
     4.  Enter a tagline.
     4.  Enter a description.
@@ -37,15 +38,6 @@ The web application uses javascript WebSocket objects, so the browser you use mu
     9.  Under 'Availability' check each item.
     1.  Under 'Legal & Privacy' enter a url for your site. (EX:  http://myserver/myapplication/legal_privacy.html)
     2.  Select [Save]
-    
-## Configure the Example Application    
-    
-1.  On the "Your Apps" page, find the "App ID:", and copy it.  
-2.  In the src/CloverOAuth.js file, replace the value of config.clientId with the value of your new App ID.
-2.  In the src/CloverOAuth.js file, ensure the value of config.domain is set to the url of the clover server.
-       
-       
-Make sure the web socket app is installed for your merchant on your device.
     
 ## Build and run the Example Application
     
@@ -59,3 +51,14 @@ Run the app inside a jetty container
 ```
 java -jar target/dependency/jetty-runner.jar target/*.war
 ```
+
+## Configure the Example Application    
+    
+1.  Make sure the web socket app is installed for your merchant on your device.
+2.  On the "Your Apps" page, find the "App ID:", and copy it. <a href="myapps.png"><img src="myapps.png" width="200"></a>
+2.  Go to the web page for the example app.  http://<yourserver:8080
+3.  Enter the client id on the page. <a href="webpageClientid.png"><img src="webpageClientid.png" width="200"></a>
+4.  Begin the test by authenticating.
+       
+       
+    

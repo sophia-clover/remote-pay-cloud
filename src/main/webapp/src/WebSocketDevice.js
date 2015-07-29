@@ -19,7 +19,7 @@ function WebSocketDevice() {
     // The last time a ping was sent.
     this.pingSentMillis = 0;
     // How often a ping is sent
-    this.millisecondsBetweenPings = 5000; // 5 seconds
+    this.millisecondsBetweenPings = 10000; // 5 seconds
     // How long should it be before we warn on a dead connection
     this.deadConnectionWarnThreshold = this.millisecondsBetweenPings * 3;
     // How long should it be before we error on a dead connection
@@ -28,7 +28,7 @@ function WebSocketDevice() {
     this.reconnect = true;
     this.reconnectAttempts = 0;
     this.numberOfReconnectAttemptsBeforeWeGiveUp = 20;
-    this.timebetweenReconnectAttempts = 3000;
+    this.timebetweenReconnectAttempts = 6000;
     // A queue of messages that may be populated while we attempt to reconnect.
     this.resendQueue = [];
 
@@ -82,7 +82,8 @@ function WebSocketDevice() {
                             }, me.timebetweenReconnectAttempts );
                     }
                     else {
-                        console.error("Exceeded number of reconnect attempts, giving up");
+                        console.error("Exceeded number of reconnect attempts, giving up. There are " +
+                            me.resendQueue.length + " messages that were queued, but not sent.");
                         me.reconnectAttempts = 0;
                         me.onerror(event);
                     }
@@ -217,7 +218,7 @@ function WebSocketDevice() {
             }
         }
         else {
-            if(this.resendQueue.length > 0) {
+            while(this.resendQueue.length > 0) {
                 this.deviceSocket.send(this.resendQueue.shift());
             }
             this.deviceSocket.send(stringMessage);
