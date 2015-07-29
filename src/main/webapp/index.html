@@ -42,7 +42,7 @@
 <!-- Let the user enter their app id and the clover server (it might be a dev server, or their own) -->
 <div id="ouauth_config">
   Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
-  Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth" value="http://10.249.3.69:9001/"/><br/>
+  Clover Server URL: <input type="text" id="cloverUrl_oauth" value="https://dev1.dev.clover.com/"/><br/>
   <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
 </div>
 
@@ -128,8 +128,8 @@
    * The domain is the url to the clover server
    */
   var config = {
-    clientId: document.getElementById("clientId_oauth").value, // 'DCNRDRE3A2VME',  // this is the app id
-    domain: "http://10.249.3.69:9001/" // this is the url to the clover domain (http://www.clover.com)
+    clientId: document.getElementById("clientId_oauth").value, // this is the app id
+    domain: document.getElementById("cloverUrl_oauth").value   // this is the url to the clover domain (https://www.clover.com)
   };
 
   /**
