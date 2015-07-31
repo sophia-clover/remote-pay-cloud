@@ -32,3 +32,7 @@ Run the app inside a jetty container:
 ```
 java -jar target/dependency/jetty-runner.jar target/*.war
 ```
+
+## Make a Transaction
+
+View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the details of the JS SDK protocol for showing order details, starting a transaction, and getting a payment response back from the Clover device.
