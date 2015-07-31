@@ -5,6 +5,7 @@ The purpose of this repository is to illustrate the communication of your web ap
 This produces a runnable jar that will serve a web application. There are several prerequisites that must be set up for this to work:
 - The web application is served by Jetty, so you need a JDK installed.
 - The web application uses JavaScript WebSocket objects, so the browser you use must support WebSockets. See [WebSocket Browser Support](http://caniuse.com/#feat=websockets).
+- To complete a transaction end-to-end, we recommend getting a [Clover Mini Dev Kit](http://cloverdevkit.com/collections/devkits/products/clover-mini-dev-kit).
 
 ## Create a Clover Application
 
