@@ -26,3 +26,11 @@ function getNewId() {
     return id;
 }
 
+
+function getNewTransactionNo() {
+    // Not sure about whatthis can be.
+    return Math.floor(Math.random() * 32000);
+}
+
+
+

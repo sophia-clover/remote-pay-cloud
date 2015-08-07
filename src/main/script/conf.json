@@ -1,10 +1,7 @@
 {
-  "tags": {
-    "allowUnknownTags": true,
-    "dictionaries": ["jsdoc","closure"]
-  },
   "source": {
     "include": [
+      "../webapp/src/Clover.js",
       "../webapp/src/CloverOAuth.js",
       "../webapp/src/Endpoints.js",
       "../webapp/src/RemoteMessageBuilder.js",
@@ -12,10 +9,5 @@
     ],
     "includePattern": ".+\\.js(doc)?$",
     "excludePattern": "(^|\\/|\\\\)_"
-  },
-  "plugins": [],
-  "templates": {
-    "cleverLinks": false,
-    "monospaceLinks": false
   }
 }

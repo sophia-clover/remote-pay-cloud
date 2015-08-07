@@ -96,6 +96,10 @@
     <button onclick="device.sendShowWelcomeScreen()">Show Welcome</button>
 
     <button onclick="device.sendShowReceiptScreen()">Put options for receipt for last order on device</button>
+
+    <button onclick="device.sendPaymentVoid(lastPaymentDetails)">Void the last payment we saw.</button>
+
+    <button onclick="device.sendPrintText(['line 1', 'line2', 'A much longer line 3 that demonstartes the effect you will see when you try to print a very long line of text'])">Print some text</button>
   </p>
 
   <p id="add_item" style="display:none">
@@ -177,6 +181,7 @@
      * Payment details used during the process.  This object is used during signature verification/rejection.
      */
     var paymentDetails = null;
+    var lastPaymentDetails = null;
 
     // the map of available devices
     var deviceBySerial;
@@ -232,6 +237,7 @@
           var payment = JSON.parse(payload.payment);
 
           displayPaymentDetails(payment);
+          lastPaymentDetails = payment;
 
           device.sendShowThankYouScreen();
 
@@ -609,8 +615,6 @@
 
     function createNewOrder() {
       var orderId = getNewId();
-      var merchantId = cloverOAuth.getURLParams()["merchant_id"];
-      var employeeId = cloverOAuth.getURLParams()["employee_id"];
 
       return {
         // "href": "http://192.168.0.52:9001/v3/merchants/" + merchantId + "/orders/" + orderId,

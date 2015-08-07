@@ -14,15 +14,6 @@
   <script src="src/ids.js"></script>
   <script src="src/eventemitter3_v1_1_1.js"></script>
   <script src="src/RemoteMessageBuilder.js"></script>
-
-
-
-  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/CloverOAuth.js"></script>-->
-  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/WebSocketDevice.js"></script>-->
-  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/Endpoints.js"></script>-->
-  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/ids.js"></script>-->
-  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/eventemitter3_v1_1_1.js"></script>-->
-  <!--<script src="http://10.250.0.17:9001/web/cloudadaptor/RemoteMessageBuilder.js"></script>-->
   <script type="text/javascript">
 
 
@@ -55,26 +46,6 @@
     <li>Enter the address and port displayed on the device into the "Device Location" below and select the [Pair Device] button.</li>
   </ol>
 </div>
-
-<!--&lt;!&ndash; Let the user enter their app id and the clover server (it might be a dev server, or their own) &ndash;&gt;-->
-<!--<div id="ouauth_config">-->
-<!--Client ID: <input type="text" id="clientId_oauth" value="3RPTN642FHXTC"/><br/>-->
-<!--Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth"-->
-<!--value="http://10.250.0.17:9001/"/>-->
-<!--<br/>-->
-<!--&lt;!&ndash;value="http://10.250.0.17:9001/"/>&ndash;&gt;-->
-<!--&lt;!&ndash;value="http://dev1.dev.clover.com/"/>&ndash;&gt;-->
-<!--<button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>-->
-<!--</div>-->
-
-<!--&lt;!&ndash; A container to put the device(s) into to allow the user to select one for use &ndash;&gt;-->
-<!--<div id="device_box" style="display:none">-->
-<!--<h2>Devices For Your Merchant</h2>-->
-
-<!--<form id="deviceForm">-->
-<!--<div id="id01"></div>-->
-<!--</form>-->
-<!--</div>-->
 
 <!-- controls to 'pair' or 'unpair' the device -->
 <p id="pair_device" style="display:block">
@@ -112,6 +83,10 @@
     <button onclick="device.sendShowWelcomeScreen()">Show Welcome</button>
 
     <button onclick="device.sendShowReceiptScreen()">Put options for receipt for last order on device</button>
+
+    <button onclick="device.sendPaymentVoid(lastPaymentDetails)">Void the last payment we saw.</button>
+
+    <button onclick="device.sendPrintText(['line 1', 'line2', 'A much longer line 3 that demonstartes the effect you will see when you try to print a very long line of text'])">Print some text</button>
   </p>
 
   <p id="add_item" style="display:none">
@@ -146,40 +121,6 @@
 
 <script>
 
-  /**
-   * This is the configuration for the app.  These values must be set.
-   *
-   * The clientId is the web app id for your clover application.
-   * The domain is the url to the clover server
-   */
-  //  var config = {
-  //    clientId: document.getElementById("clientId_oauth").value, // '3RPTN642FHXTC', 'DCNRDRE3A2VME',  // this is the app id
-  //    domain: document.getElementById("cloverUrl_oauth").value //"https://dev1.dev.clover.com/" // this is the url to the clover domain (http://www.clover.com)
-  //  };
-
-  /**
-   * This is a utility to make the oauth process simpler.
-   *
-   */
-//  var cloverOAuth = new CloverOAuth(config);
-
-
-//  function checkOAuth() {
-//    var newConfig = {
-//      clientId: document.getElementById("clientId_oauth").value, // 'DCNRDRE3A2VME',  // this is the app id
-//      domain: document.getElementById("cloverUrl_oauth").value // this is the url to the clover domain (http://www.clover.com)
-//    };
-//    var cloverOAuth = new CloverOAuth(newConfig);
-//    cloverOAuth.getAccessToken();
-//  }
-//
-//  if (!cloverOAuth.hasToken()) {
-//    // Get user to enter clientId and domain
-//  }
-//  else {
-
-    // disable("ouauth_config");
-    // enable("device_box");
   displayUIFeedBack("You need to select the device to communicate with.");
 
   /**
@@ -193,6 +134,7 @@
    * Payment details used during the process.  This object is used during signature verification/rejection.
    */
   var paymentDetails = null;
+  var lastPaymentDetails = null;
 
   // the map of available devices
   var deviceBySerial;
@@ -248,6 +190,7 @@
         var payment = JSON.parse(payload.payment);
 
         displayPaymentDetails(payment);
+        lastPaymentDetails = payment;
 
         device.sendShowThankYouScreen();
 
@@ -625,8 +568,6 @@
 
   function createNewOrder() {
     var orderId = getNewId();
-//      var merchantId = cloverOAuth.getURLParams()["merchant_id"];
-//      var employeeId = cloverOAuth.getURLParams()["employee_id"];
 
     return {
       // "href": "http://192.168.0.52:9001/v3/merchants/" + merchantId + "/orders/" + orderId,
