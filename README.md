@@ -36,4 +36,41 @@ java -jar target/dependency/jetty-runner.jar target/*.war
 
 ## Make a Transaction
 
-View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the details of the JS SDK protocol for showing order details, starting a transaction, and getting a payment response back from the Clover device.
+###High Level API
+To make a payment using the High Level Cloud API
+####Create the Clover object.
+```
+var clover = new Clover(configuration);
+```
+
+There are several ways the Clover object can be configured. See the [Clover](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/Clover.html)
+documentation for details on the [CloverConfig](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/global.html#CloverConfig)
+object and how to set up your connection.
+
+####Start communicating with the device
+```
+clover.initDeviceConnection();
+```
+
+####Tell the device to call your program when it is ready
+```
+clover.notifyWhenDeviceIsReady(makeASale);
+```
+
+####Have your program use the clover object
+```
+function makeASale() {
+  clover.sale({"amount" : 12345, "tipAmount" : 123, "orderId" : "123456789012"}, mySaleResult);
+}
+```
+
+```
+function mySaleResult(success, saleResult) {
+  // do something with the result
+}
+```
+
+
+View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 
+details of the JS SDK protocol for showing order details, starting a transaction, and getting a payment response back 
+from the Clover device.
