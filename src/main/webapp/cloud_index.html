@@ -39,7 +39,7 @@
 
 
 <!-- this is a place to talk about what is happening while the example is being run -->
-<div id="uiFeedback" style="">
+<div id="uiFeedback" style="height: 200px;">
   You need to enter your client id and the clover server url. Your client id can be found on the 'Your Apps'
   page on the app as "App ID".
 </div>
@@ -154,7 +154,7 @@
 
   function checkOAuth() {
     var newConfig = {
-      clientId: document.getElementById("clientId_oauth").value, // 'DCNRDRE3A2VME',  // this is the app id
+      clientId: document.getElementById("clientId_oauth").value, // this is the app id
       domain: document.getElementById("cloverUrl_oauth").value // this is the url to the clover domain (http://www.clover.com)
     };
     var cloverOAuth = new CloverOAuth(newConfig);
@@ -315,12 +315,6 @@
       document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'yellow';
     }
 
-    // The device connection is ok
-    // device.connectionOK = function () {
-    //  document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
-    //  console.log('device connection ok');
-    // }
-
     // The device connection has been opened
     device.onopen = function () {
       // The connection to the device is open, but we do not yet know if there is anyone at the other end.
@@ -378,7 +372,7 @@
     var xmlHttpSupport = new XmlHttpSupport();
     //******************************************************
 
-    // Endpoints for the REST sefvices
+    // Endpoints for the REST services
     var endpoints = new Endpoints(cloverOAuth);
 
     // Load the devices for the merchant
@@ -554,16 +548,6 @@
     /**
      * A hardcoded tax rate for the order
      */
-    function getNoTaxRate() {
-
-      return {
-        "id": "S00VR686JF5CR", // id for tax
-        "isDefault": false,
-        "rate": 0,
-        "name": "NO_TAX_APPLIED"
-      };
-    }
-
     function getTaxRate() {
 
       return {
@@ -598,17 +582,9 @@
 
     function getCustomLineItem(amt) {
       var lineItem = {
-        //"exchanged": false,
         "id": getNewId(),
-        //"refunded": false,
         "price": amt,
-        //"binName": null,
-        //"createdTime": new Date().getTime(),
-        "name": "Custom Item"//,
-        //"printed": false,
-        //"userData": null,
-        //"note": null,
-        //"alternateName": ""
+        "name": "Custom Item"
       };
       return lineItem;
     }
@@ -617,20 +593,7 @@
       var orderId = getNewId();
 
       return {
-        // "href": "http://192.168.0.52:9001/v3/merchants/" + merchantId + "/orders/" + orderId,
-        "id": orderId//,
-        // "currency": "USD",
-        //"employee": {
-        //  "id": employeeId
-        //},
-        //"taxRemoved": false,
-        //"isVat": false,
-        //"manualTransaction": false,
-        //"groupLineItems": true,
-        //"testMode": false,
-        //"createdTime": new Date().getTime(),
-        //"clientCreatedTime": new Date().getTime(),
-        //"modifiedTime": new Date().getTime()
+        "id": orderId
       };
     }
 
@@ -641,21 +604,7 @@
         "transactionType": "PAYMENT",
         "transactionNo": 300010,
         "orderId": currentOrder.id,
-        //      "taxableAmountRateList": [
-        //        JSON.stringify(
-        //            {
-        //              "id": getTaxRate().id,
-        //              "taxableAmount": currentOrder.total,
-        //              "rate": 0,
-        //              "name": getTaxRate().name
-        //            }
-        //        )
-        //      ],
         "taxAmount": 0,
-        // "remotePrint": true,
-        // "isTesting": false,
-        // "isDisableCashBack": false,
-        // "isCardNotPresent": false,
         "cardEntryMethods": 15
       };
     }
