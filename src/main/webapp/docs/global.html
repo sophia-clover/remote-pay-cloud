@@ -392,7 +392,333 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line401">line 401</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line494">line 494</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="CloverConfig">CloverConfig</h4>
+
+
+
+
+<div class="description">
+    The configuration for the Clover api object.  This encapsulates the different ways that the Clover object can
+be configured for proper access to the device.
+
+<p>
+    Possible configurations:<br/>
+    <ol>
+         <li>deviceURL (Only valid when device is in Local Pay Display app configuration)</li>
+         <li>oauthToken, domain, merchantId, deviceId</li>
+         <li>oauthToken, domain, merchantId, deviceSerialId</li>
+         <li>clientId, domain, merchantId, deviceId (Requires log in to Clover server)</li>
+         <li>clientId, domain, merchantId, deviceSerialId (Requires log in to Clover server)</li>
+    </ol>
+</p>
+</div>
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>deviceURL</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the web socket url to use when connecting to the device.  Optional
+ if other configuration values allow this to be obtained.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>oauthToken</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the authentication token used when communicating with the clover cos
+ server.  Required if deviceURL is not set. Optional if other configuration values allow this
+ to be obtained.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>domain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the url to the clover cos server.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>merchantId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the merchant id.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>deviceId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the unique device identifier for the merchant device.  This identifies
+ the device that will be used</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>deviceSerialId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the serial id of the device to use.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clientId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the Clover application id to use when obtaining the oauth token.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line533">line 533</a>
     </li></ul></dd>
     
 
@@ -706,7 +1032,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line390">line 390</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line483">line 483</a>
     </li></ul></dd>
     
 
@@ -849,7 +1175,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line433">line 433</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line526">line 526</a>
     </li></ul></dd>
     
 
@@ -1013,7 +1339,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line355">line 355</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line447">line 447</a>
     </li></ul></dd>
     
 
@@ -1080,6 +1406,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1105,6 +1433,12 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+                </td>
+            
 
             
 
@@ -1115,7 +1449,7 @@
 
         <tr>
             
-                <td class="name"><code>tipamount</code></td>
+                <td class="name"><code>tipAmount</code></td>
             
 
             <td class="type">
@@ -1128,6 +1462,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
 
             
 
@@ -1138,7 +1480,7 @@
 
         <tr>
             
-                <td class="name"><code>orderid</code></td>
+                <td class="name"><code>orderId</code></td>
             
 
             <td class="type">
@@ -1150,6 +1492,12 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+                </td>
             
 
             
@@ -1161,7 +1509,7 @@
 
         <tr>
             
-                <td class="name"><code>employeeid</code></td>
+                <td class="name"><code>employeeId</code></td>
             
 
             <td class="type">
@@ -1174,10 +1522,19 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">the employee making this sale.</td>
+            <td class="description last">the valid Clover id of an employee recognized by the device.  Represents the
+ employee making this sale.</td>
         </tr>
 
     
@@ -1216,7 +1573,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line363">line 363</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line455">line 455</a>
     </li></ul></dd>
     
 
@@ -1380,7 +1737,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line382">line 382</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line475">line 475</a>
     </li></ul></dd>
     
 
@@ -1482,7 +1839,7 @@
 
         <tr>
             
-                <td class="name"><code></code></td>
+                <td class="name"><code>payment</code></td>
             
 
             <td class="type">
@@ -1505,7 +1862,7 @@
 
         <tr>
             
-                <td class="name"><code></code></td>
+                <td class="name"><code>signature</code></td>
             
 
             <td class="type">
@@ -1560,7 +1917,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line373">line 373</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line466">line 466</a>
     </li></ul></dd>
     
 
@@ -1727,7 +2084,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line419">line 419</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line512">line 512</a>
     </li></ul></dd>
     
 
@@ -1851,7 +2208,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line428">line 428</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line521">line 521</a>
     </li></ul></dd>
     
 
@@ -1887,7 +2244,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Mon Aug 10 2015 10:06:21 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Mon Aug 10 2015 17:16:54 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>
