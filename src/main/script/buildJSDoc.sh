@@ -1,0 +1,1 @@
+~/sources/jsdoc/jsdoc --readme ../../../README.md -d ../webapp/docs -c ./conf.json

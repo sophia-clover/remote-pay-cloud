@@ -1,0 +1,13 @@
+{
+  "source": {
+    "include": [
+      "../webapp/src/Clover.js",
+      "../webapp/src/CloverOAuth.js",
+      "../webapp/src/Endpoints.js",
+      "../webapp/src/RemoteMessageBuilder.js",
+      "../webapp/src/WebSocketDevice.js"
+    ],
+    "includePattern": ".+\\.js(doc)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  }
+}
