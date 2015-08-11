@@ -255,6 +255,18 @@ function WebSocketDevice() {
         this.eventEmitter.on(eventName, callback);
     }
 
+    /**
+     * Registers event callbacks for message method types.
+     *
+     * @see LanMethod
+     *
+     * @param {string} eventName - one of the LanMethod types
+     * @param {function} callback - the function called with the event data
+     */
+    this.once = function (eventName, callback) {
+        this.eventEmitter.once(eventName, callback);
+    }
+
     this.pong = function() {
         this.pongReceivedMillis = new Date().getTime();
     }
@@ -340,6 +352,22 @@ WebSocketDevice.prototype.sendSignatureRejected = function(payment) {
     this.sendMessage(lanMessage);
 }
 
+// Reject the signature
+/**
+ * Verify that the signature is NOT valid
+ *
+ * @param {json} payment - the payment object with signature verification fields populated (negatively)
+ */
+WebSocketDevice.prototype.sendPaymentVoid = function(payment) {
+    var payload = {};
+    payload.payment = JSON.stringify(payment);
+    payload.voidReason = "USER_CANCEL";
+
+    var lanMessage = this.messageBuilder.buildPaymentVoid(payload);
+
+    this.sendMessage(lanMessage);
+}
+
 /**
  * Send a cancellation message
  *
@@ -389,5 +417,16 @@ WebSocketDevice.prototype.sendTerminalMessage = function(message) {
  */
 WebSocketDevice.prototype.sendDiscoveryRequest = function() {
     var lanMessage = this.messageBuilder.buildDiscoveryRequest();
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * Send a message to ask the device if it is there.
+ * @param textLines - an  array of strings
+ */
+WebSocketDevice.prototype.sendPrintText = function(textLines) {
+    //List<String> textLines
+    var payload = {"textLines" : textLines};
+    var lanMessage = this.messageBuilder.buildPrintText(payload);
     this.sendMessage(lanMessage);
 }

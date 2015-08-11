@@ -65,6 +65,17 @@ function RemoteMessageBuilder(defaultPackageName){
     }
 
     /**
+     * Builds a signature verified message
+     *
+     * @param {json} payload - the signature verified object
+     * @returns {json} the constructed message
+     */
+    this.buildPaymentVoid = function(payload) {
+        payload.method = LanMethod.PAYMENT_VOIDED;
+        return this.buildRemoteMessage(LanMethod.PAYMENT_VOIDED, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a terminal message (display message for device)
      *
      * @param {json} payload - the message
@@ -73,6 +84,17 @@ function RemoteMessageBuilder(defaultPackageName){
     this.buildTerminalMessage = function(payload) {
         payload.method = LanMethod.TERMINAL_MESSAGE;
         return this.buildRemoteMessage(LanMethod.TERMINAL_MESSAGE, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
+     * Builds a terminal message (display message for device)
+     *
+     * @param {json} payload - the message
+     * @returns {json} the constructed message
+     */
+    this.buildPrintText = function(payload) {
+        payload.method = LanMethod.PRINT_TEXT;
+        return this.buildRemoteMessage(LanMethod.PRINT_TEXT, RemoteMessageBuilder.COMMAND, payload);
     }
 
     /**
