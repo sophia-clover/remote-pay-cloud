@@ -97,6 +97,17 @@ function RemoteMessageBuilder(defaultPackageName){
     }
 
     /**
+     * Builds a terminal message (display message for device)
+     *
+     * @param {json} payload - the message
+     * @returns {json} the constructed message
+     */
+    this.buildPrintImage = function(payload) {
+        payload.method = LanMethod.PRINT_IMAGE;
+        return this.buildRemoteMessage(LanMethod.PRINT_IMAGE, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a message to send to the device to make it show the welcome screen
      *
      * @returns {json} the constructed message

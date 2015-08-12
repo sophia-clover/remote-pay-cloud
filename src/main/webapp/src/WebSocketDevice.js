@@ -451,3 +451,37 @@ WebSocketDevice.prototype.sendShutdown = function() {
     var lanMessage = this.messageBuilder.buildShutdown();
     this.sendMessage(lanMessage);
 }
+
+/**
+ * Send a message to ask the device if it is there.
+ * @param textLines - an  array of strings
+ */
+WebSocketDevice.prototype.sendPrintImage = function(img) {
+    var payload = {"png" : getBase64Image(img) };
+    var lanMessage = this.messageBuilder.buildPrintImage(payload);
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * @private
+ * @param img
+ * @returns {string}
+ */
+function getBase64Image(img) {
+    // Create an empty canvas element
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // Copy the image contents to the canvas
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    // Get the data-URL formatted image
+    // Firefox supports PNG and JPEG. You could check img.src to
+    // guess the original format, but be aware the using "image/jpg"
+    // will re-encode the image.
+    var dataURL = canvas.toDataURL("image/png");
+
+    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
