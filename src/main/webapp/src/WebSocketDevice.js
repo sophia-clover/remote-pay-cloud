@@ -182,9 +182,7 @@ function WebSocketDevice() {
      */
     this.disconnectFromDevice = function() {
         clearInterval(this.pingIntervalId);
-
-        var lanMessage = this.messageBuilder.buildShutdown();
-        this.sendMessage(lanMessage);
+        this.sendShutdown();
     }
 
     /**
@@ -192,7 +190,13 @@ function WebSocketDevice() {
      * @private
      */
     this.attemptReconnect = function() {
-        this.disconnectFromDevice();
+        {
+            // Disconnect without telling the peer that we
+            // wantto, because it appears
+            // the connection may have gone stale.
+            clearInterval(this.pingIntervalId);
+            this.deviceSocket.close();
+        }
         this.reconnecting = true;
         console.log("attempting reconnect...");
         this.contactDevice(this.deviceSocket.url);

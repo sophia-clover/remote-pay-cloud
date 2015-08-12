@@ -33,6 +33,15 @@ function Clover(configuration) {
     );
 
     /**
+     * Closes the connection to the Clover device.
+     */
+    this.close = function () {
+        if(this.device) {
+            this.device.sendShutdown();
+        }
+    }
+
+    /**
      *  The deviuce connection is NOT made on completion of this call.  The device connection
      *  will be made once the WebSocketDevice.onopen is called.
      */
