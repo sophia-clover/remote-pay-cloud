@@ -1,0 +1,78 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <script src="src/xmlHttpSupport.js"></script>
+
+  <script src="src/Clover.js"></script>
+  <script src="src/CardEntryMethods.js"></script>
+  <script src="src/CloverOAuth.js"></script>
+  <script src="src/WebSocketDevice.js"></script>
+  <script src="src/Endpoints.js"></script>
+  <script src="src/ids.js"></script>
+  <script src="src/eventemitter3_v1_1_1.js"></script>
+  <script src="src/RemoteMessageBuilder.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body>
+
+<p>
+  This is a simple Example of the Clover High Level Cloud API.  It relies on the device to be running the
+  Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
+  previously obtained.  It makes a connection to a device, prints the image you see below.
+</p>
+
+<div>
+  <img id="rct_img" src="img/clover.png" alt="Clover"/>
+</div>
+
+<script>
+
+  // Create the Clover object to communicate with the device
+  var clover = new Clover(
+      {
+        "oauthToken" : "568e3141-f4a1-472e-a52d-036b2d7bd040",
+        "domain" : "https://dev1.dev.clover.com/",
+        "merchantId" : "BBFF8NBCXEMDT",
+        "deviceId" : "6bd54a27-28ce-e8f2-213c-6159deafb6f3"
+      });
+
+  imageIsLoaded = false
+  // Make sure the image is fully loaded.
+  document.getElementById("rct_img").addEventListener("load", function() { imageLoaded(); });
+
+  // Start communication
+  clover.initDeviceConnection();
+
+  deviceIsReady = false;
+  // When the device is ready, use it
+  clover.notifyWhenDeviceIsReady(deviceReady);
+
+  function imageLoaded() {
+    imageIsLoaded = true;
+    if(deviceIsReady) {
+      printImg();
+    }
+  }
+
+  function deviceReady() {
+    deviceIsReady = true;
+    if(imageIsLoaded) {
+      printImg();
+    }
+  }
+
+  // This will be called when the device is ready
+  function printImg() {
+    var theImg = document.getElementById("rct_img");
+    clover.printImage(theImg);
+  }
+</script>
+
+</body>
+</html>
