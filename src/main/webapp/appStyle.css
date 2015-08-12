@@ -37,10 +37,6 @@ button:active {
     position:relative;
     top:1px;
 }
-
-
-
-
 .device_disabled {
     color: #dddddd;
     font-style: italic;
@@ -52,4 +48,8 @@ button:active {
     border-radius: 25px;
     border: 2px solid #080808;
     padding: 20px;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
 }

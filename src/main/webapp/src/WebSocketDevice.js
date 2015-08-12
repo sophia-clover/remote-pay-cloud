@@ -182,7 +182,7 @@ function WebSocketDevice() {
      */
     this.disconnectFromDevice = function() {
         clearInterval(this.pingIntervalId);
-        this.deviceSocket.close();
+        this.sendShutdown();
     }
 
     /**
@@ -190,7 +190,13 @@ function WebSocketDevice() {
      * @private
      */
     this.attemptReconnect = function() {
-        this.disconnectFromDevice();
+        {
+            // Disconnect without telling the peer that we
+            // wantto, because it appears
+            // the connection may have gone stale.
+            clearInterval(this.pingIntervalId);
+            this.deviceSocket.close();
+        }
         this.reconnecting = true;
         console.log("attempting reconnect...");
         this.contactDevice(this.deviceSocket.url);
@@ -236,7 +242,10 @@ function WebSocketDevice() {
         }
         if(message.hasOwnProperty("type")) {
             if(message["type"] == RemoteMessageBuilder.PONG) {
-                this.pong(message);
+                this.pongReceived(message);
+            }
+            if(message["type"] == RemoteMessageBuilder.PING) {
+                this.pingReceived(message);
             }
         }
         this.eventEmitter.emit(message.method, message);
@@ -267,8 +276,15 @@ function WebSocketDevice() {
         this.eventEmitter.once(eventName, callback);
     }
 
-    this.pong = function() {
+    this.pongReceived = function() {
         this.pongReceivedMillis = new Date().getTime();
+    }
+    this.pingReceived = function() {
+        this.pong();
+    }
+    this.pong = function() {
+        this.pingSentMillis = new Date().getTime();
+        this.sendMessage(this.messageBuilder.buildPong());
     }
     this.ping = function() {
         this.pingSentMillis = new Date().getTime();
@@ -429,4 +445,47 @@ WebSocketDevice.prototype.sendPrintText = function(textLines) {
     var payload = {"textLines" : textLines};
     var lanMessage = this.messageBuilder.buildPrintText(payload);
     this.sendMessage(lanMessage);
+}
+
+/**
+ * Send a message to ask the device if it is there.
+ * @param textLines - an  array of strings
+ */
+WebSocketDevice.prototype.sendShutdown = function() {
+    var lanMessage = this.messageBuilder.buildShutdown();
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * Send a message to ask the device if it is there.
+ * @param textLines - an  array of strings
+ */
+WebSocketDevice.prototype.sendPrintImage = function(img) {
+    var payload = {"png" : getBase64Image(img) };
+    var lanMessage = this.messageBuilder.buildPrintImage(payload);
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * @private
+ * @param img
+ * @returns {string}
+ */
+function getBase64Image(img) {
+    // Create an empty canvas element
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // Copy the image contents to the canvas
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    // Get the data-URL formatted image
+    // Firefox supports PNG and JPEG. You could check img.src to
+    // guess the original format, but be aware the using "image/jpg"
+    // will re-encode the image.
+    var dataURL = canvas.toDataURL("image/png");
+
+    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
