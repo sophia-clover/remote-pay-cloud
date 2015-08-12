@@ -1,4 +1,3 @@
-
 /**
  * Builds messages to pass to the clover device.
  *
@@ -162,6 +161,24 @@ function RemoteMessageBuilder(defaultPackageName){
     this.buildPing = function() {
         return this.buildRemoteMessage(null, RemoteMessageBuilder.PING);
     }
+
+    /**
+     * @private
+     * @returns {json} the ping message
+     */
+    this.buildPong = function() {
+        return this.buildRemoteMessage(null, RemoteMessageBuilder.PONG);
+    }
+
+    /**
+     * Builds a terminal message (display message for device)
+     *
+     * @param {json} payload - the message
+     * @returns {json} the constructed message
+     */
+    this.buildShutdown = function() {
+        return this.buildRemoteMessage(LanMethod.SHUTDOWN, RemoteMessageBuilder.COMMAND);
+    }
 }
 RemoteMessageBuilder.COMMAND = "COMMAND";
 RemoteMessageBuilder.QUERY = "QUERY";
@@ -227,5 +244,11 @@ LanMethod.SHOW_ORDER_SCREEN = "SHOW_ORDER_SCREEN";
 /** The break method type */
 LanMethod.BREAK = "BREAK";
 
-// LanMethod.ORDER_UPDATE = "ORDER_UPDATE";
-//LanMethod.PRINT = "PRINT";
+/** The void payment method type */
+LanMethod.VOID_PAYMENT = "VOID_PAYMENT";
+
+/**
+ * The shutdown method type
+ * This is a special type only present in the cloud adaptor.
+ */
+LanMethod.SHUTDOWN = "SHUTDOWN";

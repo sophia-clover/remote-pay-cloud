@@ -182,7 +182,7 @@ function WebSocketDevice() {
      */
     this.disconnectFromDevice = function() {
         clearInterval(this.pingIntervalId);
-        this.deviceSocket.close();
+        this.sendShutdown();
     }
 
     /**
@@ -190,7 +190,13 @@ function WebSocketDevice() {
      * @private
      */
     this.attemptReconnect = function() {
-        this.disconnectFromDevice();
+        {
+            // Disconnect without telling the peer that we
+            // wantto, because it appears
+            // the connection may have gone stale.
+            clearInterval(this.pingIntervalId);
+            this.deviceSocket.close();
+        }
         this.reconnecting = true;
         console.log("attempting reconnect...");
         this.contactDevice(this.deviceSocket.url);
@@ -236,7 +242,10 @@ function WebSocketDevice() {
         }
         if(message.hasOwnProperty("type")) {
             if(message["type"] == RemoteMessageBuilder.PONG) {
-                this.pong(message);
+                this.pongReceived(message);
+            }
+            if(message["type"] == RemoteMessageBuilder.PING) {
+                this.pingReceived(message);
             }
         }
         this.eventEmitter.emit(message.method, message);
@@ -267,8 +276,15 @@ function WebSocketDevice() {
         this.eventEmitter.once(eventName, callback);
     }
 
-    this.pong = function() {
+    this.pongReceived = function() {
         this.pongReceivedMillis = new Date().getTime();
+    }
+    this.pingReceived = function() {
+        this.pong();
+    }
+    this.pong = function() {
+        this.pingSentMillis = new Date().getTime();
+        this.sendMessage(this.messageBuilder.buildPong());
     }
     this.ping = function() {
         this.pingSentMillis = new Date().getTime();
@@ -428,6 +444,15 @@ WebSocketDevice.prototype.sendPrintText = function(textLines) {
     //List<String> textLines
     var payload = {"textLines" : textLines};
     var lanMessage = this.messageBuilder.buildPrintText(payload);
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * Send a message to ask the device if it is there.
+ * @param textLines - an  array of strings
+ */
+WebSocketDevice.prototype.sendShutdown = function() {
+    var lanMessage = this.messageBuilder.buildShutdown();
     this.sendMessage(lanMessage);
 }
 
