@@ -33,6 +33,15 @@ function Clover(configuration) {
     );
 
     /**
+     * Closes the connection to the Clover device.
+     */
+    this.close = function () {
+        if(this.device) {
+            this.device.sendShutdown();
+        }
+    }
+
+    /**
      *  The deviuce connection is NOT made on completion of this call.  The device connection
      *  will be made once the WebSocketDevice.onopen is called.
      */
@@ -317,10 +326,15 @@ function Clover(configuration) {
     }
 
     /**
-     * Not yet implemented
+     * Prints an image on the receipt printer of the device.
+     *
+     * The size of the image should be limited, and the optimal
+     * width of the image is 384 pixals.
+     *
+     * @param img an HTML DOM IMG object.
      */
     this.printImage = function (img) {
-        throw new Error("Not yet implemented");
+        this.device.sendPrintImage(img);
     }
 
     /**

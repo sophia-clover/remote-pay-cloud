@@ -22,7 +22,7 @@
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
 
-<body>
+<body onbeforeunload="shutdown()">
 <h1>Web Socket Cloud Remote API Example</h1>
 
 <a href="./docs">Developer documents</a><br/>
@@ -151,6 +151,15 @@
    */
   var cloverOAuth = new CloverOAuth(config);
 
+  function shutdown() {
+    if(device) {
+      try {
+        device.disconnectFromDevice()
+      }catch(e){
+        //eat it
+      }
+    }
+  }
 
   function checkOAuth() {
     var newConfig = {
