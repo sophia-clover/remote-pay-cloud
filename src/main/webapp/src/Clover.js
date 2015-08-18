@@ -13,9 +13,17 @@ function Clover(configuration) {
 
     this.configuration = configuration;
 
-    this.payIntentTemplate =  {
+    this.sale_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "PAYMENT",
+        // "transactionNo": 300010,
+        "taxAmount": 0, // tax amount is included in the amount
+        "cardEntryMethods": CardEntryMethods.ALL
+    };
+
+    this.refund_payIntentTemplate = {
+        "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+        "transactionType": "CREDIT",
         // "transactionNo": 300010,
         "taxAmount": 0, // tax amount is included in the amount
         "cardEntryMethods": CardEntryMethods.ALL
@@ -36,13 +44,15 @@ function Clover(configuration) {
      * Closes the connection to the Clover device.
      */
     this.close = function () {
-        if(this.device) {
+        if (this.device) {
             this.device.sendShutdown();
         }
     }
 
     /**
-     *  The deviuce connection is NOT made on completion of this call.  The device connection
+     * Called to initialize the device for communications.
+     *
+     *  The device connection is NOT made on completion of this call.  The device connection
      *  will be made once the WebSocketDevice.onopen is called.
      */
     this.initDeviceConnection = function () {
@@ -60,7 +70,7 @@ function Clover(configuration) {
                     // We need the device id of the device we will contact.
                     // Either we have it...
                     var xmlHttpSupport = new XmlHttpSupport();
-                    var inlineEndpointConfig = {"configuration" : {}};
+                    var inlineEndpointConfig = {"configuration": {}};
                     var me = this;
                     inlineEndpointConfig.getAccessToken = function () {
                         return me.configuration.oauthToken;
@@ -105,7 +115,7 @@ function Clover(configuration) {
                             }, deviceContactInfo
                         );
 
-                    } else if(this.configuration.deviceSerialId){
+                    } else if (this.configuration.deviceSerialId) {
                         // or we need to go get it.  This is a little hard, because the merchant
                         // can have multiple devices.
 
@@ -116,7 +126,7 @@ function Clover(configuration) {
                         var url = endpoints.getDevicesEndpoint(this.configuration.merchantId);
 
                         xmlHttpSupport.getData(url,
-                            function(devices) {
+                            function (devices) {
                                 me.handleDevices(devices);
                                 // serial' number of the device
                                 me.configuration.deviceId =
@@ -124,7 +134,7 @@ function Clover(configuration) {
                                 // recurse
                                 me.initDeviceConnection();
                             }
-                            ,console.log
+                            , console.log
                         );
                     } else {
                         //Nothing left to try.  Error out.
@@ -159,7 +169,7 @@ function Clover(configuration) {
      * @private
      * @param devicesVX
      */
-    this.handleDevices = function(devicesVX) {
+    this.handleDevices = function (devicesVX) {
         var devices = null;
         this.deviceBySerial = {};
         // depending on the version of the call, the devices might be in a slightly different format.
@@ -222,40 +232,77 @@ function Clover(configuration) {
 
     /**
      *
+     * @param tellMeWhenDeviceIsReady - callback function called when the device is ready for operations.
      */
-    this.notifyWhenDeviceIsReady = function(tellMeWhenDeviceIsReady) {
+    this.notifyWhenDeviceIsReady = function (tellMeWhenDeviceIsReady) {
         this.device.once(LanMethod.DISCOVERY_RESPONSE, tellMeWhenDeviceIsReady);
     }
 
     /**
      * Sale AKA purchase
      *
-     * @param {SaleRequest} saleInfo - the information for the sale
-     * @param {SaleResponse} saleRequestCallback - the callback that receives the sale completion information.  Two parameters
-     *  will be passed to this function: if the payment succeeded, the first will be true, and the second will
-     *  be the payment information;  if the payment failed, the first parameter will be false.
+     * @param {TransactionRequest} saleInfo - the information for the sale
+     * @param {Clover~transactionRequestCallback} saleRequestCallback - the callback that receives the sale completion
+     *  information.
      */
     this.sale = function (saleInfo, saleRequestCallback) {
-        var payIntent = this.payIntentTemplate;
+        this.verifyValidAmount(saleInfo);
+        this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
+    }
+
+    /**
+     * Refund AKA credit
+     *
+     * @param {TransactionRequest} refundInfo - amount is refunded
+     * @param {Clover~transactionRequestCallback} refundRequestCallback
+     */
+    this.refund = function (refundInfo, refundRequestCallback) {
+        this.verifyValidAmount(refundInfo);
+        refundInfo.amount = refundInfo.amount * -1;
+        this.internalTx(refundInfo, refundRequestCallback, this.refund_payIntentTemplate, "credit");
+    }
+
+    /**
+     * @private
+     * @param info
+     */
+    this.verifyValidAmount = function (txnInfo) {
+        if (!txnInfo.hasOwnProperty("amount") || !isInt(txnInfo["amount"]) || (txnInfo.amount < 0)) {
+            throw new Error("paymentInfo must include 'amount',and  the value must be an integer with " +
+                "a value greater than 0");
+        }
+    }
+
+    /**
+     * @private
+     * @param {TransactionRequest} txnInfo
+     * @param {Clover~transactionRequestCallback} txnRequestCallback
+     * @param template
+     */
+    this.internalTx = function (txnInfo, txnRequestCallback, template, txnName) {
+        // Use a template to start with
+        var payIntent = template;
         // Do verification of parameters
-        if (!saleInfo.hasOwnProperty("amount") || !isInt(saleInfo["amount"])) {
+        if (!txnInfo.hasOwnProperty("amount") || !isInt(txnInfo["amount"])) {
             throw new Error("paymentInfo must include 'amount', and the value must be an integer");
         }
-        if (!saleInfo.hasOwnProperty("tipAmount")) {
-            saleInfo["tipAmount"] = 0;
-        } else if (!isInt(saleInfo["tipAmount"])) {
+        if (!txnInfo.hasOwnProperty("tipAmount")) {
+            txnInfo["tipAmount"] = 0;
+        } else if (!isInt(txnInfo["tipAmount"])) {
             throw new Error("if paymentInfo has 'tipAmount', the value must be an integer");
         }
-        if (saleInfo.hasOwnProperty("employeeId")) {
-            payIntent.employeeId = saleInfo["employeeId"];
+        if (txnInfo.hasOwnProperty("employeeId")) {
+            payIntent.employeeId = txnInfo["employeeId"];
         }
-        if (saleInfo.hasOwnProperty("orderId")) {
-            payIntent.orderId = saleInfo["orderId"];
+        if (txnInfo.hasOwnProperty("orderId")) {
+            payIntent.orderId = txnInfo["orderId"];
         }
-        payIntent.amount = saleInfo["amount"];
-        payIntent.tipAmount = saleInfo["tipAmount"];
+        payIntent.amount = txnInfo["amount"];
+        payIntent.tipAmount = txnInfo["tipAmount"];
 
+        // Reserve a reference to this object
         var me = this;
+        // We will hold on to the signature since we are not showing it to the user.
         var signature = null;
         //Wire in the handler for completion to be called once.
         /**
@@ -263,50 +310,74 @@ function Clover(configuration) {
          */
         this.device.once(LanMethod.VERIFY_SIGNATURE,
             function (message) {
-                var payload = JSON.parse(message.payload);
-                var payment = JSON.parse(payload.payment);
-                // Already an object...hmmm
-                signature = payload.signature;
-                me.device.sendSignatureVerified(payment);
+                try {
+                    var payload = JSON.parse(message.payload);
+                    var payment = JSON.parse(payload.payment);
+                    // Already an object...hmmm
+                    signature = payload.signature;
+                    me.device.sendSignatureVerified(payment);
+                } catch (error) {
+                    var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
+                        "Failure attempting to send signature verification", error);
+                    txnRequestCallback(cloverError, {
+                        "code": "ERROR",
+                        "signature": signature,
+                        "request": txnInfo
+                    });
+                }
             }
         );
         this.device.once(LanMethod.FINISH_OK,
             function (message) {
                 var payload = JSON.parse(message.payload);
-                var payment = JSON.parse(payload.payment);
+                var txnInfo = JSON.parse(payload[txnName]);//payment, credit
                 var callBackPayload = {};
-                callBackPayload.payment = payment;
+                callBackPayload.request = txnInfo;
+                callBackPayload[txnName] = txnInfo;
                 callBackPayload.signature = signature;
-                callBackPayload.result = payment.result;
+                callBackPayload.code = txnInfo.result;
 
-                saleRequestCallback(true, callBackPayload);
+                txnRequestCallback(null, callBackPayload);
                 me.device.sendShowWelcomeScreen();
             }
         );
         this.device.once(LanMethod.FINISH_CANCEL,
             function (message) {
                 var callBackPayload = {};
-                callBackPayload.result = "CANCEL";
-                saleRequestCallback(false, callBackPayload);
+                callBackPayload.request = txnInfo;
+                callBackPayload.signature = signature;
+                callBackPayload.code = "CANCEL";
+                txnRequestCallback(null, callBackPayload);
                 me.device.sendShowWelcomeScreen();
             }
         );
-        this.device.sendTXStart(payIntent);
+        try {
+            this.device.sendTXStart(payIntent);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.TX_START,
+                "Failure attempting to send start transaction", error);
+            txnRequestCallback(cloverError, {
+                "code": "ERROR",
+                "request": txnInfo
+            });
+        }
     }
 
     /**
      *
-     * @param {Object} payment - the payment information returned from a call to 'sale'
-     * @param {requestCallback} completionCallback - TODO: the callback that receives the sale completion information.
-     *  Two parameters
-     *  will be passed to this function: if the void succeeded, the first will be true, and the second will
-     *  be any additional information;  if the void failed, the first parameter will be false.
+     * @param {Payment} payment - the payment information returned from a call to 'sale'
+     * @param {requestCallback} completionCallback
      */
     this.voidTransaction = function (payment, completionCallback) {
 
         // TODO: Add ACK callback to void.
+        this.device.on(WebSocketDevice.ALL_MESSAGES,
+            function (message) {
+                completionCallback(null, message);
+            }
+        );
 
-        device.sendPaymentVoid(payment);
+        this.device.sendPaymentVoid(payment);
     }
 
     /**
@@ -341,13 +412,6 @@ function Clover(configuration) {
      * Not yet implemented
      */
     this.saleWithCashback = function () {
-        throw new Error("Not yet implemented");
-    }
-
-    /**
-     * Not yet implemented
-     */
-    this.refund = function () {
         throw new Error("Not yet implemented");
     }
 
@@ -459,39 +523,52 @@ function isInt(value) {
 
 
 /**
- * This callback type is called `requestCallback` and is displayed as a global symbol.
+ * This callback type is called `requestCallback` and is displayed as a global symbol.  This type
+ * of callback adheres to the Node.js convention of 'Error-first' callbacks.
+ * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+ *
+ * The first argument of the callback is always reserved for an error object.
+ * On a successful response, the ‘err’ argument is null. Call the callback and include the successful data only.
+ *
+ * On an unsuccessful response, the ‘err’ argument is set. Call the callback with an actual error object. The
+ * error should describe what happened and include enough information to tell the callback what went wrong. Data
+ * can still be returned in the other arguments as well, but generally the error is passed alone.
  *
  * @callback requestCallback
- * @param {boolean} success
- * @param {Object} [responseData]
+ * @param {Error} [error] - null iff there was no error, else an object that contains a code and a message text
+ * @param {Object} [result] - data that results from the function.  This is a hash of information.  There will be a
+ *  code within the object that indicates the operation completion status.  This may be null, depending on the
+ *  nature of the call, and the error state.
  */
 
 /**
  * A payment
  *
- * @typedef {Object} SaleRequest
- * @property {integer} amount - the amount of a sale, including tax
- * @property {integer} [tipAmount] - the amount of a tip.  Added to the amount for the total.
- * @property {string} orderId - an id for this sale
+ * @typedef {Object} TransactionRequest
+ * @property {integer} amount - the amount of a sale or refund, including tax
+ * @property {integer} [tipAmount] - the amount of a tip.  Added to the amount for the total.  Valid for sale operations
+ * @property {string} [orderId] - an id for this sale or refund
  * @property {string} [employeeId] - the valid Clover id of an employee recognized by the device.  Represents the
- *  employee making this sale.
+ *  employee making this sale or refund.
  */
 
 /**
  * The response to a sale
  *
- * @typedef {Object} SaleResponse
- * @property {string} result - the result code for the transaction - "SUCCESS", "CANCEL"
+ * @typedef {Object} TransactionResponse
+ * @property {string} code - the result code for the transaction - "SUCCESS", "CANCEL", "ERROR"
  * @property {Payment} payment - the payment information
- * @property {Signature} signature - the signature, if present
+ * @property {Credit} credit - the payment information
+ * @property {Signature} [signature] - the signature, if present
+ * @property {TransactionRequest} [request] - the request that resulted in this response
  */
 
 /**
  * The callback on a sale
  *
- * @callback saleRequestCallback
- * @param {boolean} success
- * @param {SaleResponse} [responseData]
+ * @callback Clover~transactionRequestCallback
+ * @param {Error} [error] - null iff there was no error, else an object that contains a code and a message text
+ * @param {TransactionResponse} result - data that results from the function.
  */
 
 /**
@@ -503,6 +580,22 @@ function isInt(value) {
  * @property {integer} [tipAmount] - added tip amount
  * @property {Object} [order] - order information. Ex: id - the order id
  * @property {Object} [employee] - employee information. Ex: id - the employee id
+ */
+
+/**
+ * @typedef {Object} Credit
+ * @property {integer} [amount] - the amount of the transaction, including tax
+ * @property {integer} [createdTime] - the time in milliseconds that the transaction successfully completed
+ * @property {Tender} [tender] - refund information
+ * @property {Object} [orderRef] - order information. Ex: id - the order id
+ * @property {Object} [employee] - employee information. Ex: id - the employee id
+ * @property {CardTransaction} [cardTransaction] - successful transaction information
+ */
+
+/**
+ * @typedef {Object} Tender
+ * @property {string} id - the tender id
+ * @property {string} label - the label that describes the tender
  */
 
 /**
