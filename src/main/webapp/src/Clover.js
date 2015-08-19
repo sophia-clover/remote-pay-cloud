@@ -246,8 +246,9 @@ function Clover(configuration) {
      *  information.
      */
     this.sale = function (saleInfo, saleRequestCallback) {
-        this.verifyValidAmount(saleInfo);
-        this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
+        if(this.verifyValidAmount(saleInfo, saleRequestCallback)) {
+            this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
+        }
     }
 
     /**
@@ -257,19 +258,25 @@ function Clover(configuration) {
      * @param {Clover~transactionRequestCallback} refundRequestCallback
      */
     this.refund = function (refundInfo, refundRequestCallback) {
-        this.verifyValidAmount(refundInfo);
-        refundInfo.amount = Math.abs(refundInfo.amount) * -1;
-        this.internalTx(refundInfo, refundRequestCallback, this.refund_payIntentTemplate, "credit");
+        if(this.verifyValidAmount(refundInfo, refundRequestCallback)) {
+            refundInfo.amount = Math.abs(refundInfo.amount) * -1;
+            this.internalTx(refundInfo, refundRequestCallback, this.refund_payIntentTemplate, "credit");
+        }
     }
 
     /**
+     *
      * @private
-     * @param info
+     * @param txnInfo
+     * @param errorFirstCallback
+     * @returns {boolean}
      */
-    this.verifyValidAmount = function (txnInfo) {
+    this.verifyValidAmount = function (txnInfo, errorFirstCallback) {
         if (!txnInfo.hasOwnProperty("amount") || !isInt(amount) || (txnInfo.amount < 0)) {
-            throw new Error("paymentInfo must include 'amount',and  the value must be an integer with " +
-                "a value greater than 0");
+            errorFirstCallback(CloverError.INVALID_DATA,
+                new CloverError("paymentInfo must include 'amount',and  the value must be an integer with " +
+                    "a value greater than 0"));
+            return false;
         }
     }
 
@@ -286,77 +293,79 @@ function Clover(configuration) {
         if (!txnInfo.hasOwnProperty("tipAmount")) {
             txnInfo["tipAmount"] = 0;
         } else if (!isInt(txnInfo.tipAmount)) {
-            throw new Error("if paymentInfo has 'tipAmount', the value must be an integer");
-        }
-        if (txnInfo.hasOwnProperty("employeeId")) {
-            payIntent.employeeId = txnInfo.employeeId;
-        }
-        if (txnInfo.hasOwnProperty("orderId")) {
-            payIntent.orderId = txnInfo.orderId;
-        }
-        payIntent.amount = txnInfo.amount;
-        payIntent.tipAmount = txnInfo.tipAmount;
+            txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
+                "if paymentInfo has 'tipAmount', the value must be an integer"));
+        } else {
+            if (txnInfo.hasOwnProperty("employeeId")) {
+                payIntent.employeeId = txnInfo.employeeId;
+            }
+            if (txnInfo.hasOwnProperty("orderId")) {
+                payIntent.orderId = txnInfo.orderId;
+            }
+            payIntent.amount = txnInfo.amount;
+            payIntent.tipAmount = txnInfo.tipAmount;
 
-        // Reserve a reference to this object
-        var me = this;
-        // We will hold on to the signature since we are not showing it to the user.
-        var signature = null;
-        //Wire in the handler for completion to be called once.
-        /**
-         * Wire in automatic signature verification for now
-         */
-        this.device.once(LanMethod.VERIFY_SIGNATURE,
-            function (message) {
-                try {
-                    var payload = JSON.parse(message.payload);
-                    var payment = JSON.parse(payload.payment);
-                    // Already an object...hmmm
-                    signature = payload.signature;
-                    me.device.sendSignatureVerified(payment);
-                } catch (error) {
-                    var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
-                        "Failure attempting to send signature verification", error);
-                    txnRequestCallback(cloverError, {
-                        "code": "ERROR",
-                        "signature": signature,
-                        "request": txnInfo
-                    });
+            // Reserve a reference to this object
+            var me = this;
+            // We will hold on to the signature since we are not showing it to the user.
+            var signature = null;
+            //Wire in the handler for completion to be called once.
+            /**
+             * Wire in automatic signature verification for now
+             */
+            this.device.once(LanMethod.VERIFY_SIGNATURE,
+                function (message) {
+                    try {
+                        var payload = JSON.parse(message.payload);
+                        var payment = JSON.parse(payload.payment);
+                        // Already an object...hmmm
+                        signature = payload.signature;
+                        me.device.sendSignatureVerified(payment);
+                    } catch (error) {
+                        var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
+                            "Failure attempting to send signature verification", error);
+                        txnRequestCallback(cloverError, {
+                            "code": "ERROR",
+                            "signature": signature,
+                            "request": txnInfo
+                        });
+                    }
                 }
-            }
-        );
-        this.device.once(LanMethod.FINISH_OK,
-            function (message) {
-                var payload = JSON.parse(message.payload);
-                var txnInfo = JSON.parse(payload[txnName]);//payment, credit
-                var callBackPayload = {};
-                callBackPayload.request = txnInfo;
-                callBackPayload[txnName] = txnInfo;
-                callBackPayload.signature = signature;
-                callBackPayload.code = txnInfo.result;
+            );
+            this.device.once(LanMethod.FINISH_OK,
+                function (message) {
+                    var payload = JSON.parse(message.payload);
+                    var txnInfo = JSON.parse(payload[txnName]);//payment, credit
+                    var callBackPayload = {};
+                    callBackPayload.request = txnInfo;
+                    callBackPayload[txnName] = txnInfo;
+                    callBackPayload.signature = signature;
+                    callBackPayload.code = txnInfo.result;
 
-                txnRequestCallback(null, callBackPayload);
-                me.device.sendShowWelcomeScreen();
+                    txnRequestCallback(null, callBackPayload);
+                    me.device.sendShowWelcomeScreen();
+                }
+            );
+            this.device.once(LanMethod.FINISH_CANCEL,
+                function (message) {
+                    var callBackPayload = {};
+                    callBackPayload.request = txnInfo;
+                    callBackPayload.signature = signature;
+                    callBackPayload.code = "CANCEL";
+                    txnRequestCallback(null, callBackPayload);
+                    me.device.sendShowWelcomeScreen();
+                }
+            );
+            try {
+                this.device.sendTXStart(payIntent);
+            } catch (error) {
+                var cloverError = new CloverError(LanMethod.TX_START,
+                    "Failure attempting to send start transaction", error);
+                txnRequestCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": txnInfo
+                });
             }
-        );
-        this.device.once(LanMethod.FINISH_CANCEL,
-            function (message) {
-                var callBackPayload = {};
-                callBackPayload.request = txnInfo;
-                callBackPayload.signature = signature;
-                callBackPayload.code = "CANCEL";
-                txnRequestCallback(null, callBackPayload);
-                me.device.sendShowWelcomeScreen();
-            }
-        );
-        try {
-            this.device.sendTXStart(payIntent);
-        } catch (error) {
-            var cloverError = new CloverError(LanMethod.TX_START,
-                "Failure attempting to send start transaction", error);
-            txnRequestCallback(cloverError, {
-                "code": "ERROR",
-                "request": txnInfo
-            });
         }
     }
 
@@ -366,8 +375,7 @@ function Clover(configuration) {
      * @param {requestCallback} completionCallback
      */
     this.voidTransaction = function (payment, completionCallback) {
-
-        // TODO: Add ACK callback to void.
+        // TODO: Add ACK callback
         this.device.sendPaymentVoid(payment);
     }
 
@@ -376,15 +384,16 @@ function Clover(configuration) {
      *
      * @param {string[]} textLines - an array of strings to print
      */
-    this.print = function (textLines) {
+    this.print = function (textLines, completionCallback) {
+        // TODO: Add ACK callback
         device.sendPrintText(textLines);
     }
 
     /**
      * Not yet implemented
      */
-    this.printReceipt = function () {
-        throw new Error("Not yet implemented");
+    this.printReceipt = function (completionCallback) {
+        completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
     }
 
     /**
@@ -395,15 +404,16 @@ function Clover(configuration) {
      *
      * @param img an HTML DOM IMG object.
      */
-    this.printImage = function (img) {
+    this.printImage = function (img, completionCallback) {
+        // TODO: Add ACK callback
         this.device.sendPrintImage(img);
     }
 
     /**
      * Not yet implemented
      */
-    this.saleWithCashback = function () {
-        throw new Error("Not yet implemented");
+    this.saleWithCashback = function (saleInfo, saleRequestCallback) {
+        completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
     }
 
     //////////

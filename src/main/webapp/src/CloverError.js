@@ -17,3 +17,6 @@ function CloverError(code, message, cause) {
     this.stack = (new Error()).stack;
 }
 CloverError.prototype = new Error;
+
+CloverError.INVALID_DATA = "invalid data";
+CloverError.NOT_IMPLEMENTED = "not implemented";
