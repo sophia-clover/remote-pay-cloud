@@ -258,7 +258,7 @@ function Clover(configuration) {
      */
     this.refund = function (refundInfo, refundRequestCallback) {
         this.verifyValidAmount(refundInfo);
-        refundInfo.amount = refundInfo.amount * -1;
+        refundInfo.amount = Math.abs(refundInfo.amount) * -1;
         this.internalTx(refundInfo, refundRequestCallback, this.refund_payIntentTemplate, "credit");
     }
 
@@ -267,7 +267,7 @@ function Clover(configuration) {
      * @param info
      */
     this.verifyValidAmount = function (txnInfo) {
-        if (!txnInfo.hasOwnProperty("amount") || !isInt(txnInfo["amount"]) || (txnInfo.amount < 0)) {
+        if (!txnInfo.hasOwnProperty("amount") || !isInt(amount) || (txnInfo.amount < 0)) {
             throw new Error("paymentInfo must include 'amount',and  the value must be an integer with " +
                 "a value greater than 0");
         }
@@ -283,22 +283,19 @@ function Clover(configuration) {
         // Use a template to start with
         var payIntent = template;
         // Do verification of parameters
-        if (!txnInfo.hasOwnProperty("amount") || !isInt(txnInfo["amount"])) {
-            throw new Error("paymentInfo must include 'amount', and the value must be an integer");
-        }
         if (!txnInfo.hasOwnProperty("tipAmount")) {
             txnInfo["tipAmount"] = 0;
-        } else if (!isInt(txnInfo["tipAmount"])) {
+        } else if (!isInt(txnInfo.tipAmount)) {
             throw new Error("if paymentInfo has 'tipAmount', the value must be an integer");
         }
         if (txnInfo.hasOwnProperty("employeeId")) {
-            payIntent.employeeId = txnInfo["employeeId"];
+            payIntent.employeeId = txnInfo.employeeId;
         }
         if (txnInfo.hasOwnProperty("orderId")) {
-            payIntent.orderId = txnInfo["orderId"];
+            payIntent.orderId = txnInfo.orderId;
         }
-        payIntent.amount = txnInfo["amount"];
-        payIntent.tipAmount = txnInfo["tipAmount"];
+        payIntent.amount = txnInfo.amount;
+        payIntent.tipAmount = txnInfo.tipAmount;
 
         // Reserve a reference to this object
         var me = this;
@@ -371,12 +368,6 @@ function Clover(configuration) {
     this.voidTransaction = function (payment, completionCallback) {
 
         // TODO: Add ACK callback to void.
-        this.device.on(WebSocketDevice.ALL_MESSAGES,
-            function (message) {
-                completionCallback(null, message);
-            }
-        );
-
         this.device.sendPaymentVoid(payment);
     }
 
