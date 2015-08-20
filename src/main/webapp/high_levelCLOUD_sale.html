@@ -58,12 +58,20 @@
 
     // Call the device to take payment, after the payment is complete, call the
     // 'mySaleResult' function
-    clover.sale(mySale, mySaleResult);
+    clover.sale(mySale, resultCallback);
   }
 
-  function mySaleResult(success, saleResult) {
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function resultCallback(error, resultData) {
     // do something with this.
-    document.getElementById("uiFeedback").innerHTML = "<pre>"+JSON.stringify(saleResult, null, 4) + "</pre>";
+    var resultDisplay = "";
+    if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
   }
 </script>
 
