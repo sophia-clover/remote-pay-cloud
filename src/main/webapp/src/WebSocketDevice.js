@@ -73,6 +73,26 @@ function WebSocketDevice() {
 
             this.deviceSocket.onerror = function (event) {
                 if(me.reconnect) {
+
+                    ///////////////////////////
+                    // Dealing with the very strange 401 error in secure web sockets
+                    if(!me.triedToFix401) {
+                        // Try to deal with the issue where the browser has cached
+                        // an old certificate somehow.  There is no indication of this
+                        // in the error, so just try to fix it, even if there is some
+                        // other error.
+                        var wssUrl = me.deviceSocket.url;
+                        if (wssUrl.indexOf("wss") > -1) {
+                            var httpsUrl = wssUrl.replace("wss", "https");
+                            if (!me.xmlHttpSupport) {
+                                me.xmlHttpSupport = new XmlHttpSupport();
+                            }
+                            me.xmlHttpSupport.getData(httpsUrl, console.log, console.log);
+                            me.triedToFix401 = true;
+                        }
+                    }
+                    ///////////////////////////
+
                     if(me.reconnectAttempts < me.numberOfReconnectAttemptsBeforeWeGiveUp) {
                         me.reconnectAttempts++;
                         setTimeout(
