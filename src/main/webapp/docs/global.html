@@ -392,7 +392,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line508">line 508</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line603">line 603</a>
     </li></ul></dd>
     
 
@@ -423,7 +423,6 @@ be configured for proper access to the device.
     Possible configurations:<br/>
     <ol>
          <li>deviceURL (Only valid when device is in Local Pay Display app configuration)</li>
-         <li>oauthToken, domain, merchantId, deviceId</li>
          <li>oauthToken, domain, merchantId, deviceSerialId</li>
          <li>clientId, domain, merchantId, deviceId (Requires log in to Clover server)</li>
          <li>clientId, domain, merchantId, deviceSerialId (Requires log in to Clover server)</li>
@@ -592,38 +591,6 @@ be configured for proper access to the device.
 
         <tr>
             
-                <td class="name"><code>deviceId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">the unique device identifier for the merchant device.  This identifies
- the device that will be used</td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>deviceSerialId</code></td>
             
 
@@ -718,7 +685,292 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line547">line 547</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line642">line 642</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Credit">Credit</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>amount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">integer</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the amount of the transaction, including tax</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>createdTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">integer</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the time in milliseconds that the transaction successfully completed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tender</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Tender">Tender</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">refund information</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>orderRef</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">order information. Ex: id - the order id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>employee</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">employee information. Ex: id - the employee id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cardTransaction</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#CardTransaction">CardTransaction</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">successful transaction information</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line587">line 587</a>
     </li></ul></dd>
     
 
@@ -1032,7 +1284,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line497">line 497</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line576">line 576</a>
     </li></ul></dd>
     
 
@@ -1175,7 +1427,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line540">line 540</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line635">line 635</a>
     </li></ul></dd>
     
 
@@ -1196,14 +1448,15 @@ be configured for proper access to the device.
 
     
 
-    <h4 class="name" id="requestCallback"><span class="type-signature"></span>requestCallback<span class="signature">(success, responseData<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="requestCallback"><span class="type-signature"></span>requestCallback<span class="signature">(error<span class="signature-attributes">opt</span>, result<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    This callback type is called `requestCallback` and is displayed as a global symbol.
+    This callback type is called `requestCallback` and is displayed as a global symbol.  This type
+of callback adheres to the Node.js convention of 'Error-first' callbacks.
 </div>
 
 
@@ -1241,44 +1494,13 @@ be configured for proper access to the device.
 
         <tr>
             
-                <td class="name"><code>success</code></td>
+                <td class="name"><code>error</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>responseData</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
+<span class="param-type">Error</span>
 
 
             
@@ -1298,520 +1520,9 @@ be configured for proper access to the device.
 
             
 
-            <td class="description last"></td>
+            <td class="description last">null iff there was no error, else an object that contains a code and a message text</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line461">line 461</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="SaleRequest">SaleRequest</h4>
-
-
-
-
-<div class="description">
-    A payment
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>amount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">the amount of a sale, including tax</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>tipAmount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">the amount of a tip.  Added to the amount for the total.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>orderId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">an id for this sale</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>employeeId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">the valid Clover id of an employee recognized by the device.  Represents the
- employee making this sale.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line469">line 469</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
-                
-
-    
-
-    <h4 class="name" id="saleRequestCallback"><span class="type-signature"></span>saleRequestCallback<span class="signature">(success, responseData<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    The callback on a sale
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>success</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>responseData</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#SaleResponse">SaleResponse</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line489">line 489</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="SaleResponse">SaleResponse</h4>
-
-
-
-
-<div class="description">
-    The response to a sale
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
@@ -1822,68 +1533,36 @@ be configured for proper access to the device.
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Object</span>
 
 
             
             </td>
 
             
-
-            
-
-            <td class="description last">the result code for the transaction - "SUCCESS", "CANCEL"</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>payment</code></td>
-            
-
-            <td class="type">
-            
+                <td class="attributes">
                 
-<span class="param-type"><a href="global.html#Payment">Payment</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">the payment information</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>signature</code></td>
-            
-
-            <td class="type">
-            
+                    &lt;optional><br>
                 
-<span class="param-type"><a href="global.html#Signature">Signature</a></span>
 
+                
 
-            
-            </td>
-
-            
-
+                
+                </td>
             
 
-            <td class="description last">the signature, if present</td>
+            
+
+            <td class="description last">data that results from the function.  This is a hash of information.  There will be a
+ code within the object that indicates the operation completion status.  This may be null, depending on the
+ nature of the call, and the error state.</td>
         </tr>
 
     
     </tbody>
 </table>
+
+
 
 
 
@@ -1917,16 +1596,40 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line480">line 480</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line527">line 527</a>
     </li></ul></dd>
     
 
     
 
     
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/%0A%0AThe%20first%20argument%20of%20the%20callback%20is%20always%20reserved%20for%20an%20error%20object.%0AOn%20a%20successful%20response,%20the%20%E2%80%98err%E2%80%99%20argument%20is%20null.%20Call%20the%20callback%20and%20include%20the%20successful%20data%20only.%0A%0AOn%20an%20unsuccessful%20response,%20the%20%E2%80%98err%E2%80%99%20argument%20is%20set.%20Call%20the%20callback%20with%20an%20actual%20error%20object.%20The%0Aerror%20should%20describe%20what%20happened%20and%20include%20enough%20information%20to%20tell%20the%20callback%20what%20went%20wrong.%20Data%0Acan%20still%20be%20returned%20in%20the%20other%20arguments%20as%20well,%20but%20generally%20the%20error%20is%20passed%20alone.">http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+
+The first argument of the callback is always reserved for an error object.
+On a successful response, the ‘err’ argument is null. Call the callback and include the successful data only.
+
+On an unsuccessful response, the ‘err’ argument is set. Call the callback with an actual error object. The
+error should describe what happened and include enough information to tell the callback what went wrong. Data
+can still be returned in the other arguments as well, but generally the error is passed alone.</a></li>
+        </ul>
+    </dd>
+    
 
     
 </dl>
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2084,7 +1787,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line526">line 526</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line621">line 621</a>
     </li></ul></dd>
     
 
@@ -2208,7 +1911,628 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line535">line 535</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line630">line 630</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Tender">Tender</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the tender id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the label that describes the tender</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line597">line 597</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="TransactionRequest">TransactionRequest</h4>
+
+
+
+
+<div class="description">
+    A payment
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>amount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">integer</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the amount of a sale or refund, including tax</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tipAmount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">integer</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the amount of a tip.  Added to the amount for the total.  Valid for sale operations</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>orderId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">an id for this sale or refund</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>employeeId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the valid Clover id of an employee recognized by the device.  Represents the
+ employee making this sale or refund.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line546">line 546</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="TransactionResponse">TransactionResponse</h4>
+
+
+
+
+<div class="description">
+    The response to a sale
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>code</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the result code for the transaction - "SUCCESS", "CANCEL", "ERROR"</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>payment</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Payment">Payment</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the payment information</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>credit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Credit">Credit</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the payment information</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Signature">Signature</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the signature, if present</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#TransactionRequest">TransactionRequest</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the request that resulted in this response</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line557">line 557</a>
     </li></ul></dd>
     
 
@@ -2244,7 +2568,7 @@ be configured for proper access to the device.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Aug 13 2015 10:31:18 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Fri Aug 21 2015 09:01:35 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>
