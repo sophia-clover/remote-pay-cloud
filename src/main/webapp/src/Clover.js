@@ -647,7 +647,6 @@ function isInt(value) {
  *     Possible configurations:<br/>
  *     <ol>
  *          <li>deviceURL (Only valid when device is in Local Pay Display app configuration)</li>
- *          <li>oauthToken, domain, merchantId, deviceId</li>
  *          <li>oauthToken, domain, merchantId, deviceSerialId</li>
  *          <li>clientId, domain, merchantId, deviceId (Requires log in to Clover server)</li>
  *          <li>clientId, domain, merchantId, deviceSerialId (Requires log in to Clover server)</li>
@@ -662,8 +661,6 @@ function isInt(value) {
  *  to be obtained.
  * @property {string} [domain] - the url to the clover cos server.
  * @property {string} [merchantId] - the merchant id.
- * @property {string} [deviceId] - the unique device identifier for the merchant device.  This identifies
- *  the device that will be used
  * @property {string} [deviceSerialId] - the serial id of the device to use.
  * @property {string} [clientId] - the Clover application id to use when obtaining the oauth token.
  *
