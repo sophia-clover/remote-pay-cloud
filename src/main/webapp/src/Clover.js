@@ -272,12 +272,13 @@ function Clover(configuration) {
      * @returns {boolean}
      */
     this.verifyValidAmount = function (txnInfo, errorFirstCallback) {
-        if (!txnInfo.hasOwnProperty("amount") || !isInt(amount) || (txnInfo.amount < 0)) {
+        if (!txnInfo.hasOwnProperty("amount") || !isInt(txnInfo.amount) || (txnInfo.amount < 0)) {
             errorFirstCallback(CloverError.INVALID_DATA,
                 new CloverError("paymentInfo must include 'amount',and  the value must be an integer with " +
                     "a value greater than 0"));
             return false;
         }
+        return true;
     }
 
     /**
@@ -337,7 +338,7 @@ function Clover(configuration) {
                     var payload = JSON.parse(message.payload);
                     var txnInfo = JSON.parse(payload[txnName]);//payment, credit
                     var callBackPayload = {};
-                    callBackPayload.request = txnInfo;
+                    callBackPayload.request = payIntent;
                     callBackPayload[txnName] = txnInfo;
                     callBackPayload.signature = signature;
                     callBackPayload.code = txnInfo.result;
@@ -349,7 +350,7 @@ function Clover(configuration) {
             this.device.once(LanMethod.FINISH_CANCEL,
                 function (message) {
                     var callBackPayload = {};
-                    callBackPayload.request = txnInfo;
+                    callBackPayload.request = payIntent;
                     callBackPayload.signature = signature;
                     callBackPayload.code = "CANCEL";
                     txnRequestCallback(null, callBackPayload);
