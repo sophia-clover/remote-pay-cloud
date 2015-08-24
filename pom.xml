@@ -9,6 +9,7 @@
 
   <properties>
     <jettyVersion>7.2.0.v20101020</jettyVersion>
+    <gsonversion>3.8.1</gsonversion>
   </properties>
 
   <url>http://maven.apache.org</url>
@@ -28,7 +29,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>${gsonversion}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
