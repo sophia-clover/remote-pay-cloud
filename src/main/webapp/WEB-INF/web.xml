@@ -4,4 +4,18 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+
+  <servlet>
+    <servlet-name>WebHook</servlet-name>
+    <servlet-class>com.clover.webhook.WebHook</servlet-class>
+  </servlet>
+
+  <!-- Note: All <servlet> elements MUST be grouped together and
+        placed IN FRONT of the <servlet-mapping> elements -->
+
+  <servlet-mapping>
+    <servlet-name>WebHook</servlet-name>
+    <url-pattern>/webhook</url-pattern>
+  </servlet-mapping>
+
 </web-app>
