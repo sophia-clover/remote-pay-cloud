@@ -9,6 +9,7 @@
 
 
   <script src="src/CloverOAuth.js"></script>
+  <script src="src/Clover.js"></script>
   <script src="src/WebSocketDevice.js"></script>
   <script src="src/Endpoints.js"></script>
   <script src="src/ids.js"></script>
@@ -67,10 +68,10 @@
   <button id="pair_button" onclick="handshakeDevice(getSelectedDevice())">Pair Device</button>
 
 <div id="unpair_button" style="display:none">
-  <button id="unpair_btn" onclick="device.disconnectFromDevice()">Unpair Device</button>
-
+  <button id="unpair_btn" onclick="device.disconnectFromDevice()">Unpair Device</button><br/>
   <button onclick="device.sendTerminalMessage(document.getElementById('termMsg').value)">Put message on device</button>
   <input type="text" name="termMsg" id="termMsg" value="Test Message"><br>
+  <button id="save_cfg_btn" onclick="Clover.writeConfigurationToCookie(getConfig())">Save Configuration</button><br/>
 </div>
 
 </p>
@@ -159,6 +160,16 @@
         //eat it
       }
     }
+  }
+
+  function getConfig() {
+    return {
+      clientId: cloverOAuth.clientId,
+      domain: cloverOAuth.configuration.domain,
+      oauthToken: cloverOAuth.getAccessToken(),
+      merchantId: cloverOAuth.getURLParams()["merchant_id"],
+      deviceSerialId : getSelectedDevice().serial
+    };
   }
 
   function checkOAuth() {
@@ -421,8 +432,19 @@
             // Use this data to build the web socket url
             var url = data.host + '/support/cs?token=' + data.token;
 
-            displayUIFeedBack("Server responded with information on how to contact device. " +
-                "Opening communication channel...");
+            displayUIFeedBack("Server responded with information on how to contact device.<br/>" +
+                    "The following can be used to configure the simple examples:<br/>" +
+                '<pre>' +
+                '{\n'+
+                '   "oauthToken" : "'+cloverOAuth.getAccessToken()+'",\n'+
+                '   "domain" : "'+cloverOAuth.configuration.domain+'",\n' +
+                '   "merchantId" : "'+merchantId+'",\n' +
+                '   "deviceSerialId" : "'+selectedDevice.serial+'"\n' +
+                '}\n' +
+                '</pre>'
+            );
+
+            displayUIFeedBack("Opening communication channel...");
 
             // The response to this will be reflected in the device.onopen method (or on error),
             // That function will attempt the discovery.
