@@ -61,6 +61,7 @@ function Clover(configuration) {
             if (!this.loadPersistedConfiguration()) {
                 return;
             }
+            this.initDeviceConnection();
         } else if (this.configuration.deviceURL) {
             // We have enough information to contact the device.
             // save the configuration (except for the device url, which always changes)
@@ -186,18 +187,11 @@ function Clover(configuration) {
     this.loadPersistedConfiguration = function () {
         // We have no configuration at all.  Try to get it from a cookie
         if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
-        var cvalue = getCookie(this.configurationName);
-        if(cvalue) {
-            this.configuration = JSON.parse(cvalue);
-            // We could not get the configuration from a cookie.
-            if (!this.configuration) {
-                // fire up a gui to get the values?
-                // This could be some server call back or other too.
-                this.incompleteConfiguration("No initialization info found in cookie", this.configuration );
-                return false;
-            }
-        } else {
-            this.incompleteConfiguration("No initialization cookie  found", this.configuration );
+        this.configuration = Clover.loadConfigurationFromCookie(this.configurationName);
+        if (!this.configuration) {
+            // fire up a gui to get the values?
+            // This could be some server call back or other too.
+            this.incompleteConfiguration("No initialization info found in cookie", this.configuration );
             return false;
         }
         return true;
@@ -208,21 +202,14 @@ function Clover(configuration) {
      * configuration into a cookie.
      */
     this.persistConfiguration = function () {
-        var cvalue = JSON.stringify(this.configuration);
-        var jsonValue = JSON.parse(cvalue);
-        delete jsonValue.deviceURL;
-        cvalue = JSON.stringify(jsonValue);
-
-        var exdays = 2;
-        if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
-        setCookie(this.configurationName, cvalue, exdays);
+        Clover.writeConfigurationToCookie(this.configuration);
     }
 
 
     /**
      * We can override this to pop up a window to let the user enter any missing information.
      *
-     * @param message an error message.  This could be ignored.
+     * @param message - an error message.  This could be ignored.
      */
     this.incompleteConfiguration = function (message) {
         throw new Error(message);
@@ -604,6 +591,30 @@ function getCookie(cname) {
     }
     return "";
 }
+
+Clover.writeConfigurationToCookie = function (configuration) {
+    var cvalue = JSON.stringify(configuration);
+    var jsonValue = JSON.parse(cvalue);
+    delete jsonValue.deviceURL;
+    cvalue = JSON.stringify(jsonValue);
+
+    var exdays = 2;
+    if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
+    setCookie(this.configurationName, cvalue, exdays);
+}
+
+Clover.loadConfigurationFromCookie = function (configurationName) {
+    // We have no configuration at all.  Try to get it from a cookie
+    var configuration = null;
+    var cvalue = getCookie(configurationName);
+    if(cvalue) {
+        configuration = JSON.parse(cvalue);
+    }
+    return configuration;
+}
+
+
+
 
 /**
  * This callback type is called `requestCallback` and is displayed as a global symbol.  This type

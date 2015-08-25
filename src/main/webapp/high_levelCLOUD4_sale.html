@@ -40,11 +40,11 @@
   // to the Clover object, it reads a cookie to get the information needed to communicate.
   var clover = new Clover();
 
-  // Start communication
-  clover.initDeviceConnection();
-
   // When the device is ready, start a transaction.
   clover.notifyWhenDeviceIsReady(makeASale);
+
+  // Start communication
+  clover.initDeviceConnection();
 
   // This will be called when the device is ready
   function makeASale() {
