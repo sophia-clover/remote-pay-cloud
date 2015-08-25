@@ -56,7 +56,32 @@ function Clover(configuration) {
      *  will be made once the WebSocketDevice.onopen is called.
      */
     this.initDeviceConnection = function () {
-        if (this.configuration.deviceURL) {
+        // Check to see if we have any configuration at all.
+        if (!this.configuration) {
+            // We have no configuration at all.  Try to get it from a cookie
+            if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
+            var cvalue = getCookie(this.configurationName);
+            this.configuration = JSON.parse(cvalue);
+            // We could not get the configuration from a cookie.
+            if (!this.configuration) {
+                // fire up a gui to get the values?
+                // This could be some server call back or other too.
+                this.incompleteConfiguration("No initialization info found");
+                return;
+            }
+        } else if (this.configuration.deviceURL) {
+            // We have enough information to contact the device.
+            // save the configuration (except for the device url, which always changes)
+            // in a cookie.
+            var cvalue = JSON.stringify(this.configuration);
+            var jsonValue = JSON.parse(cvalue);
+            delete jsonValue.deviceURL;
+            cvalue = JSON.stringify(jsonValue);
+
+            var exdays = 2;
+            if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
+            setCookie(this.configurationName, cvalue, exdays);
+
             // We have the device url, contact the device
             this.contactDevice();
         } else {
@@ -137,17 +162,20 @@ function Clover(configuration) {
                             , console.log
                         );
                     } else {
-                        //Nothing left to try.  Error out.
-                        throw new Error("Cannot determine what device to use for connection." +
+                        //Nothing left to try.  Either error out or get more info from the user.
+                        this.incompleteConfiguration("Cannot determine what device to use for connection." +
                             "  You must provide the configuration.deviceId, or the serial number" +
                             " of the device. " +
                             " You can find the device serial number using the device. Select " +
                             "'Settings > About (Station|Mini|Mobile) > Status', select 'Status' and " +
                             "look for 'Serial number' in the list displayed.");
+                        return;
+
                     }
                 } else {
                     // We do not have enough info to initialize.  Error out
-                    throw new Error("Incomplete init info.");
+                    this.incompleteConfiguration("Incomplete init info.");
+                    return;
                 }
             } else {
                 // or we need to go get it.
@@ -162,6 +190,15 @@ function Clover(configuration) {
                 }
             }
         }
+    }
+
+    /**
+     * We can override this to pop up a window to let the user enter any missing information.
+     *
+     * @param message an error message.  This could be ignored.
+     */
+    this.incompleteConfiguration = function (message) {
+        throw new Error(message);
     }
 
     /**
@@ -246,7 +283,7 @@ function Clover(configuration) {
      *  information.
      */
     this.sale = function (saleInfo, saleRequestCallback) {
-        if(this.verifyValidAmount(saleInfo, saleRequestCallback)) {
+        if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
             this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
         }
     }
@@ -258,7 +295,7 @@ function Clover(configuration) {
      * @param {Clover~transactionRequestCallback} refundRequestCallback
      */
     this.refund = function (refundInfo, refundRequestCallback) {
-        if(this.verifyValidAmount(refundInfo, refundRequestCallback)) {
+        if (this.verifyValidAmount(refundInfo, refundRequestCallback)) {
             refundInfo.amount = Math.abs(refundInfo.amount) * -1;
             this.internalTx(refundInfo, refundRequestCallback, this.refund_payIntentTemplate, "credit");
         }
@@ -523,6 +560,23 @@ function isInt(value) {
     return (x | 0) === x;
 }
 
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return "";
+}
 
 /**
  * This callback type is called `requestCallback` and is displayed as a global symbol.  This type
