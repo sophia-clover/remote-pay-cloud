@@ -1,7 +1,7 @@
 /**
  * Clover API for external Systems
  *
- * @param {CloverConfig} configuration - the device that sends and receives messages
+ * @param {CloverConfig} [configuration] - the device that sends and receives messages
  * @constructor
  */
 function Clover(configuration) {
@@ -58,29 +58,14 @@ function Clover(configuration) {
     this.initDeviceConnection = function () {
         // Check to see if we have any configuration at all.
         if (!this.configuration) {
-            // We have no configuration at all.  Try to get it from a cookie
-            if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
-            var cvalue = getCookie(this.configurationName);
-            this.configuration = JSON.parse(cvalue);
-            // We could not get the configuration from a cookie.
-            if (!this.configuration) {
-                // fire up a gui to get the values?
-                // This could be some server call back or other too.
-                this.incompleteConfiguration("No initialization info found");
+            if (!this.loadPersistedConfiguration()) {
                 return;
             }
         } else if (this.configuration.deviceURL) {
             // We have enough information to contact the device.
             // save the configuration (except for the device url, which always changes)
             // in a cookie.
-            var cvalue = JSON.stringify(this.configuration);
-            var jsonValue = JSON.parse(cvalue);
-            delete jsonValue.deviceURL;
-            cvalue = JSON.stringify(jsonValue);
-
-            var exdays = 2;
-            if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
-            setCookie(this.configurationName, cvalue, exdays);
+            this.persistConfiguration();
 
             // We have the device url, contact the device
             this.contactDevice();
@@ -168,13 +153,13 @@ function Clover(configuration) {
                             " of the device. " +
                             " You can find the device serial number using the device. Select " +
                             "'Settings > About (Station|Mini|Mobile) > Status', select 'Status' and " +
-                            "look for 'Serial number' in the list displayed.");
+                            "look for 'Serial number' in the list displayed.", this.configuration );
                         return;
 
                     }
                 } else {
                     // We do not have enough info to initialize.  Error out
-                    this.incompleteConfiguration("Incomplete init info.");
+                    this.incompleteConfiguration("Incomplete init info.", this.configuration );
                     return;
                 }
             } else {
@@ -191,6 +176,48 @@ function Clover(configuration) {
             }
         }
     }
+
+    /**
+     * Loads the configuration that was stored.  This implementation just grabs the
+     * configuration from a cookie.
+     *
+     * @returns {boolean} true if the configuration was loaded.
+     */
+    this.loadPersistedConfiguration = function () {
+        // We have no configuration at all.  Try to get it from a cookie
+        if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
+        var cvalue = getCookie(this.configurationName);
+        if(cvalue) {
+            this.configuration = JSON.parse(cvalue);
+            // We could not get the configuration from a cookie.
+            if (!this.configuration) {
+                // fire up a gui to get the values?
+                // This could be some server call back or other too.
+                this.incompleteConfiguration("No initialization info found in cookie", this.configuration );
+                return false;
+            }
+        } else {
+            this.incompleteConfiguration("No initialization cookie  found", this.configuration );
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Stores the configuration for later retrieval.  This implementation just drops the
+     * configuration into a cookie.
+     */
+    this.persistConfiguration = function () {
+        var cvalue = JSON.stringify(this.configuration);
+        var jsonValue = JSON.parse(cvalue);
+        delete jsonValue.deviceURL;
+        cvalue = JSON.stringify(jsonValue);
+
+        var exdays = 2;
+        if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
+        setCookie(this.configurationName, cvalue, exdays);
+    }
+
 
     /**
      * We can override this to pop up a window to let the user enter any missing information.
