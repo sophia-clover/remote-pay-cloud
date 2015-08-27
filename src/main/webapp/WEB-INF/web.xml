@@ -8,6 +8,31 @@
   <servlet>
     <servlet-name>WebHook</servlet-name>
     <servlet-class>com.clover.webhook.WebHook</servlet-class>
+    <init-param>
+      <param-name>cloverServer</param-name>
+      <param-value>https://apidev1.dev.clover.com</param-value>
+    </init-param>
+    <init-param>
+      <param-name>accessTokenFileName</param-name>
+      <param-value>accessTokens.json</param-value>
+    </init-param>
+    <init-param>
+      <param-name>accessTokenDirectoryEnvVar</param-name>
+      <param-value>OPENSHIFT_DATA_DIR</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet>
+    <servlet-name>SaveAuth</servlet-name>
+    <servlet-class>com.clover.webhook.SaveAuth</servlet-class>
+    <init-param>
+      <param-name>accessTokenFileName</param-name>
+      <param-value>accessTokens.json</param-value>
+    </init-param>
+    <init-param>
+      <param-name>accessTokenDirectoryEnvVar</param-name>
+      <param-value>OPENSHIFT_DATA_DIR</param-value>
+    </init-param>
   </servlet>
 
   <!-- Note: All <servlet> elements MUST be grouped together and
@@ -16,6 +41,11 @@
   <servlet-mapping>
     <servlet-name>WebHook</servlet-name>
     <url-pattern>/webhook</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SaveAuth</servlet-name>
+    <url-pattern>/saveauth</url-pattern>
   </servlet-mapping>
 
 </web-app>

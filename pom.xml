@@ -9,7 +9,9 @@
 
   <properties>
     <jettyVersion>7.2.0.v20101020</jettyVersion>
-    <gsonversion>3.8.1</gsonversion>
+    <junitversion>3.8.1</junitversion>
+    <gsonversion>2.3.1</gsonversion>
+    <common-io-version>2.4</common-io-version>
   </properties>
 
   <url>http://maven.apache.org</url>
@@ -23,15 +25,22 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>2.3.1</version>
+      <version>${gsonversion}</version>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${gsonversion}</version>
+      <version>${junitversion}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${common-io-version}</version>
+    </dependency>
+
   </dependencies>
   <build>
     <finalName>RemotePos</finalName>
