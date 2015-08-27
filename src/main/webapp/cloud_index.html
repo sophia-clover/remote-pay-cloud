@@ -30,7 +30,11 @@
 
 <p>
   The intention of this page is to illustrate the use of the 'Clover Cloud-POS API' from within a web application
-  that is entirely html/javascript.
+  that is entirely html/javascript.<br/>
+  There is additional functionality included to allow for use of the Clover webhook callback api.  This functionality
+  is implemented in java as a set of servlets.   The only direct user interaction with this functionality is to save
+  the user authentication token to the server fto allow use with the Clover REST API when obtaining additional details
+  about events in the webhook callback.
 </p>
 
 <p>
@@ -61,6 +65,7 @@
   <form id="deviceForm">
     <div id="id01"></div>
   </form>
+  <button id="save_auth_button" onclick="saveAuth()">Save merchant auth token to server</button>
 </div>
 
 <!-- controls to 'pair' or 'unpair' the device -->
@@ -361,12 +366,12 @@
     }
 
     // The device connection has been closed
-    device.onclose = function () {
+    device.onclose = function (closeEvent) {
       document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
       enable('pair_button');
       disable('unpair_button');
       disable('process_flow');
-      console.log('device closed');
+      console.log('device closed: ' + closeEvent);
       displayUIFeedBack("The device connection has been closed");
 
     }
@@ -571,6 +576,20 @@
         }
       }
       return null;
+    }
+
+    /**
+     *
+     *
+     */
+    function saveAuth() {
+      var authMapping = {};
+      authMapping[cloverOAuth.getURLParams()["merchant_id"]] = cloverOAuth.getAccessToken();
+      xmlHttpSupport.postData(
+          "./saveauth", //endpoint,
+          function(data) { console.log(data) }, //onDataLoaded,
+          function(data) { console.error(data) }, //onError,
+          authMapping);
     }
 
     //*********************************************
