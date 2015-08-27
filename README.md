@@ -14,7 +14,7 @@ This produces a runnable jar that will serve a web application. There are severa
 
 ### Webhook Example
 If you want to use the embedded webhook example, you will need to run the example on a public facing web server.  You 
-will need to run the example before you can perform the verification of the web hook. The default address of the webhook
+will need to run the example before you can perform the verification of the webhook. The default address of the webhook
 in the example is ```http://<yourserver>/webhook```.  This can be changed by modifying the `web.xml` file.
 
 There are two servlets that are used to demonstrate the webhook functionality.  The webhook servlet echoes the 
@@ -22,12 +22,12 @@ information sent to the hook.  It reads merchant authentication tokens from a fi
 The second servlet will write merchant authentication tokens to the file.  There is a button on the min Cloud example 
 that will allow you to send the current merchant authentication token to be written.
 
-View our [Webhooks Developer Docs](https://docs.clover.com/build/web-apps/webhooks/?region=dev1) for details on how to configure and use webhooks.
+View our [Webhooks Developer Docs](https://docs.clover.com/build/web-apps/webhooks/) for details on how to configure and use webhooks.
     
 ## Configure the Example Application    
     
 Make sure the Cloud Pay Display app is installed for your merchant on your Clover device.
-For the main "Cloud Example", you will need the "App Id".  On the "Your Apps" page, find and copy the "App ID".
+For the main "Cloud Example", you will need the "App ID".  On the "Your Apps" page, find and copy the "App ID".
 
 The "Simple" examples require information that can be obtained by running the "Cloud Example".              
     
