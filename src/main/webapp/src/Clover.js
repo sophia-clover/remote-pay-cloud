@@ -211,7 +211,10 @@ function Clover(configuration) {
      *
      * @param message - an error message.  This could be ignored.
      */
-    this.incompleteConfiguration = function (message) {
+    this.incompleteConfiguration = function (message, configuration) {
+        // If this is used to obtain the configuration information, then the
+        // configuration should be updated, and then the 'initDeviceConnection'
+        // should be called again to connect to the device.
         throw new Error(message);
     }
 
