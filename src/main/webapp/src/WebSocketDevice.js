@@ -87,7 +87,7 @@ function WebSocketDevice() {
                             if (!me.xmlHttpSupport) {
                                 me.xmlHttpSupport = new XmlHttpSupport();
                             }
-                            me.xmlHttpSupport.getData(httpsUrl, console.log, console.log);
+                            me.xmlHttpSupport.getData(httpsUrl, console.log.bind(console), console.log.bind(console));
                             me.triedToFix401 = true;
                         }
                     }

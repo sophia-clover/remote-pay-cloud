@@ -145,7 +145,7 @@ function Clover(configuration) {
                                 // recurse
                                 me.initDeviceConnection();
                             }
-                            , console.log
+                            , console.log.bind(console)
                         );
                     } else {
                         //Nothing left to try.  Either error out or get more info from the user.
