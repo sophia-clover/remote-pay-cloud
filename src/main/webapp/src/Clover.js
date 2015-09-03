@@ -57,6 +57,7 @@ function Clover(configuration) {
      *  will be made once the WebSocketDevice.onopen is called.
      *
      * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
+     *  Adheres to error first paradigm.
      */
     this.initDeviceConnection = function (callBackOnDeviceReady) {
         if(callBackOnDeviceReady) {
@@ -69,7 +70,7 @@ function Clover(configuration) {
      *
      *  The device connection is NOT made on completion of this call.  The device connection
      *  will be made once the WebSocketDevice.onopen is called.
-     *
+     * @private
      * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
      */
     this.initDeviceConnectionInternal = function (callBackOnDeviceReady) {
@@ -261,7 +262,10 @@ function Clover(configuration) {
     /**
      * We can override this to pop up a window to let the user enter any missing information.
      *
-     * @param message - an error message.  This could be ignored.
+     * @param {string} message - an error message.  This could be ignored.
+     * @param {CloverConfig} [configuration] - the configuration that is incomplete.
+     * @param callback - the error first callback.  If defined, then it will be called with
+     *  the first parameter as a CloverError.  If not defined, then the CloverError will be thrown.
      */
     this.incompleteConfiguration = function (message, configuration, callback) {
         // If this is used to obtain the configuration information, then the
@@ -276,7 +280,7 @@ function Clover(configuration) {
     }
 
     /**
-     * Display a set of devices
+     * Handle a set of devices.  Sets up an internal map of devices from serial->device
      * @private
      * @param devicesVX
      */
@@ -300,6 +304,9 @@ function Clover(configuration) {
     }
 
     /**
+     * Contacts the device.  Sends DISCOVERY_REQUEST messages for a period of time until a response is received.
+     * Currently set to retry 10 times at 3 second intervals
+     *
      * @private
      */
     this.contactDevice = function () {
@@ -342,7 +349,7 @@ function Clover(configuration) {
     }
 
     /**
-     *
+     * Can be used to manually set a function to be called one time when the device gets a DISCOVERY_RESPONSE.
      * @param tellMeWhenDeviceIsReady - callback function called when the device is ready for operations.
      */
     this.notifyWhenDeviceIsReady = function (tellMeWhenDeviceIsReady) {
