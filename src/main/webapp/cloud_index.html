@@ -431,29 +431,38 @@
           function (data) {
             // The format of the data received is:
             //{
+            //    'sent': true | false,
             //    'host': web_socket_host,
             //    'token': token_to_link_to_the_device
             //}
             // Use this data to build the web socket url
-            var url = data.host + '/support/cs?token=' + data.token;
+            // Note "!data.hasOwnProperty('sent')" is included to allow for
+            // backwards compatibility.  If the property is NOT included, then
+            // we will assume an earlier version of the protocol on the server,
+            // and assume that the notification WAS SENT.
+            if(!data.hasOwnProperty('sent') || data.sent) {
+              var url = data.host + '/support/cs?token=' + data.token;
 
-            displayUIFeedBack("Server responded with information on how to contact device.<br/>" +
-                    "The following can be used to configure the simple examples:<br/>" +
-                '<pre>' +
-                '{\n'+
-                '   "oauthToken" : "'+cloverOAuth.getAccessToken()+'",\n'+
-                '   "domain" : "'+cloverOAuth.configuration.domain+'",\n' +
-                '   "merchantId" : "'+merchantId+'",\n' +
-                '   "deviceSerialId" : "'+selectedDevice.serial+'"\n' +
-                '}\n' +
-                '</pre>'
-            );
+              displayUIFeedBack("Server responded with information on how to contact device.<br/>" +
+                  "The following can be used to configure the simple examples:<br/>" +
+                  '<pre>' +
+                  '{\n' +
+                  '   "oauthToken" : "' + cloverOAuth.getAccessToken() + '",\n' +
+                  '   "domain" : "' + cloverOAuth.configuration.domain + '",\n' +
+                  '   "merchantId" : "' + merchantId + '",\n' +
+                  '   "deviceSerialId" : "' + selectedDevice.serial + '"\n' +
+                  '}\n' +
+                  '</pre>'
+              );
 
-            displayUIFeedBack("Opening communication channel...");
+              displayUIFeedBack("Opening communication channel...");
 
-            // The response to this will be reflected in the device.onopen method (or on error),
-            // That function will attempt the discovery.
-            device.contactDevice(url);
+              // The response to this will be reflected in the device.onopen method (or on error),
+              // That function will attempt the discovery.
+              device.contactDevice(url);
+            } else {
+              displayUIFeedBack("Device is not connected to push server, cannot create connection");
+            }
           },
           function (error) {
             console.log(error);
@@ -528,12 +537,14 @@
       var i;
       for (i = 0; i < devices.length; i++) {
         var style = 'device_enabled';
-        out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
-            '<input type="radio" name="device" value="' +
-            devices[i].serial + '"  ' +
-            ' onclick="deviceClicked(this)"/>' +
-            devices[i].model + " " + devices[i].serial +
-            '</div><br>';
+        if(devices[i].model != "Clover_C100") {
+          out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
+              '<input type="radio" name="device" value="' +
+              devices[i].serial + '"  ' +
+              ' onclick="deviceClicked(this)"/>' +
+              devices[i].model + " " + devices[i].serial +
+              '</div><br>';
+        }
         deviceBySerial[devices[i].serial] = devices[i];
       }
       document.getElementById("id01").innerHTML = out;
