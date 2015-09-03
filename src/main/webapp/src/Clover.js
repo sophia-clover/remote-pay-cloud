@@ -49,19 +49,36 @@ function Clover(configuration) {
         }
     }
 
+
     /**
      * Called to initialize the device for communications.
      *
      *  The device connection is NOT made on completion of this call.  The device connection
      *  will be made once the WebSocketDevice.onopen is called.
+     *
+     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
      */
-    this.initDeviceConnection = function () {
+    this.initDeviceConnection = function (callBackOnDeviceReady) {
+        if(callBackOnDeviceReady) {
+            this.device.once(LanMethod.DISCOVERY_RESPONSE, function(message){ callBackOnDeviceReady(null, message) });
+        }
+        return this.initDeviceConnectionInternal(callBackOnDeviceReady);
+    }
+    /**
+     * Called to initialize the device for communications.
+     *
+     *  The device connection is NOT made on completion of this call.  The device connection
+     *  will be made once the WebSocketDevice.onopen is called.
+     *
+     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
+     */
+    this.initDeviceConnectionInternal = function (callBackOnDeviceReady) {
         // Check to see if we have any configuration at all.
         if (!this.configuration) {
-            if (!this.loadPersistedConfiguration()) {
+            if (!this.loadPersistedConfiguration(callBackOnDeviceReady)) {
                 return;
             }
-            this.initDeviceConnection();
+            this.initDeviceConnectionInternal(callBackOnDeviceReady);
         } else if (this.configuration.deviceURL) {
             // We have enough information to contact the device.
             // save the configuration (except for the device url, which always changes)
@@ -125,14 +142,27 @@ function Clover(configuration) {
                                     // That function will attempt the discovery.
                                     me.configuration.deviceURL = url;
                                     //recurse
-                                    me.initDeviceConnection();
+                                    me.initDeviceConnectionInternal(callBackOnDeviceReady);
                                 } else {
                                     // Should it retry?
-                                    console.log("Device is not connected to push server, cannot create connection");
+                                    // If the callback is defined, call it.
+                                    var message = "Device is not connected to push server, cannot create connection";
+                                    if(callBackOnDeviceReady) {
+                                        callBackOnDeviceReady(new CloverError(CloverError.DEVICE_OFFLINE,
+                                            message));
+                                    } else {
+                                        console.log(message);
+                                    }
                                 }
                             },
                             function (error) {
-                                console.log(error);
+                                // TODO: Might want to create a new CloverError here.
+                                callBackOnDeviceReady(error);
+                                if(callBackOnDeviceReady) {
+                                    callBackOnDeviceReady(error);
+                                } else {
+                                    console.log(error);
+                                }
                             }, deviceContactInfo
                         );
 
@@ -163,9 +193,9 @@ function Clover(configuration) {
                                 me.configuration.deviceId =
                                     me.deviceBySerial[me.configuration.deviceSerialId].id;
                                 // recurse
-                                me.initDeviceConnection();
+                                me.initDeviceConnectionInternal(callBackOnDeviceReady);
                             }
-                            , console.log.bind(console)
+                            , callBackOnDeviceReady
                         );
                     } else {
                         //Nothing left to try.  Either error out or get more info from the user.
@@ -174,13 +204,15 @@ function Clover(configuration) {
                             " of the device. " +
                             " You can find the device serial number using the device. Select " +
                             "'Settings > About (Station|Mini|Mobile) > Status', select 'Status' and " +
-                            "look for 'Serial number' in the list displayed.", this.configuration );
+                            "look for 'Serial number' in the list displayed.", this.configuration,
+                            callBackOnDeviceReady);
                         return;
 
                     }
                 } else {
                     // We do not have enough info to initialize.  Error out
-                    this.incompleteConfiguration("Incomplete init info.", this.configuration );
+                    this.incompleteConfiguration("Incomplete init info.", this.configuration,
+                        callBackOnDeviceReady );
                     return;
                 }
             } else {
@@ -192,7 +224,7 @@ function Clover(configuration) {
                     // This may cause a redirect
                     this.configuration.oauthToken = this.cloverOAuth.getAccessToken();
                     // recurse
-                    this.initDeviceConnection();
+                    this.initDeviceConnectionInternal(callBackOnDeviceReady);
                 }
             }
         }
@@ -204,14 +236,14 @@ function Clover(configuration) {
      *
      * @returns {boolean} true if the configuration was loaded.
      */
-    this.loadPersistedConfiguration = function () {
+    this.loadPersistedConfiguration = function (callback) {
         // We have no configuration at all.  Try to get it from a cookie
         if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
         this.configuration = Clover.loadConfigurationFromCookie(this.configurationName);
         if (!this.configuration) {
             // fire up a gui to get the values?
             // This could be some server call back or other too.
-            this.incompleteConfiguration("No initialization info found in cookie", this.configuration );
+            this.incompleteConfiguration("No initialization info found in cookie", this.configuration, callback );
             return false;
         }
         return true;
@@ -231,11 +263,11 @@ function Clover(configuration) {
      *
      * @param message - an error message.  This could be ignored.
      */
-    this.incompleteConfiguration = function (message, configuration) {
+    this.incompleteConfiguration = function (message, configuration, callback) {
         // If this is used to obtain the configuration information, then the
         // configuration should be updated, and then the 'initDeviceConnection'
         // should be called again to connect to the device.
-        throw new Error(message);
+        callback(new CloverError(CloverError.INCOMPLETE_CONFIGURATION), message);
     }
 
     /**
