@@ -267,7 +267,12 @@ function Clover(configuration) {
         // If this is used to obtain the configuration information, then the
         // configuration should be updated, and then the 'initDeviceConnection'
         // should be called again to connect to the device.
-        callback(new CloverError(CloverError.INCOMPLETE_CONFIGURATION), message);
+        var error = new CloverError(CloverError.INCOMPLETE_CONFIGURATION, message);
+        if(callback) {
+            callback(error);
+        } else {
+            throw error;
+        }
     }
 
     /**
