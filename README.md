@@ -65,7 +65,7 @@ function makeASale(error) {
   else clover.sale({"amount" : 12345, "tipAmount" : 123 }, mySaleResult);
 }
 ```
-
+#####Here we define the error-first callback that we pass in to the Clover.sale function above.  If an error occurs, it will be the first parameter.
 ```
 function mySaleResult(error, saleResult) {
   // do something with the result
