@@ -25,7 +25,8 @@ function RemoteMessageBuilder(defaultPackageName){
         lanMessage.packageName = this.defaultPackageName; //"com.clover.remote.protocol.websocket";
         if(packageName)lanMessage.packageName = packageName;
         // This is how they are doing the payload...
-        if(payload) lanMessage.payload = JSON.stringify(payload);
+        if(!payload)payload = { "method" : method };
+        lanMessage.payload = JSON.stringify(payload);
         lanMessage.type = RemoteMessageBuilder.COMMAND;
         if(type)lanMessage.type = type;
         // There is an 'id' in the java instance, but I do not see it being used right now.

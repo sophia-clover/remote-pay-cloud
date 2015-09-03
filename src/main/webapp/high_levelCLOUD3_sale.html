@@ -5,16 +5,7 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-  <script src="src/xmlHttpSupport.js"></script>
-
-  <script src="src/Clover.js"></script>
-  <script src="src/CardEntryMethods.js"></script>
-  <script src="src/CloverOAuth.js"></script>
-  <script src="src/WebSocketDevice.js"></script>
-  <script src="src/Endpoints.js"></script>
-  <script src="src/ids.js"></script>
-  <script src="src/eventemitter3_v1_1_1.js"></script>
-  <script src="src/RemoteMessageBuilder.js"></script>
+  <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -40,26 +31,27 @@
         "oauthToken" : "4576ef43-a375-f7b4-b3eb-94735dcb4b08",
         "domain" : "https://dev1.dev.clover.com/",
         "merchantId" : "BBFF8NBCXEMDT",
-        "deviceSerialId" : "C030UQ50550081"
+        "deviceSerialId" : "C030UQ50550161"
       });
 
   // Start communication
-  clover.initDeviceConnection();
-
-  // When the device is ready, start a transaction.
-  clover.notifyWhenDeviceIsReady(makeASale);
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(makeASale);
 
   // This will be called when the device is ready
-  function makeASale() {
-    var mySale = {
-      "amount" : 12345, //the amount of a sale, including tax
-      "tipAmount" : 123 /*, // - the amount of a tip.  Added to the amount for the total.
-      "orderId" : "123456789012" // - an id for this sale */
-    }
+  function makeASale(error) {
+    if(error) {
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    } else {
+      var mySale = {
+        "amount": 12345, //the amount of a sale, including tax
+        "tipAmount": 123 // - the amount of a tip.  Added to the amount for the total.
+      }
 
-    // Call the device to take payment, after the payment is complete, call the
-    // 'mySaleResult' function
-    clover.sale(mySale, resultCallback);
+      // Call the device to take payment, after the payment is complete, call the
+      // 'mySaleResult' function
+      clover.sale(mySale, resultCallback);
+    }
   }
 
   /**

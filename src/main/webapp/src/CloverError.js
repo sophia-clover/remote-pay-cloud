@@ -20,3 +20,5 @@ CloverError.prototype = new Error;
 
 CloverError.INVALID_DATA = "invalid data";
 CloverError.NOT_IMPLEMENTED = "not implemented";
+CloverError.DEVICE_OFFLINE = "device offline";
+CloverError.INCOMPLETE_CONFIGURATION = "incomplete configuration";

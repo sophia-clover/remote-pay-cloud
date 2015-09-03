@@ -5,20 +5,7 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-  <script src="src/xmlHttpSupport.js"></script>
-
-
-  <script src="src/CloverOAuth.js"></script>
-  <script src="src/Clover.js"></script>
-  <script src="src/WebSocketDevice.js"></script>
-  <script src="src/Endpoints.js"></script>
-  <script src="src/ids.js"></script>
-  <script src="src/eventemitter3_v1_1_1.js"></script>
-  <script src="src/RemoteMessageBuilder.js"></script>
-  <script type="text/javascript">
-
-
-  </script>
+  <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -436,11 +423,7 @@
             //    'token': token_to_link_to_the_device
             //}
             // Use this data to build the web socket url
-            // Note "!data.hasOwnProperty('sent')" is included to allow for
-            // backwards compatibility.  If the property is NOT included, then
-            // we will assume an earlier version of the protocol on the server,
-            // and assume that the notification WAS SENT.
-            if(!data.hasOwnProperty('sent') || data.sent) {
+            if(data.sent) {
               var url = data.host + '/support/cs?token=' + data.token;
 
               displayUIFeedBack("Server responded with information on how to contact device.<br/>" +
@@ -537,14 +520,12 @@
       var i;
       for (i = 0; i < devices.length; i++) {
         var style = 'device_enabled';
-        if(devices[i].model != "Clover_C100") {
-          out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
-              '<input type="radio" name="device" value="' +
-              devices[i].serial + '"  ' +
-              ' onclick="deviceClicked(this)"/>' +
-              devices[i].model + " " + devices[i].serial +
-              '</div><br>';
-        }
+        out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
+            '<input type="radio" name="device" value="' +
+            devices[i].serial + '"  ' +
+            ' onclick="deviceClicked(this)"/>' +
+            devices[i].model + " " + devices[i].serial +
+            '</div><br>';
         deviceBySerial[devices[i].serial] = devices[i];
       }
       document.getElementById("id01").innerHTML = out;

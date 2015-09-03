@@ -68,6 +68,45 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <version>1.3.2</version>
+        <configuration>
+          <preProcessAggregates>true</preProcessAggregates>
+          <aggregations>
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <output>${basedir}/target/cloverCloud.js</output>
+              <inputDir>${basedir}/src/main/webapp/src</inputDir>
+              <includes>
+                <include>**/*.js</include>
+              </includes>
+            </aggregation>
+          </aggregations>
+          <excludes>
+            <exclude>**/*-min.js</exclude>
+            <exclude>**/*.min.js</exclude>
+            <exclude>**/*-min.css</exclude>
+            <exclude>**/*.min.css</exclude>
+          </excludes>
+          <jswarn>false</jswarn>
+          <nosuffix>false</nosuffix>
+          <sourceDirectory>${basedir}/target</sourceDirectory>
+          <outputDirectory>${pom.build.directory}/${pom.build.finalName}/src</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>compress_js_css</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 

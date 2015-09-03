@@ -49,19 +49,36 @@ function Clover(configuration) {
         }
     }
 
+
     /**
      * Called to initialize the device for communications.
      *
      *  The device connection is NOT made on completion of this call.  The device connection
      *  will be made once the WebSocketDevice.onopen is called.
+     *
+     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
      */
-    this.initDeviceConnection = function () {
+    this.initDeviceConnection = function (callBackOnDeviceReady) {
+        if(callBackOnDeviceReady) {
+            this.device.once(LanMethod.DISCOVERY_RESPONSE, function(message){ callBackOnDeviceReady(null, message) });
+        }
+        return this.initDeviceConnectionInternal(callBackOnDeviceReady);
+    }
+    /**
+     * Called to initialize the device for communications.
+     *
+     *  The device connection is NOT made on completion of this call.  The device connection
+     *  will be made once the WebSocketDevice.onopen is called.
+     *
+     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
+     */
+    this.initDeviceConnectionInternal = function (callBackOnDeviceReady) {
         // Check to see if we have any configuration at all.
         if (!this.configuration) {
-            if (!this.loadPersistedConfiguration()) {
+            if (!this.loadPersistedConfiguration(callBackOnDeviceReady)) {
                 return;
             }
-            this.initDeviceConnection();
+            this.initDeviceConnectionInternal(callBackOnDeviceReady);
         } else if (this.configuration.deviceURL) {
             // We have enough information to contact the device.
             // save the configuration (except for the device url, which always changes)
@@ -104,25 +121,48 @@ function Clover(configuration) {
                             function (data) {
                                 // The format of the data received is:
                                 //{
+                                //    'sent': true | false,
                                 //    'host': web_socket_host,
                                 //    'token': token_to_link_to_the_device
                                 //}
                                 // Use this data to build the web socket url
-                                var url = data.host + '/support/cs?token=' + data.token;
-                                me.device.messageBuilder = new RemoteMessageBuilder(
-                                    "com.clover.remote.protocol.websocket");
+                                // Note "!data.hasOwnProperty('sent')" is included to allow for
+                                // backwards compatibility.  If the property is NOT included, then
+                                // we will assume an earlier version of the protocol on the server,
+                                // and assume that the notification WAS SENT.
+                                if(!data.hasOwnProperty('sent') || data.sent) {
+                                    var url = data.host + '/support/cs?token=' + data.token;
+                                    me.device.messageBuilder = new RemoteMessageBuilder(
+                                        "com.clover.remote.protocol.websocket");
 
-                                console.log("Server responded with information on how to contact device. " +
-                                    "Opening communication channel...");
+                                    console.log("Server responded with information on how to contact device. " +
+                                        "Opening communication channel...");
 
-                                // The response to this will be reflected in the device.onopen method (or on error),
-                                // That function will attempt the discovery.
-                                me.configuration.deviceURL = url;
-                                //recurse
-                                me.initDeviceConnection();
+                                    // The response to this will be reflected in the device.onopen method (or on error),
+                                    // That function will attempt the discovery.
+                                    me.configuration.deviceURL = url;
+                                    //recurse
+                                    me.initDeviceConnectionInternal(callBackOnDeviceReady);
+                                } else {
+                                    // Should it retry?
+                                    // If the callback is defined, call it.
+                                    var message = "Device is not connected to push server, cannot create connection";
+                                    if(callBackOnDeviceReady) {
+                                        callBackOnDeviceReady(new CloverError(CloverError.DEVICE_OFFLINE,
+                                            message));
+                                    } else {
+                                        console.log(message);
+                                    }
+                                }
                             },
                             function (error) {
-                                console.log(error);
+                                // TODO: Might want to create a new CloverError here.
+                                callBackOnDeviceReady(error);
+                                if(callBackOnDeviceReady) {
+                                    callBackOnDeviceReady(error);
+                                } else {
+                                    console.log(error);
+                                }
                             }, deviceContactInfo
                         );
 
@@ -139,13 +179,23 @@ function Clover(configuration) {
                         xmlHttpSupport.getData(url,
                             function (devices) {
                                 me.handleDevices(devices);
+                                // Stations do not support the kiosk/pay display.
+                                // If the user has selected one, then print out a (loud) warning
+                                if(me.deviceBySerial[me.configuration.deviceSerialId].model == "Clover_C100") {
+                                    console.log(
+                                        "Warning - Selected device model (" +
+                                        me.deviceBySerial[me.configuration.deviceSerialId].model +
+                                        ") does not support cloud pay display." +
+                                        "  Will attempt to send notification to device, but no response" +
+                                        " should be expected.");
+                                }
                                 // serial' number of the device
                                 me.configuration.deviceId =
                                     me.deviceBySerial[me.configuration.deviceSerialId].id;
                                 // recurse
-                                me.initDeviceConnection();
+                                me.initDeviceConnectionInternal(callBackOnDeviceReady);
                             }
-                            , console.log
+                            , callBackOnDeviceReady
                         );
                     } else {
                         //Nothing left to try.  Either error out or get more info from the user.
@@ -154,13 +204,15 @@ function Clover(configuration) {
                             " of the device. " +
                             " You can find the device serial number using the device. Select " +
                             "'Settings > About (Station|Mini|Mobile) > Status', select 'Status' and " +
-                            "look for 'Serial number' in the list displayed.", this.configuration );
+                            "look for 'Serial number' in the list displayed.", this.configuration,
+                            callBackOnDeviceReady);
                         return;
 
                     }
                 } else {
                     // We do not have enough info to initialize.  Error out
-                    this.incompleteConfiguration("Incomplete init info.", this.configuration );
+                    this.incompleteConfiguration("Incomplete init info.", this.configuration,
+                        callBackOnDeviceReady );
                     return;
                 }
             } else {
@@ -172,7 +224,7 @@ function Clover(configuration) {
                     // This may cause a redirect
                     this.configuration.oauthToken = this.cloverOAuth.getAccessToken();
                     // recurse
-                    this.initDeviceConnection();
+                    this.initDeviceConnectionInternal(callBackOnDeviceReady);
                 }
             }
         }
@@ -184,14 +236,14 @@ function Clover(configuration) {
      *
      * @returns {boolean} true if the configuration was loaded.
      */
-    this.loadPersistedConfiguration = function () {
+    this.loadPersistedConfiguration = function (callback) {
         // We have no configuration at all.  Try to get it from a cookie
         if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
         this.configuration = Clover.loadConfigurationFromCookie(this.configurationName);
         if (!this.configuration) {
             // fire up a gui to get the values?
             // This could be some server call back or other too.
-            this.incompleteConfiguration("No initialization info found in cookie", this.configuration );
+            this.incompleteConfiguration("No initialization info found in cookie", this.configuration, callback );
             return false;
         }
         return true;
@@ -211,8 +263,16 @@ function Clover(configuration) {
      *
      * @param message - an error message.  This could be ignored.
      */
-    this.incompleteConfiguration = function (message) {
-        throw new Error(message);
+    this.incompleteConfiguration = function (message, configuration, callback) {
+        // If this is used to obtain the configuration information, then the
+        // configuration should be updated, and then the 'initDeviceConnection'
+        // should be called again to connect to the device.
+        var error = new CloverError(CloverError.INCOMPLETE_CONFIGURATION, message);
+        if(callback) {
+            callback(error);
+        } else {
+            throw error;
+        }
     }
 
     /**

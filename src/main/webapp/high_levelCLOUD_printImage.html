@@ -5,16 +5,7 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-  <script src="src/xmlHttpSupport.js"></script>
-
-  <script src="src/Clover.js"></script>
-  <script src="src/CardEntryMethods.js"></script>
-  <script src="src/CloverOAuth.js"></script>
-  <script src="src/WebSocketDevice.js"></script>
-  <script src="src/Endpoints.js"></script>
-  <script src="src/ids.js"></script>
-  <script src="src/eventemitter3_v1_1_1.js"></script>
-  <script src="src/RemoteMessageBuilder.js"></script>
+  <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -39,7 +30,7 @@
         "oauthToken" : "4576ef43-a375-f7b4-b3eb-94735dcb4b08",
         "domain" : "https://dev1.dev.clover.com/",
         "merchantId" : "BBFF8NBCXEMDT",
-        "deviceSerialId" : "C030UQ50550081"
+        "deviceSerialId" : "C030UQ50550161"
       });
 
   imageIsLoaded = false
@@ -47,11 +38,9 @@
   document.getElementById("rct_img").addEventListener("load", function() { imageLoaded(); });
 
   // Start communication
-  clover.initDeviceConnection();
-
   deviceIsReady = false;
-  // When the device is ready, use it
-  clover.notifyWhenDeviceIsReady(deviceReady);
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(deviceReady);
 
   function imageLoaded() {
     imageIsLoaded = true;
@@ -60,10 +49,14 @@
     }
   }
 
-  function deviceReady() {
-    deviceIsReady = true;
-    if(imageIsLoaded) {
-      printImg();
+  function deviceReady(error) {
+    if(error) {
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    } else {
+      deviceIsReady = true;
+      if (imageIsLoaded) {
+        printImg();
+      }
     }
   }
 
