@@ -104,22 +104,28 @@ function Clover(configuration) {
                             function (data) {
                                 // The format of the data received is:
                                 //{
+                                //    'sent': true | false,
                                 //    'host': web_socket_host,
                                 //    'token': token_to_link_to_the_device
                                 //}
                                 // Use this data to build the web socket url
-                                var url = data.host + '/support/cs?token=' + data.token;
-                                me.device.messageBuilder = new RemoteMessageBuilder(
-                                    "com.clover.remote.protocol.websocket");
+                                if(data.sent) {
+                                    var url = data.host + '/support/cs?token=' + data.token;
+                                    me.device.messageBuilder = new RemoteMessageBuilder(
+                                        "com.clover.remote.protocol.websocket");
 
-                                console.log("Server responded with information on how to contact device. " +
-                                    "Opening communication channel...");
+                                    console.log("Server responded with information on how to contact device. " +
+                                        "Opening communication channel...");
 
-                                // The response to this will be reflected in the device.onopen method (or on error),
-                                // That function will attempt the discovery.
-                                me.configuration.deviceURL = url;
-                                //recurse
-                                me.initDeviceConnection();
+                                    // The response to this will be reflected in the device.onopen method (or on error),
+                                    // That function will attempt the discovery.
+                                    me.configuration.deviceURL = url;
+                                    //recurse
+                                    me.initDeviceConnection();
+                                } else {
+                                    // Should it retry?
+                                    console.log("Device is not connected to push server, cannot create connection");
+                                }
                             },
                             function (error) {
                                 console.log(error);
