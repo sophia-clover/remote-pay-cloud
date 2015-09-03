@@ -58,7 +58,7 @@ documentation for details on the [CloverConfig](https://rawgit.com/clover/remote
 object and how to set up your connection.
 
 ####Define how your program will use the Clover object
-#####This function will be passed when we start communicating with the device.  If there is an error when communication is initiated, this function will get the error as a parameter.
+#####In this example, this function will be passed when we start communicating with the device.  If there is an error when communication is initiated, this function will get the error as a parameter.
 ```
 function makeASale(error) {
   if(error) console.log(error)
