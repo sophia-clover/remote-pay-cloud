@@ -56,6 +56,13 @@ function Clover(configuration) {
      *  The device connection is NOT made on completion of this call.  The device connection
      *  will be made once the WebSocketDevice.onopen is called.
      *
+     *  If there is no active configuration, then this will try to load the configuration using
+     *  Clover.loadPersistedConfiguration.  Once the deviceURL has been derived, an attempt will be made to persist
+     *  the configuration using Clover.persistConfiguration.
+     *
+     *  If there is not enough configuration information to connect to the device, then Clover.incompleteConfiguration
+     *  will be called.
+     *
      * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
      *  Adheres to error first paradigm.
      */
@@ -235,6 +242,8 @@ function Clover(configuration) {
      * Loads the configuration that was stored.  This implementation just grabs the
      * configuration from a cookie.
      *
+     * @param callback - the error first callback that will be passed to Clover.incompleteConfiguration
+     *  if no configuration could be loaded.
      * @returns {boolean} true if the configuration was loaded.
      */
     this.loadPersistedConfiguration = function (callback) {

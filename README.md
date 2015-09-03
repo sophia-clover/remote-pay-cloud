@@ -29,7 +29,7 @@ View our [Webhooks Developer Docs](https://docs.clover.com/build/web-apps/webhoo
 Make sure the Cloud Pay Display app is installed for your merchant on your Clover device.
 For the main "Cloud Example", you will need the "App ID".  On the "Your Apps" page, find and copy the "App ID".
 
-The "Simple" examples require information that can be obtained by running the "Cloud Example".              
+The "Simple" examples require information that can be obtained by running the "Cloud Example".             
     
 ## Build and run the Example Application
     
@@ -57,29 +57,25 @@ There are several ways the Clover object can be configured. See the [Clover](htt
 documentation for details on the [CloverConfig](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/global.html#CloverConfig)
 object and how to set up your connection.
 
-####Start communicating with the device
+####Define how your program will use the Clover object
+#####This function will be passed when we start communicating with the device.  If there is an error when communication is initiated, this function will get the error as a parameter.
 ```
-clover.initDeviceConnection();
-```
-
-####Tell the device to call your program when it is ready
-```
-clover.notifyWhenDeviceIsReady(makeASale);
-```
-
-####Have your program use the clover object
-```
-function makeASale() {
-  clover.sale({"amount" : 12345, "tipAmount" : 123, "orderId" : "123456789012"}, mySaleResult);
+function makeASale(error) {
+  if(error) console.log(error)
+  else clover.sale({"amount" : 12345, "tipAmount" : 123 }, mySaleResult);
 }
 ```
 
 ```
-function mySaleResult(success, saleResult) {
+function mySaleResult(error, saleResult) {
   // do something with the result
 }
 ```
 
+####Start communicating with the device and tell the device to call your program when it is ready
+```
+clover.initDeviceConnection(makeASale);
+```
 
 View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 
 details of the JS SDK protocol for showing order details, starting a transaction, and getting a payment response back 
