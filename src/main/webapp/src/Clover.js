@@ -109,7 +109,11 @@ function Clover(configuration) {
                                 //    'token': token_to_link_to_the_device
                                 //}
                                 // Use this data to build the web socket url
-                                if(data.sent) {
+                                // Note "!data.hasOwnProperty('sent')" is included to allow for
+                                // backwards compatibility.  If the property is NOT included, then
+                                // we will assume an earlier version of the protocol on the server,
+                                // and assume that the notification WAS SENT.
+                                if(!data.hasOwnProperty('sent') || data.sent) {
                                     var url = data.host + '/support/cs?token=' + data.token;
                                     me.device.messageBuilder = new RemoteMessageBuilder(
                                         "com.clover.remote.protocol.websocket");
@@ -145,6 +149,16 @@ function Clover(configuration) {
                         xmlHttpSupport.getData(url,
                             function (devices) {
                                 me.handleDevices(devices);
+                                // Stations do not support the kiosk/pay display.
+                                // If the user has selected one, then print out a (loud) warning
+                                if(me.deviceBySerial[me.configuration.deviceSerialId].model == "Clover_C100") {
+                                    console.log(
+                                        "Warning - Selected device model (" +
+                                        me.deviceBySerial[me.configuration.deviceSerialId].model +
+                                        ") does not support cloud pay display." +
+                                        "  Will attempt to send notification to device, but no response" +
+                                        " should be expected.");
+                                }
                                 // serial' number of the device
                                 me.configuration.deviceId =
                                     me.deviceBySerial[me.configuration.deviceSerialId].id;
