@@ -47,6 +47,8 @@ java -jar target/dependency/jetty-runner.jar target/*.war
 ## Make a Transaction
 
 ###High Level API
+This example refers to the source files in the [webapp directory](./src/main/webapp).
+
 To make a payment using the High Level Cloud API
 ####Create the Clover object.
 ```
@@ -57,6 +59,12 @@ There are several ways the Clover object can be configured. See the [Clover](htt
 documentation for details on the [CloverConfig](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/global.html#CloverConfig)
 object and how to set up your connection.
 
+Examples of creating the Clover object:
+
+1. [With a clientID, domain, merchantId, deviceSerialId](./src/main/webapp/high_levelCLOUD_sale.html#L29)
+1. [With a oauthToken, domain, merchantId, deviceSerialId](./src/main/webapp/high_levelCLOUD_printImage.html#L30)
+1. [Relying on a saved configuration in a cookie](./src/main/webapp/high_levelCLOUD4_sale.html#L32)
+
 ####Define how your program will use the Clover object
 #####In this example, this function will be passed when we start communicating with the device.  If there is an error when communication is initiated, this function will get the error as a parameter.
 ```
@@ -65,6 +73,8 @@ function makeASale(error) {
   else clover.sale({"amount" : 12345, "tipAmount" : 123 }, mySaleResult);
 }
 ```
+
+[Example of function to handle device initialization and invoke an operation](./src/main/webapp/high_levelCLOUD_sale.html#L42)
 #####Here we define the error-first callback that we pass in to the Clover.sale function above.  If an error occurs, it will be the first parameter.
 ```
 function mySaleResult(error, saleResult) {
@@ -72,10 +82,14 @@ function mySaleResult(error, saleResult) {
 }
 ```
 
+[Example of function to handle result of an operation](./src/main/webapp/high_levelCLOUD_sale.html#L62)
 ####Start communicating with the device and tell the device to call your program when it is ready
 ```
 clover.initDeviceConnection(makeASale);
 ```
+
+[Example of initializing the device connection](./src/main/webapp/high_levelCLOUD_sale.html#L39)
+
 
 View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 
 details of the JS SDK protocol for showing order details, starting a transaction, and getting a payment response back 

@@ -67,8 +67,10 @@ function Clover(configuration) {
      *  Adheres to error first paradigm.
      */
     this.initDeviceConnection = function (callBackOnDeviceReady) {
-        if(callBackOnDeviceReady) {
-            this.device.once(LanMethod.DISCOVERY_RESPONSE, function(message){ callBackOnDeviceReady(null, message) });
+        if (callBackOnDeviceReady) {
+            this.device.once(LanMethod.DISCOVERY_RESPONSE, function (message) {
+                callBackOnDeviceReady(null, message)
+            });
         }
         return this.initDeviceConnectionInternal(callBackOnDeviceReady);
     }
@@ -138,7 +140,7 @@ function Clover(configuration) {
                                 // backwards compatibility.  If the property is NOT included, then
                                 // we will assume an earlier version of the protocol on the server,
                                 // and assume that the notification WAS SENT.
-                                if(!data.hasOwnProperty('sent') || data.sent) {
+                                if (!data.hasOwnProperty('sent') || data.sent) {
                                     var url = data.host + '/support/cs?token=' + data.token;
                                     me.device.messageBuilder = new RemoteMessageBuilder(
                                         "com.clover.remote.protocol.websocket");
@@ -155,7 +157,7 @@ function Clover(configuration) {
                                     // Should it retry?
                                     // If the callback is defined, call it.
                                     var message = "Device is not connected to push server, cannot create connection";
-                                    if(callBackOnDeviceReady) {
+                                    if (callBackOnDeviceReady) {
                                         callBackOnDeviceReady(new CloverError(CloverError.DEVICE_OFFLINE,
                                             message));
                                     } else {
@@ -166,7 +168,7 @@ function Clover(configuration) {
                             function (error) {
                                 // TODO: Might want to create a new CloverError here.
                                 callBackOnDeviceReady(error);
-                                if(callBackOnDeviceReady) {
+                                if (callBackOnDeviceReady) {
                                     callBackOnDeviceReady(error);
                                 } else {
                                     console.log(error);
@@ -189,7 +191,7 @@ function Clover(configuration) {
                                 me.handleDevices(devices);
                                 // Stations do not support the kiosk/pay display.
                                 // If the user has selected one, then print out a (loud) warning
-                                if(me.deviceBySerial[me.configuration.deviceSerialId].model == "Clover_C100") {
+                                if (me.deviceBySerial[me.configuration.deviceSerialId].model == "Clover_C100") {
                                     console.log(
                                         "Warning - Selected device model (" +
                                         me.deviceBySerial[me.configuration.deviceSerialId].model +
@@ -220,7 +222,7 @@ function Clover(configuration) {
                 } else {
                     // We do not have enough info to initialize.  Error out
                     this.incompleteConfiguration("Incomplete init info.", this.configuration,
-                        callBackOnDeviceReady );
+                        callBackOnDeviceReady);
                     return;
                 }
             } else {
@@ -253,7 +255,7 @@ function Clover(configuration) {
         if (!this.configuration) {
             // fire up a gui to get the values?
             // This could be some server call back or other too.
-            this.incompleteConfiguration("No initialization info found in cookie", this.configuration, callback );
+            this.incompleteConfiguration("No initialization info found in cookie", this.configuration, callback);
             return false;
         }
         return true;
@@ -281,7 +283,7 @@ function Clover(configuration) {
         // configuration should be updated, and then the 'initDeviceConnection'
         // should be called again to connect to the device.
         var error = new CloverError(CloverError.INCOMPLETE_CONFIGURATION, message);
-        if(callback) {
+        if (callback) {
             callback(error);
         } else {
             throw error;
@@ -423,78 +425,78 @@ function Clover(configuration) {
         } else if (!isInt(txnInfo.tipAmount)) {
             txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
                 "if paymentInfo has 'tipAmount', the value must be an integer"));
-        } else {
-            if (txnInfo.hasOwnProperty("employeeId")) {
-                payIntent.employeeId = txnInfo.employeeId;
-            }
-            if (txnInfo.hasOwnProperty("orderId")) {
-                payIntent.orderId = txnInfo.orderId;
-            }
-            payIntent.amount = txnInfo.amount;
-            payIntent.tipAmount = txnInfo.tipAmount;
-
-            // Reserve a reference to this object
-            var me = this;
-            // We will hold on to the signature since we are not showing it to the user.
-            var signature = null;
-            //Wire in the handler for completion to be called once.
-            /**
-             * Wire in automatic signature verification for now
-             */
-            this.device.once(LanMethod.VERIFY_SIGNATURE,
-                function (message) {
-                    try {
-                        var payload = JSON.parse(message.payload);
-                        var payment = JSON.parse(payload.payment);
-                        // Already an object...hmmm
-                        signature = payload.signature;
-                        me.device.sendSignatureVerified(payment);
-                    } catch (error) {
-                        var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
-                            "Failure attempting to send signature verification", error);
-                        txnRequestCallback(cloverError, {
-                            "code": "ERROR",
-                            "signature": signature,
-                            "request": txnInfo
-                        });
-                    }
-                }
-            );
-            this.device.once(LanMethod.FINISH_OK,
-                function (message) {
-                    var payload = JSON.parse(message.payload);
-                    var txnInfo = JSON.parse(payload[txnName]);//payment, credit
-                    var callBackPayload = {};
-                    callBackPayload.request = payIntent;
-                    callBackPayload[txnName] = txnInfo;
-                    callBackPayload.signature = signature;
-                    callBackPayload.code = txnInfo.result;
-
-                    txnRequestCallback(null, callBackPayload);
-                    me.device.sendShowWelcomeScreen();
-                }
-            );
-            this.device.once(LanMethod.FINISH_CANCEL,
-                function (message) {
-                    var callBackPayload = {};
-                    callBackPayload.request = payIntent;
-                    callBackPayload.signature = signature;
-                    callBackPayload.code = "CANCEL";
-                    txnRequestCallback(null, callBackPayload);
-                    me.device.sendShowWelcomeScreen();
-                }
-            );
-            try {
-                this.device.sendTXStart(payIntent);
-            } catch (error) {
-                var cloverError = new CloverError(LanMethod.TX_START,
-                    "Failure attempting to send start transaction", error);
-                txnRequestCallback(cloverError, {
-                    "code": "ERROR",
-                    "request": txnInfo
-                });
-            }
         }
+        if (txnInfo.hasOwnProperty("employeeId")) {
+            payIntent.employeeId = txnInfo.employeeId;
+        }
+        if (txnInfo.hasOwnProperty("orderId")) {
+            payIntent.orderId = txnInfo.orderId;
+        }
+        payIntent.amount = txnInfo.amount;
+        payIntent.tipAmount = txnInfo.tipAmount;
+
+        // Reserve a reference to this object
+        var me = this;
+        // We will hold on to the signature since we are not showing it to the user.
+        var signature = null;
+        //Wire in the handler for completion to be called once.
+        /**
+         * Wire in automatic signature verification for now
+         */
+        this.device.once(LanMethod.VERIFY_SIGNATURE,
+            function (message) {
+                try {
+                    var payload = JSON.parse(message.payload);
+                    var payment = JSON.parse(payload.payment);
+                    // Already an object...hmmm
+                    signature = payload.signature;
+                    me.device.sendSignatureVerified(payment);
+                } catch (error) {
+                    var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
+                        "Failure attempting to send signature verification", error);
+                    txnRequestCallback(cloverError, {
+                        "code": "ERROR",
+                        "signature": signature,
+                        "request": txnInfo
+                    });
+                }
+            }
+        );
+        this.device.once(LanMethod.FINISH_OK,
+            function (message) {
+                var payload = JSON.parse(message.payload);
+                var txnInfo = JSON.parse(payload[txnName]);//payment, credit
+                var callBackPayload = {};
+                callBackPayload.request = payIntent;
+                callBackPayload[txnName] = txnInfo;
+                callBackPayload.signature = signature;
+                callBackPayload.code = txnInfo.result;
+
+                txnRequestCallback(null, callBackPayload);
+                me.device.sendShowWelcomeScreen();
+            }
+        );
+        this.device.once(LanMethod.FINISH_CANCEL,
+            function (message) {
+                var callBackPayload = {};
+                callBackPayload.request = payIntent;
+                callBackPayload.signature = signature;
+                callBackPayload.code = "CANCEL";
+                txnRequestCallback(null, callBackPayload);
+                me.device.sendShowWelcomeScreen();
+            }
+        );
+        try {
+            this.device.sendTXStart(payIntent);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.TX_START,
+                "Failure attempting to send start transaction", error);
+            txnRequestCallback(cloverError, {
+                "code": "ERROR",
+                "request": txnInfo
+            });
+        }
+
     }
 
     /**
@@ -683,13 +685,11 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
     // We have no configuration at all.  Try to get it from a cookie
     var configuration = null;
     var cvalue = getCookie(configurationName);
-    if(cvalue) {
+    if (cvalue) {
         configuration = JSON.parse(cvalue);
     }
     return configuration;
 }
-
-
 
 
 /**
