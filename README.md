@@ -29,7 +29,7 @@ View our [Webhooks Developer Docs](https://docs.clover.com/build/web-apps/webhoo
 Make sure the Cloud Pay Display app is installed for your merchant on your Clover device.
 For the main "Cloud Example", you will need the "App ID".  On the "Your Apps" page, find and copy the "App ID".
 
-The "Simple" examples require information that can be obtained by running the "Cloud Example".              
+The "Simple" examples require information that can be obtained by running the "Cloud Example".             
     
 ## Build and run the Example Application
     
@@ -47,6 +47,8 @@ java -jar target/dependency/jetty-runner.jar target/*.war
 ## Make a Transaction
 
 ###High Level API
+This example refers to the source files in the [webapp directory](./src/main/webapp).
+
 To make a payment using the High Level Cloud API
 ####Create the Clover object.
 ```
@@ -57,28 +59,36 @@ There are several ways the Clover object can be configured. See the [Clover](htt
 documentation for details on the [CloverConfig](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/global.html#CloverConfig)
 object and how to set up your connection.
 
-####Start communicating with the device
-```
-clover.initDeviceConnection();
-```
+Examples of creating the Clover object:
 
-####Tell the device to call your program when it is ready
-```
-clover.notifyWhenDeviceIsReady(makeASale);
-```
+1. <a href="./src/main/webapp/high_levelCLOUD_sale.html#L29" target="_blank">With a clientID, domain, merchantId, deviceSerialId</a>
+1. <a href="./src/main/webapp/high_levelCLOUD_printImage.html#L30" target="_blank">With a oauthToken, domain, merchantId, deviceSerialId</a>
+1. <a href="./src/main/webapp/high_levelCLOUD4_sale.html#L32" target="_blank">Relying on a saved configuration in a cookie</a>
 
-####Have your program use the clover object
+####Define how your program will use the Clover object
+#####In this example, this function will be passed when we start communicating with the device.  If there is an error when communication is initiated, this function will get the error as a parameter.
 ```
-function makeASale() {
-  clover.sale({"amount" : 12345, "tipAmount" : 123, "orderId" : "123456789012"}, mySaleResult);
+function makeASale(error) {
+  if(error) console.log(error)
+  else clover.sale({"amount" : 12345, "tipAmount" : 123 }, mySaleResult);
 }
 ```
 
+<a href="./src/main/webapp/high_levelCLOUD_sale.html#L42" target="_blank">Example of function to handle device initialization and invoke an operation</a>
+#####Here we define the error-first callback that we pass in to the Clover.sale function above.  If an error occurs, it will be the first parameter.
 ```
-function mySaleResult(success, saleResult) {
+function mySaleResult(error, saleResult) {
   // do something with the result
 }
 ```
+
+<a href="./src/main/webapp/high_levelCLOUD_sale.html#L62" target="_blank">Example of function to handle result of an operation</a>
+####Start communicating with the device and tell the device to call your program when it is ready
+```
+clover.initDeviceConnection(makeASale);
+```
+
+<a href="./src/main/webapp/high_levelCLOUD_sale.html#L39" target="_blank">Example of initializing the device connection</a>
 
 
 View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 
