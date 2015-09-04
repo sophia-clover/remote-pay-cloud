@@ -405,6 +405,21 @@ WebSocketDevice.prototype.sendPaymentVoid = function(payment) {
 }
 
 /**
+ * Void a payment
+ *
+ * @param {json} payment - the payment object with signature verification fields populated (negatively)
+ */
+WebSocketDevice.prototype.sendVoidPayment = function(payment) {
+    var payload = {};
+    payload.payment = JSON.stringify(payment);
+    payload.voidReason = "USER_CANCEL";
+
+    var lanMessage = this.messageBuilder.buildVoidPayment(payload);
+
+    this.sendMessage(lanMessage);
+}
+
+/**
  * Send a cancellation message
  *
  */

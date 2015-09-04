@@ -506,7 +506,7 @@ function Clover(configuration) {
      */
     this.voidTransaction = function (payment, completionCallback) {
         // TODO: Add ACK callback
-        this.device.sendPaymentVoid(payment);
+        this.device.sendVoidPayment(payment);
     }
 
     /**
