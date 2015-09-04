@@ -455,7 +455,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line270">line 270</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line281">line 281</a>
     </li></ul></dd>
     
 
@@ -497,6 +497,13 @@
 
  The device connection is NOT made on completion of this call.  The device connection
  will be made once the WebSocketDevice.onopen is called.
+
+ If there is no active configuration, then this will try to load the configuration using
+ Clover.loadPersistedConfiguration.  Once the deviceURL has been derived, an attempt will be made to persist
+ the configuration using Clover.persistConfiguration.
+
+ If there is not enough configuration information to connect to the device, then Clover.incompleteConfiguration
+ will be called.
 </div>
 
 
@@ -585,7 +592,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line62">line 62</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line69">line 69</a>
     </li></ul></dd>
     
 
@@ -616,7 +623,7 @@
 
     
 
-    <h4 class="name" id="loadPersistedConfiguration"><span class="type-signature"></span>loadPersistedConfiguration<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="loadPersistedConfiguration"><span class="type-signature"></span>loadPersistedConfiguration<span class="signature">(callback)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
     
 
@@ -633,6 +640,51 @@ configuration from a cookie.
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the error first callback that will be passed to Clover.incompleteConfiguration
+ if no configuration could be loaded.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -668,7 +720,7 @@ configuration from a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line240">line 240</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line251">line 251</a>
     </li></ul></dd>
     
 
@@ -816,7 +868,7 @@ configuration from a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line355">line 355</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line366">line 366</a>
     </li></ul></dd>
     
 
@@ -899,7 +951,7 @@ configuration into a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line257">line 257</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line268">line 268</a>
     </li></ul></dd>
     
 
@@ -1030,7 +1082,7 @@ configuration into a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line506">line 506</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line517">line 517</a>
     </li></ul></dd>
     
 
@@ -1159,7 +1211,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line526">line 526</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line537">line 537</a>
     </li></ul></dd>
     
 
@@ -1241,7 +1293,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line514">line 514</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line525">line 525</a>
     </li></ul></dd>
     
 
@@ -1395,7 +1447,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line378">line 378</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line389">line 389</a>
     </li></ul></dd>
     
 
@@ -1550,7 +1602,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line366">line 366</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line377">line 377</a>
     </li></ul></dd>
     
 
@@ -1632,7 +1684,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line534">line 534</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line545">line 545</a>
     </li></ul></dd>
     
 
@@ -1782,7 +1834,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line496">line 496</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line507">line 507</a>
     </li></ul></dd>
     
 
@@ -1962,7 +2014,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line727">line 727</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line736">line 736</a>
     </li></ul></dd>
     
 
@@ -2008,7 +2060,7 @@ width of the image is 384 pixals.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Sep 03 2015 16:27:18 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Sep 03 2015 18:16:47 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
