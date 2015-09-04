@@ -61,9 +61,9 @@ object and how to set up your connection.
 
 Examples of creating the Clover object:
 
-1. [With a clientID, domain, merchantId, deviceSerialId](./src/main/webapp/high_levelCLOUD_sale.html#L29)
-1. [With a oauthToken, domain, merchantId, deviceSerialId](./src/main/webapp/high_levelCLOUD_printImage.html#L30)
-1. [Relying on a saved configuration in a cookie](./src/main/webapp/high_levelCLOUD4_sale.html#L32)
+1. <a href="./src/main/webapp/high_levelCLOUD_sale.html#L29" target="_blank">With a clientID, domain, merchantId, deviceSerialId</a>
+1. <a href="./src/main/webapp/high_levelCLOUD_printImage.html#L30">With a oauthToken, domain, merchantId, deviceSerialId</a>
+1. <a href="./src/main/webapp/high_levelCLOUD4_sale.html#L32">Relying on a saved configuration in a cookie</a>
 
 ####Define how your program will use the Clover object
 #####In this example, this function will be passed when we start communicating with the device.  If there is an error when communication is initiated, this function will get the error as a parameter.
@@ -74,7 +74,7 @@ function makeASale(error) {
 }
 ```
 
-[Example of function to handle device initialization and invoke an operation](./src/main/webapp/high_levelCLOUD_sale.html#L42)
+<a href="./src/main/webapp/high_levelCLOUD_sale.html#L42">Example of function to handle device initialization and invoke an operation</a>
 #####Here we define the error-first callback that we pass in to the Clover.sale function above.  If an error occurs, it will be the first parameter.
 ```
 function mySaleResult(error, saleResult) {
@@ -82,13 +82,13 @@ function mySaleResult(error, saleResult) {
 }
 ```
 
-[Example of function to handle result of an operation](./src/main/webapp/high_levelCLOUD_sale.html#L62)
+<a href="./src/main/webapp/high_levelCLOUD_sale.html#L62>Example of function to handle result of an operation</a>
 ####Start communicating with the device and tell the device to call your program when it is ready
 ```
 clover.initDeviceConnection(makeASale);
 ```
 
-[Example of initializing the device connection](./src/main/webapp/high_levelCLOUD_sale.html#L39)
+<a href="./src/main/webapp/high_levelCLOUD_sale.html#L39">Example of initializing the device connection</a>
 
 
 View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 
