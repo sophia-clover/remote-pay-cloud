@@ -37,14 +37,18 @@
 
   // This will be called when the device is ready
   function makeASale(error) {
-    var mySale = {
-      "amount" : 12345, //the amount of a sale, including tax
-      "tipAmount" : 123 // - the amount of a tip.  Added to the amount for the total.
-    }
+    if(error) {
+      console.log(error)
+    } else {
+      var mySale = {
+        "amount": 12345, //the amount of a sale, including tax
+        "tipAmount": 123 // - the amount of a tip.  Added to the amount for the total.
+      }
 
-    // Call the device to take payment, after the payment is complete, call the
-    // 'mySaleResult' function
-    clover.sale(mySale, resultCallback);
+      // Call the device to take payment, after the payment is complete, call the
+      // 'mySaleResult' function
+      clover.sale(mySale, resultCallback);
+    }
   }
 
   /**

@@ -285,7 +285,7 @@
 
     
 
-    <h4 class="name" id="incompleteConfiguration"><span class="type-signature"></span>incompleteConfiguration<span class="signature">(message)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="incompleteConfiguration"><span class="type-signature"></span>incompleteConfiguration<span class="signature">(message, configuration<span class="signature-attributes">opt</span>, callback)</span><span class="type-signature"></span></h4>
 
     
 
@@ -316,6 +316,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -333,13 +335,86 @@
 
             <td class="type">
             
+                
+<span class="param-type">string</span>
+
+
+            
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
 
             <td class="description last">an error message.  This could be ignored.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>configuration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#CloverConfig">CloverConfig</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the configuration that is incomplete.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the error first callback.  If defined, then it will be called with
+ the first parameter as a CloverError.  If not defined, then the CloverError will be thrown.</td>
         </tr>
 
     
@@ -380,7 +455,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line214">line 214</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line281">line 281</a>
     </li></ul></dd>
     
 
@@ -411,7 +486,7 @@
 
     
 
-    <h4 class="name" id="initDeviceConnection"><span class="type-signature"></span>initDeviceConnection<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="initDeviceConnection"><span class="type-signature"></span>initDeviceConnection<span class="signature">(callBackOnDeviceReady)</span><span class="type-signature"></span></h4>
 
     
 
@@ -422,6 +497,13 @@
 
  The device connection is NOT made on completion of this call.  The device connection
  will be made once the WebSocketDevice.onopen is called.
+
+ If there is no active configuration, then this will try to load the configuration using
+ Clover.loadPersistedConfiguration.  Once the deviceURL has been derived, an attempt will be made to persist
+ the configuration using Clover.persistConfiguration.
+
+ If there is not enough configuration information to connect to the device, then Clover.incompleteConfiguration
+ will be called.
 </div>
 
 
@@ -430,6 +512,51 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callBackOnDeviceReady</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">callback function called when the device is ready for operations.
+ Adheres to error first paradigm.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -465,7 +592,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line58">line 58</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line69">line 69</a>
     </li></ul></dd>
     
 
@@ -496,7 +623,7 @@
 
     
 
-    <h4 class="name" id="loadPersistedConfiguration"><span class="type-signature"></span>loadPersistedConfiguration<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="loadPersistedConfiguration"><span class="type-signature"></span>loadPersistedConfiguration<span class="signature">(callback)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
     
 
@@ -515,6 +642,51 @@ configuration from a cookie.
 
 
 
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the error first callback that will be passed to Clover.incompleteConfiguration
+ if no configuration could be loaded.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
 
 
 
@@ -548,7 +720,7 @@ configuration from a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line187">line 187</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line251">line 251</a>
     </li></ul></dd>
     
 
@@ -606,6 +778,10 @@ configuration from a cookie.
     
 
 
+
+<div class="description">
+    Can be used to manually set a function to be called one time when the device gets a DISCOVERY_RESPONSE.
+</div>
 
 
 
@@ -692,7 +868,7 @@ configuration from a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line288">line 288</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line366">line 366</a>
     </li></ul></dd>
     
 
@@ -775,7 +951,7 @@ configuration into a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line204">line 204</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line268">line 268</a>
     </li></ul></dd>
     
 
@@ -906,7 +1082,7 @@ configuration into a cookie.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line439">line 439</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line517">line 517</a>
     </li></ul></dd>
     
 
@@ -1035,7 +1211,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line459">line 459</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line537">line 537</a>
     </li></ul></dd>
     
 
@@ -1117,7 +1293,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line447">line 447</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line525">line 525</a>
     </li></ul></dd>
     
 
@@ -1271,7 +1447,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line311">line 311</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line389">line 389</a>
     </li></ul></dd>
     
 
@@ -1426,7 +1602,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line299">line 299</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line377">line 377</a>
     </li></ul></dd>
     
 
@@ -1508,7 +1684,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line467">line 467</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line545">line 545</a>
     </li></ul></dd>
     
 
@@ -1658,7 +1834,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line429">line 429</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line507">line 507</a>
     </li></ul></dd>
     
 
@@ -1838,7 +2014,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line660">line 660</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line736">line 736</a>
     </li></ul></dd>
     
 
@@ -1884,7 +2060,7 @@ width of the image is 384 pixals.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Aug 27 2015 16:15:15 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Sep 03 2015 18:26:28 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
