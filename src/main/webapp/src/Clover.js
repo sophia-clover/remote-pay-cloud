@@ -505,8 +505,32 @@ function Clover(configuration) {
      * @param {requestCallback} completionCallback
      */
     this.voidTransaction = function (payment, completionCallback) {
-        // TODO: Add ACK callback
-        this.device.sendVoidPayment(payment);
+        // Reserve a reference to this object
+        var me = this;
+        // Add ACK callback
+        this.device.once(LanMethod.PAYMENT_VOID_SENT,
+            function (message) {
+                var payload = JSON.parse(message.payload);
+                var callBackPayload = {};
+                callBackPayload.request = payment;
+                callBackPayload.result = {
+                    "paymentId" : payload.paymentId,
+                    "sentState" : payload.sentState
+                };
+                completionCallback(null, callBackPayload);
+                me.device.sendShowWelcomeScreen();
+            }
+        );
+        try {
+            this.device.sendVoidPayment(payment);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.VOID_PAYMENT,
+                "Failure attempting to send void", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": txnInfo
+            });
+        }
     }
 
     /**

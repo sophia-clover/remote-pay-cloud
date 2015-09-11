@@ -229,6 +229,8 @@ LanMethod.VERIFY_SIGNATURE = "VERIFY_SIGNATURE";
 LanMethod.SIGNATURE_VERIFIED = "SIGNATURE_VERIFIED";
 /** The payment voided method type */
 LanMethod.PAYMENT_VOIDED = "PAYMENT_VOIDED";
+/** The message that indicates a void request was received */
+LanMethod.PAYMENT_VOID_SENT = "PAYMENT_VOID_SENT";
 /** The print payment reuest method type */
 LanMethod.PRINT_PAYMENT = "PRINT_PAYMENT";
 /** The print merchant payment copy method type */

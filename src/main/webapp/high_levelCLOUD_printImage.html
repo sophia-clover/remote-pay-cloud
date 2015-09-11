@@ -51,7 +51,9 @@
 
   function deviceReady(error) {
     if(error) {
+      var resultDisplay = "";
       resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
       deviceIsReady = true;
       if (imageIsLoaded) {
