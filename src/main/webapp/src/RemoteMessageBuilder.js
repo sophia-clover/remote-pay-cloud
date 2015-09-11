@@ -229,9 +229,7 @@ LanMethod.VERIFY_SIGNATURE = "VERIFY_SIGNATURE";
 LanMethod.SIGNATURE_VERIFIED = "SIGNATURE_VERIFIED";
 /** The payment voided method type */
 LanMethod.PAYMENT_VOIDED = "PAYMENT_VOIDED";
-/** The message that indicates a void request was received */
-LanMethod.PAYMENT_VOID_SENT = "PAYMENT_VOID_SENT";
-/** The print payment reuest method type */
+/** The print payment request method type */
 LanMethod.PRINT_PAYMENT = "PRINT_PAYMENT";
 /** The print merchant payment copy method type */
 LanMethod.PRINT_PAYMENT_MERCHANT_COPY = "PRINT_PAYMENT_MERCHANT_COPY";
@@ -266,3 +264,20 @@ LanMethod.VOID_PAYMENT = "VOID_PAYMENT";
  * This is a special type only present in the cloud adaptor.
  */
 LanMethod.SHUTDOWN = "SHUTDOWN";
+
+/**
+ * The acknowledgement method type
+ * This is a special type only present in the cloud adaptor.
+ */
+LanMethod.ACK = "ACK";
+
+
+function VoidReason() {};
+VoidReason.USER_CANCEL = "USER_CANCEL";
+VoidReason.TRANSPORT_ERROR = "TRANSPORT_ERROR";
+VoidReason.REJECT_SIGNATURE = "REJECT_SIGNATURE";
+VoidReason.REJECT_PARTIAL_AUTH = "REJECT_PARTIAL_AUTH";
+VoidReason.NOT_APPROVED = "NOT_APPROVED";
+VoidReason.FAILED = "FAILED";
+VoidReason.AUTH_CLOSED_NEW_CARD = "AUTH_CLOSED_NEW_CARD";
+VoidReason.REJECT_DUPLICATE = "REJECT_DUPLICATE";

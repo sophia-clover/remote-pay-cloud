@@ -104,7 +104,7 @@
 
     <button onclick="device.sendShowReceiptScreen()">Put options for receipt for last order on device</button>
 
-    <button onclick="device.sendPaymentVoid(lastPaymentDetails)">Void the last payment we saw.</button>
+    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, guid())">Void the last payment we saw.</button>
 
     <button onclick="device.sendPrintText(['line 1', 'line2', 'A much longer line 3 that demonstartes the effect you will see when you try to print a very long line of text'])">Print some text</button>
   </p>

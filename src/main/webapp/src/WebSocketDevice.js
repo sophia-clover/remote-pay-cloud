@@ -285,6 +285,16 @@ function WebSocketDevice() {
     }
 
     /**
+     * Unregisters an event callback.
+     *
+     * @param eventName
+     * @param callback
+     */
+    this.removeListener = function (eventName, callback) {
+        this.eventEmitter.removeListener(eventName, callback);
+    }
+
+    /**
      * Registers event callbacks for message method types.
      *
      * @see LanMethod
@@ -330,12 +340,20 @@ WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
  * Sends an update to the order to the device, and causes it to display the change.
  *
  * @param {json} order - the entire order json object
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendShowOrderScreen = function(order) {
+WebSocketDevice.prototype.sendShowOrderScreen = function(order, ackId) {
     var payload = {
         "order": JSON.stringify(order)
     };
     var lanMessage = this.messageBuilder.buildShowOrderScreen(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
@@ -344,8 +362,13 @@ WebSocketDevice.prototype.sendShowOrderScreen = function(order) {
  * Send a message to start a transaction.  This will make the device display the payment screen
  *
  * @param {json} payIntent - the payment intention object
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendTXStart = function(payIntent) {
+WebSocketDevice.prototype.sendTXStart = function(payIntent, ackId) {
 
     // This is how they are doing the payload...
     var payload = {
@@ -353,6 +376,9 @@ WebSocketDevice.prototype.sendTXStart = function(payIntent) {
     };
 
     var lanMessage = this.messageBuilder.buildTxStart(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
@@ -361,13 +387,20 @@ WebSocketDevice.prototype.sendTXStart = function(payIntent) {
  * Verify that the signature is valid
  *
  * @param {json} payment - the payment object with signature verification fields populated (positively)
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendSignatureVerified = function(payment) {
+WebSocketDevice.prototype.sendSignatureVerified = function(payment, ackId) {
     var payload = {};
     payload.verified = true;
     payload.payment = JSON.stringify(payment);
 
     var lanMessage = this.messageBuilder.buildSignatureVerified(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
 
     this.sendMessage(lanMessage);
 }
@@ -377,29 +410,20 @@ WebSocketDevice.prototype.sendSignatureVerified = function(payment) {
  * Verify that the signature is NOT valid
  *
  * @param {json} payment - the payment object with signature verification fields populated (negatively)
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendSignatureRejected = function(payment) {
+WebSocketDevice.prototype.sendSignatureRejected = function(payment, ackId) {
     var payload = {};
     payload.verified = false;
     payload.payment = JSON.stringify(payment);
 
     var lanMessage = this.messageBuilder.buildSignatureVerified(payload);
-
-    this.sendMessage(lanMessage);
-}
-
-// Reject the signature
-/**
- * Verify that the signature is NOT valid
- *
- * @param {json} payment - the payment object with signature verification fields populated (negatively)
- */
-WebSocketDevice.prototype.sendPaymentVoid = function(payment) {
-    var payload = {};
-    payload.payment = JSON.stringify(payment);
-    payload.voidReason = "USER_CANCEL";
-
-    var lanMessage = this.messageBuilder.buildPaymentVoid(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
 
     this.sendMessage(lanMessage);
 }
@@ -408,13 +432,20 @@ WebSocketDevice.prototype.sendPaymentVoid = function(payment) {
  * Void a payment
  *
  * @param {json} payment - the payment object with signature verification fields populated (negatively)
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendVoidPayment = function(payment) {
+WebSocketDevice.prototype.sendVoidPayment = function(payment, voidReason, ackId) {
     var payload = {};
     payload.payment = JSON.stringify(payment);
-    payload.voidReason = "USER_CANCEL";
+    payload.voidReason = voidReason;
 
     var lanMessage = this.messageBuilder.buildVoidPayment(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
 
     this.sendMessage(lanMessage);
 }
@@ -422,82 +453,161 @@ WebSocketDevice.prototype.sendVoidPayment = function(payment) {
 /**
  * Send a cancellation message
  *
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendFinishCancel = function() {
+WebSocketDevice.prototype.sendFinishCancel = function(ackId) {
     var lanMessage = this.messageBuilder.buildFinishCancel();
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
 /**
  * Send a message to show the 'Thank You' screen
+ *
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendShowThankYouScreen = function() {
+WebSocketDevice.prototype.sendShowThankYouScreen = function(ackId) {
     var lanMessage = this.messageBuilder.buildShowThankYouScreen();
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
 /**
  * Send a message to show the 'Welcome' screen
+ *
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendShowWelcomeScreen = function() {
+WebSocketDevice.prototype.sendShowWelcomeScreen = function(ackId) {
     var lanMessage = this.messageBuilder.buildShowWelcomeScreen();
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
 /**
  * Send a message to show the receipt screen from the last order
+ *
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendShowReceiptScreen = function() {
+WebSocketDevice.prototype.sendShowReceiptScreen = function(ackId) {
     var lanMessage = this.messageBuilder.buildShowReceiptScreen();
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
 /**
  * Send a message to show a custom message on the screen
+ *
  * @param {string} message - the message to display
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendTerminalMessage = function(message) {
+WebSocketDevice.prototype.sendTerminalMessage = function(message, ackId) {
     var payload = {"text" : message};
     var lanMessage = this.messageBuilder.buildTerminalMessage(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
 /**
  * Send a message to ask the device if it is there.
  *
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendDiscoveryRequest = function() {
+WebSocketDevice.prototype.sendDiscoveryRequest = function(ackId) {
     var lanMessage = this.messageBuilder.buildDiscoveryRequest();
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
 /**
- * Send a message to ask the device if it is there.
+ * Send a message to ask the device to print some text
+ *
  * @param textLines - an  array of strings
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendPrintText = function(textLines) {
+WebSocketDevice.prototype.sendPrintText = function(textLines, ackId) {
     //List<String> textLines
     var payload = {"textLines" : textLines};
     var lanMessage = this.messageBuilder.buildPrintText(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
 /**
- * Send a message to ask the device if it is there.
+ * Send a message to ask the device to shutdown the connection.
+ *
  * @param textLines - an  array of strings
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
 WebSocketDevice.prototype.sendShutdown = function() {
     var lanMessage = this.messageBuilder.buildShutdown();
+    // Note:  the 'ack' is not included here because the device will
+    // be shutting down,
     this.sendMessage(lanMessage);
 }
 
 /**
  * Send a message to ask the device if it is there.
- * @param textLines - an  array of strings
+ *
+ * @param img - an image.  Can be obtained in a manner similar to :
+ *  <pre>var img = document.getElementById("img_id");</pre>
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendPrintImage = function(img) {
-    var payload = {"png" : getBase64Image(img) };
+WebSocketDevice.prototype.sendPrintImage = function(img, ackId) {
+    var payload = {"png" : this.getBase64Image(img) };
     var lanMessage = this.messageBuilder.buildPrintImage(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
     this.sendMessage(lanMessage);
 }
 
@@ -506,7 +616,7 @@ WebSocketDevice.prototype.sendPrintImage = function(img) {
  * @param img
  * @returns {string}
  */
-function getBase64Image(img) {
+WebSocketDevice.prototype.getBase64Image = function(img) {
     // Create an empty canvas element
     var canvas = document.createElement("canvas");
     canvas.width = img.width;
