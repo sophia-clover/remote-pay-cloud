@@ -466,23 +466,23 @@ function Clover(configuration) {
             function (message) {
                 var payload = JSON.parse(message.payload);
                 var txnInfo = JSON.parse(payload[txnName]);//payment, credit
-                var callBackPayload = {};
-                callBackPayload.request = payIntent;
-                callBackPayload[txnName] = txnInfo;
-                callBackPayload.signature = signature;
-                callBackPayload.code = txnInfo.result;
+                var callbackPayload = {};
+                callbackPayload.request = payIntent;
+                callbackPayload[txnName] = txnInfo;
+                callbackPayload.signature = signature;
+                callbackPayload.code = txnInfo.result;
 
-                txnRequestCallback(null, callBackPayload);
+                txnRequestCallback(null, callbackPayload);
                 me.device.sendShowWelcomeScreen();
             }
         );
         this.device.once(LanMethod.FINISH_CANCEL,
             function (message) {
-                var callBackPayload = {};
-                callBackPayload.request = payIntent;
-                callBackPayload.signature = signature;
-                callBackPayload.code = "CANCEL";
-                txnRequestCallback(null, callBackPayload);
+                var callbackPayload = {};
+                callbackPayload.request = payIntent;
+                callbackPayload.signature = signature;
+                callbackPayload.code = "CANCEL";
+                txnRequestCallback(null, callbackPayload);
                 me.device.sendShowWelcomeScreen();
             }
         );
@@ -501,12 +501,76 @@ function Clover(configuration) {
 
     /**
      *
+     * @private
+     *
+     * @param callbackPayload - the initial callback payload.  This is an object that will
+     *  eventually be passed as data to the completionCallback.  This will add a "sent"
+     *  property to this object
+     * @param {requestCallback} completionCallback - called with an ACK message.  Payload is the
+     *  callbackPayload with a boolean "sent" property added.
+     *  @return the unique identifier that should be used when sending the message for which a ACK
+     *      message is desired.
+     */
+    this.genericAcknowledgedCall = function (callbackPayload, completionCallback) {
+        // Reserve a reference to this object
+        var me = this;
+        // We will generate a uuid to use in a callback
+        var uuid = null;
+        // Add ACK callback
+
+        // Define the callback function just for this.  We need to define it this way
+        // because we want a reference to remove it inside itself.
+        var genericAckCallback = function (message) {
+            // We are looking for a specific ACK callback
+            if (message.id == uuid) {
+                // Remove the callback as soon as possible. We only want to be
+                // called once.
+                me.device.removeListener(LanMethod.ACK, genericAckCallback);
+                // Build up a callback data object
+                if ((typeof callbackPayload == 'undefined')||(callbackPayload == null)) {
+                    callbackPayload = {};
+                }
+                // Add in the value for successfully sent.
+                // This is redundant right now, but perhaps not forever
+                callbackPayload.result = {
+                    "messageReceived": true
+                };
+                // Call the callback with the data
+                completionCallback(null, callbackPayload);
+                // Show the welcome screen after the acknowledgement.
+                // This might be removed later
+                me.device.sendShowWelcomeScreen();
+            }
+        };
+        // Generate the uuid so we can filter properly
+        uuid = guid();
+        // Register the callback.
+        this.device.on(LanMethod.ACK, genericAckCallback);
+        // return the uuid so the caller of this function can use
+        // it when sending a message.
+        return uuid;
+    }
+
+    /**
+     *
      * @param {Payment} payment - the payment information returned from a call to 'sale'
+     * @param {VOIDREASON} REASON - the reason for the void.  Typically "USER_CANCEL",
+     *  see the VoidReason object.
      * @param {requestCallback} completionCallback
      */
-    this.voidTransaction = function (payment, completionCallback) {
-        // TODO: Add ACK callback
-        this.device.sendPaymentVoid(payment);
+    this.voidTransaction = function (payment, voidReason, completionCallback) {
+        var callbackPayload = {"request":{"payment":payment, "voidReason":voidReason}};
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        try {
+            this.device.sendVoidPayment(payment, voidReason, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.VOID_PAYMENT,
+                "Failure attempting to send void", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
     }
 
     /**
@@ -515,8 +579,18 @@ function Clover(configuration) {
      * @param {string[]} textLines - an array of strings to print
      */
     this.print = function (textLines, completionCallback) {
-        // TODO: Add ACK callback
-        device.sendPrintText(textLines);
+        var callbackPayload = {"request":textLines};
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        try {
+            this.device.sendPrintText(textLines, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.PRINT_TEXT,
+                "Failure attempting to print text", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
     }
 
     /**
@@ -535,14 +609,25 @@ function Clover(configuration) {
      * @param img an HTML DOM IMG object.
      */
     this.printImage = function (img, completionCallback) {
-        // TODO: Add ACK callback
-        this.device.sendPrintImage(img);
+        var callbackPayload = {"request":{"img":{"src": img.src }}};
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        try {
+            this.device.sendPrintImage(img, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.PRINT_IMAGE,
+                "Failure attempting to print image", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
+
     }
 
     /**
      * Not yet implemented
      */
-    this.saleWithCashback = function (saleInfo, saleRequestCallback) {
+    this.saleWithCashback = function (saleInfo, completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
     }
 

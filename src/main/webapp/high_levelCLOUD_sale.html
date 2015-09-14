@@ -31,7 +31,7 @@
         "clientId" : "3RPTN642FHXTC",
         "domain" : "https://dev1.dev.clover.com/",
         "merchantId" : "BBFF8NBCXEMDT",
-        "deviceSerialId" : "C030UQ50550161"
+        "deviceSerialId" : "C030UQ50550081"
       });
 
   // Start communication
@@ -41,7 +41,9 @@
   // This will be called when the device is ready
   function makeASale(error) {
     if(error) {
+      var resultDisplay = "";
       resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
       var mySale = {
         "amount": 12345, //the amount of a sale, including tax
