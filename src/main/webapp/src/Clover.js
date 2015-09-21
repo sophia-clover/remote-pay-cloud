@@ -554,7 +554,7 @@ function Clover(configuration) {
     /**
      *
      * @param {Payment} payment - the payment information returned from a call to 'sale'
-     * @param {VOIDREASON} REASON - the reason for the void.  Typically "USER_CANCEL",
+     * @param {VoidReason} REASON - the reason for the void.  Typically "USER_CANCEL",
      *  see the VoidReason object.
      * @param {requestCallback} completionCallback
      */
