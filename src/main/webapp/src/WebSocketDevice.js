@@ -359,8 +359,9 @@ WebSocketDevice.prototype.sendShowOrderScreen = function(order, ackId) {
 
 /**
  *
- * @param keyCode
- * @param ackId
+ * @param {KeyPress} keyCode - the KeyPress to send to the device
+ * @param [ackId] - an optional id for the message.  If set then the keypress will be acknowledged,
+ *  otherwise there will be no response.
  */
 WebSocketDevice.prototype.sendKeyPress = function(keyCode, ackId) {
     var payload = {
