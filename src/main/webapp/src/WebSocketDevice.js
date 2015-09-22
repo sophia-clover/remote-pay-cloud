@@ -357,6 +357,23 @@ WebSocketDevice.prototype.sendShowOrderScreen = function(order, ackId) {
     this.sendMessage(lanMessage);
 }
 
+/**
+ *
+ * @param {KeyPress} keyCode - the KeyPress to send to the device
+ * @param [ackId] - an optional id for the message.  If set then the keypress will be acknowledged,
+ *  otherwise there will be no response.
+ */
+WebSocketDevice.prototype.sendKeyPress = function(keyCode, ackId) {
+    var payload = {
+        "keyPress": keyCode
+    };
+    var lanMessage = this.messageBuilder.buildKeyPress(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
 //
 /**
  * Send a message to start a transaction.  This will make the device display the payment screen
