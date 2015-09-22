@@ -556,10 +556,19 @@ function Clover(configuration) {
      * @param {Payment} payment - the payment information returned from a call to 'sale'
      * @param {VOIDREASON} REASON - the reason for the void.  Typically "USER_CANCEL",
      *  see the VoidReason object.
-     * @param {requestCallback} completionCallback
+     * @param {requestCallback} completionCallback`
      */
     this.voidTransaction = function (payment, voidReason, completionCallback) {
         var callbackPayload = {"request":{"payment":payment, "voidReason":voidReason}};
+
+        // Temporary - Will be replaced by employee on backend
+        if(!payment.hasOwnProperty("employee")){
+            payment["employee"] = {
+                "id": "DFLTEMPLOYEE"
+            }
+        }
+
+
         var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         try {
             this.device.sendVoidPayment(payment, voidReason, uuid);
