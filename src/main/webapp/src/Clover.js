@@ -621,7 +621,6 @@ function Clover(configuration) {
                 "request": callbackPayload
             });
         }
-
     }
 
     /**
@@ -629,6 +628,26 @@ function Clover(configuration) {
      */
     this.saleWithCashback = function (saleInfo, completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
+    }
+
+
+    /**
+     * Sends an escape code to the device.  The behavior of the device when this is called is
+     * dependant on the current state of the device.
+     */
+    this.sendCancel = function (completionCallback) {
+        var callbackPayload = {"request":"cancel"};
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        try {
+            this.device.sendKeyPress(KeyPress.ESC, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.KEY_PRESS,
+                "Failure attempting to cancel", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
     }
 
     //////////
