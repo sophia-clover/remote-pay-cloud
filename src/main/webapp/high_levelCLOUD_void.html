@@ -45,19 +45,20 @@
       resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
-      var payment = {
-        "id": "KP018Z3H2AF1W",
-        "order": {
-          "id": "YCMFN69R55ZS0"
-        },
-        "employee": {
-          "id": "DFLTEMPLOYEE"
+      // Voids are time sensitive, allow user to enter a payment id.
+      var paymentId = prompt("Please enter the payment id", "KP018Z3H2AF1W");
+      if(paymentId) {
+        var payment = {
+          "id": paymentId
         }
-      }
 
-      // Call the device to take payment, after the payment is complete, call the
-      // 'mySaleResult' function
-      clover.voidTransaction(payment, VoidReason.USER_CANCEL,  resultCallback);
+        // Call the device to take payment, after the payment is complete, call the
+        // 'mySaleResult' function
+        clover.voidTransaction(payment, VoidReason.USER_CANCEL, resultCallback);
+      } else {
+        resultDisplay = "Test canceled";
+        document.getElementById("uiFeedback").innerHTML = resultDisplay;
+      }
     }
   }
 
