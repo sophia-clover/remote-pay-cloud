@@ -182,7 +182,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line329">line 329</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line346">line 346</a>
     </li></ul></dd>
     
 
@@ -891,7 +891,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line283">line 283</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line285">line 285</a>
     </li></ul></dd>
     
 
@@ -1052,7 +1052,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line305">line 305</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line307">line 307</a>
     </li></ul></dd>
     
 
@@ -1468,137 +1468,6 @@ a callback to the WebSocketDevice.on function
 
     
 
-    <h4 class="name" id="receiveMessage"><span class="type-signature"></span>receiveMessage<span class="signature">(message)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Get a message on the websocket.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>message</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">json</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">the message received on the socket</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line258">line 258</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
     <h4 class="name" id="removeListener"><span class="type-signature"></span>removeListener<span class="signature">(eventName, callback)</span><span class="type-signature"></span></h4>
 
     
@@ -1712,7 +1581,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line293">line 293</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line295">line 295</a>
     </li></ul></dd>
     
 
@@ -1859,7 +1728,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line549">line 549</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line583">line 583</a>
     </li></ul></dd>
     
 
@@ -2006,7 +1875,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line462">line 462</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line496">line 496</a>
     </li></ul></dd>
     
 
@@ -2037,15 +1906,11 @@ a callback to the WebSocketDevice.on function
 
     
 
-    <h4 class="name" id="sendMessage"><span class="type-signature"></span>sendMessage<span class="signature">(message)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="sendKeyPress"><span class="type-signature"></span>sendKeyPress<span class="signature">(keyCode, ackId<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
 
-
-<div class="description">
-    Send a message on the websocket.  The parameter will be serialized to json
-</div>
 
 
 
@@ -2068,6 +1933,8 @@ a callback to the WebSocketDevice.on function
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -2080,23 +1947,60 @@ a callback to the WebSocketDevice.on function
 
         <tr>
             
-                <td class="name"><code>message</code></td>
+                <td class="name"><code>keyCode</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">json</span>
+<span class="param-type"><a href="global.html#KeyPress">KeyPress</a></span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">the message to send</td>
+            <td class="description last">the KeyPress to send to the device</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ackId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">an optional id for the message.  If set then the keypress will be acknowledged,
+ otherwise there will be no response.</td>
         </tr>
 
     
@@ -2137,7 +2041,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line229">line 229</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line383">line 383</a>
     </li></ul></dd>
     
 
@@ -2311,7 +2215,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line605">line 605</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line639">line 639</a>
     </li></ul></dd>
     
 
@@ -2484,7 +2388,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line567">line 567</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line601">line 601</a>
     </li></ul></dd>
     
 
@@ -2662,7 +2566,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line349">line 349</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line366">line 366</a>
     </li></ul></dd>
     
 
@@ -2809,7 +2713,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line513">line 513</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line547">line 547</a>
     </li></ul></dd>
     
 
@@ -2956,7 +2860,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line479">line 479</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line513">line 513</a>
     </li></ul></dd>
     
 
@@ -3103,7 +3007,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line496">line 496</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line530">line 530</a>
     </li></ul></dd>
     
 
@@ -3276,7 +3180,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line587">line 587</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line621">line 621</a>
     </li></ul></dd>
     
 
@@ -3454,7 +3358,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line419">line 419</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line453">line 453</a>
     </li></ul></dd>
     
 
@@ -3632,7 +3536,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line396">line 396</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line430">line 430</a>
     </li></ul></dd>
     
 
@@ -3810,7 +3714,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line531">line 531</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line565">line 565</a>
     </li></ul></dd>
     
 
@@ -3988,7 +3892,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line371">line 371</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line405">line 405</a>
     </li></ul></dd>
     
 
@@ -4166,7 +4070,7 @@ a callback to the WebSocketDevice.on function
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line441">line 441</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line475">line 475</a>
     </li></ul></dd>
     
 
@@ -4208,13 +4112,13 @@ a callback to the WebSocketDevice.on function
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Clover.html">Clover</a></li><li><a href="CloverOAuth.html">CloverOAuth</a></li><li><a href="Endpoints.html">Endpoints</a></li><li><a href="LanMethod.html">LanMethod</a></li><li><a href="RemoteMessageBuilder.html">RemoteMessageBuilder</a></li><li><a href="WebSocketDevice.html">WebSocketDevice</a></li></ul><h3>Global</h3><ul><li><a href="global.html#VoidReason">VoidReason</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Clover.html">Clover</a></li><li><a href="CloverError.html">CloverError</a></li><li><a href="CloverOAuth.html">CloverOAuth</a></li><li><a href="Endpoints.html">Endpoints</a></li><li><a href="LanMethod.html">LanMethod</a></li><li><a href="RemoteMessageBuilder.html">RemoteMessageBuilder</a></li><li><a href="WebSocketDevice.html">WebSocketDevice</a></li></ul><h3>Global</h3><ul><li><a href="global.html#KeyPress">KeyPress</a></li><li><a href="global.html#VoidReason">VoidReason</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Mon Sep 21 2015 14:43:16 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Wed Sep 23 2015 12:53:44 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>

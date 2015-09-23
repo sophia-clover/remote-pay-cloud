@@ -225,6 +225,7 @@ function WebSocketDevice() {
     /**
      * Send a message on the websocket.  The parameter will be serialized to json
      * @param {json} message - the message to send
+     * @private
      */
     this.sendMessage = function(message) {
         var stringMessage = JSON.stringify(message);
@@ -254,6 +255,7 @@ function WebSocketDevice() {
     /**
      * Get a message on the websocket.
      * @param {json} message - the message received on the socket
+     * @private
      */
     this.receiveMessage = function(message) {
         if(this.echoAllMessages) {
@@ -306,16 +308,31 @@ function WebSocketDevice() {
         this.eventEmitter.once(eventName, callback);
     }
 
+    /**
+     * @private
+     */
     this.pongReceived = function() {
         this.pongReceivedMillis = new Date().getTime();
     }
+
+    /**
+     * @private
+     */
     this.pingReceived = function() {
         this.pong();
     }
+
+    /**
+     * @private
+     */
     this.pong = function() {
         this.pingSentMillis = new Date().getTime();
         this.sendMessage(this.messageBuilder.buildPong());
     }
+
+    /**
+     * @private
+     */
     this.ping = function() {
         this.pingSentMillis = new Date().getTime();
         this.sendMessage(this.messageBuilder.buildPing());
