@@ -10,6 +10,8 @@ function Clover(configuration) {
     this.device.messageBuilder = new RemoteMessageBuilder("com.clover.remote.protocol.lan");
     // Echo all messages sent and received.
     this.device.echoAllMessages = false;
+    this.pauseBetweenDiscovery = 3000;
+    this.numberOfDiscoveryMessagesToSend = 10;
 
     this.configuration = configuration;
 
@@ -96,7 +98,7 @@ function Clover(configuration) {
             this.persistConfiguration();
 
             // We have the device url, contact the device
-            this.contactDevice();
+            this.contactDevice(callBackOnDeviceReady);
         } else {
             // Otherwise we must have the oauth token to get the information we need at the very least.
             // Either we already have it...
@@ -320,7 +322,7 @@ function Clover(configuration) {
      *
      * @private
      */
-    this.contactDevice = function () {
+    this.contactDevice = function (callBackOnDeviceReady) {
         var me = this;
 
         this.device.on(LanMethod.DISCOVERY_RESPONSE,
@@ -344,13 +346,17 @@ function Clover(configuration) {
                         me.device.dicoveryMessagesSent++;
 
                         // Arbitrary decision that 10 messages is long enough to wait.
-                        if (me.device.dicoveryMessagesSent > 10) {
-                            console.log("Something is wrong.  we are getting pong messages, but no discovery response." +
+                        if (me.device.dicoveryMessagesSent > me.numberOfDiscoveryMessagesToSend) {
+                            var seconds = (me.numberOfDiscoveryMessagesToSend * me.pauseBetweenDiscovery)/1000;
+                            var message = "No discovery response after " + seconds + " seconds";
+                            console.log(message +
                                 "  Shutting down the connection.");
                             me.device.disconnectFromDevice();
                             clearInterval(me.device.discoveryTimerId);
+                            callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
+                                "No discovery response after 30 seconds"));
                         }
-                    }, 3000
+                    }, me.pauseBetweenDiscovery
                 );
             console.log('device opened');
             console.log("Communication channel open.");
