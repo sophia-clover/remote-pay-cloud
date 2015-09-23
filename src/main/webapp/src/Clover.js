@@ -65,7 +65,21 @@ function Clover(configuration) {
      *  If there is not enough configuration information to connect to the device, then Clover.incompleteConfiguration
      *  will be called.
      *
-     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
+     *  If the device is not connected to the push server, the callback will be called with the first parameter of a
+     *  CloverError with a code of CloverError.DEVICE_OFFLINE.
+     *
+     *  If there is a communication error retrieving the device websocket connection point or device info, the callback
+     *  will be called with the first parameter of a CloverError with a code of CloverError.COMMUNICATION_ERROR.
+     *
+     *  If the configuration of the device is incomplete, the callback will be called with the first parameter of a
+     *  CloverError with a code of CloverError.INCOMPLETE_CONFIGURATION.
+     *
+     *  If the device is contacted, but does not respond to a discovery request, the callback will be called with the first parameter of a
+     *  CloverError with a code of CloverError.DISCOVERY_TIMEOUT.
+     *
+     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.  The
+     *  callback function can be called with several possible results.
+     *
      *  Adheres to error first paradigm.
      */
     this.initDeviceConnection = function (callBackOnDeviceReady) {
@@ -168,10 +182,9 @@ function Clover(configuration) {
                                 }
                             },
                             function (error) {
-                                // TODO: Might want to create a new CloverError here.
-                                callBackOnDeviceReady(error);
                                 if (callBackOnDeviceReady) {
-                                    callBackOnDeviceReady(error);
+                                    callBackOnDeviceReady(new CloverError(CloverError.COMMUNICATION_ERROR,
+                                        "Error getting device ws endpoint", error));
                                 } else {
                                     console.log(error);
                                 }
@@ -207,7 +220,14 @@ function Clover(configuration) {
                                 // recurse
                                 me.initDeviceConnectionInternal(callBackOnDeviceReady);
                             }
-                            , callBackOnDeviceReady
+                            , function (error) {
+                                if (callBackOnDeviceReady) {
+                                    callBackOnDeviceReady(new CloverError(CloverError.COMMUNICATION_ERROR,
+                                        "Error getting device information", error));
+                                } else {
+                                    console.log(error);
+                                }
+                            }
                         );
                     } else {
                         //Nothing left to try.  Either error out or get more info from the user.
@@ -244,7 +264,8 @@ function Clover(configuration) {
 
     /**
      * Loads the configuration that was stored.  This implementation just grabs the
-     * configuration from a cookie.
+     * configuration from a cookie.  Reimplementation of this function could provide
+     * configuration from a server or even a UI.
      *
      * @param callback - the error first callback that will be passed to Clover.incompleteConfiguration
      *  if no configuration could be loaded.
@@ -265,7 +286,8 @@ function Clover(configuration) {
 
     /**
      * Stores the configuration for later retrieval.  This implementation just drops the
-     * configuration into a cookie.
+     * configuration into a cookie.  Reimplementation of this function could provide
+     * server or some other type of cloud persistence.
      */
     this.persistConfiguration = function () {
         Clover.writeConfigurationToCookie(this.configuration);
@@ -273,7 +295,16 @@ function Clover(configuration) {
 
 
     /**
-     * We can override this to pop up a window to let the user enter any missing information.
+     * This can be overridden to provide any missing configuration information to this.configuration (
+     * through a UI or a call to the server, etc...), after which a call to
+     * Clover.initDeviceConnection would need to be made to continue attempting to connect to the device.
+     *
+     * Note that if an overridden implementation does NOT properly provide configuration, and a call is made to
+     * Clover.initDeviceConnection, there is the possibility of creating a recursive loop that would
+     * impact the performance of the application, and could make the browser unstable.
+     *
+     * Any override of this function should ensure that configuration information is complete before making
+     * the call to Clover.initDeviceConnection.
      *
      * @param {string} message - an error message.  This could be ignored.
      * @param {CloverConfig} [configuration] - the configuration that is incomplete.
@@ -502,7 +533,6 @@ function Clover(configuration) {
                 "request": txnInfo
             });
         }
-
     }
 
     /**
@@ -573,7 +603,6 @@ function Clover(configuration) {
                 "id": "DFLTEMPLOYEE"
             }
         }
-
 
         var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         try {
