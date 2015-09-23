@@ -7,6 +7,20 @@
 
   <script src="src/cloverCloud-min.js"></script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
 
@@ -90,7 +104,7 @@
 
     <button onclick="device.sendShowReceiptScreen()">Put options for receipt for last order on device</button>
 
-    <button onclick="device.sendPaymentVoid(lastPaymentDetails)">Void the last payment we saw.</button>
+    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, guid())">Void the last payment we saw.</button>
 
     <button onclick="device.sendPrintText(['line 1', 'line2', 'A much longer line 3 that demonstartes the effect you will see when you try to print a very long line of text'])">Print some text</button>
   </p>
@@ -423,7 +437,11 @@
             //    'token': token_to_link_to_the_device
             //}
             // Use this data to build the web socket url
-            if(data.sent) {
+            // Note "!data.hasOwnProperty('sent')" is included to allow for
+            // backwards compatibility.  If the property is NOT included, then
+            // we will assume an earlier version of the protocol on the server,
+            // and assume that the notification WAS SENT.
+            if(!data.hasOwnProperty('sent') || data.sent) {
               var url = data.host + '/support/cs?token=' + data.token;
 
               displayUIFeedBack("Server responded with information on how to contact device.<br/>" +
@@ -520,12 +538,14 @@
       var i;
       for (i = 0; i < devices.length; i++) {
         var style = 'device_enabled';
-        out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
-            '<input type="radio" name="device" value="' +
-            devices[i].serial + '"  ' +
-            ' onclick="deviceClicked(this)"/>' +
-            devices[i].model + " " + devices[i].serial +
-            '</div><br>';
+        if(devices[i].model != "Clover_C100") {
+          out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
+              '<input type="radio" name="device" value="' +
+              devices[i].serial + '"  ' +
+              ' onclick="deviceClicked(this)"/>' +
+              devices[i].model + " " + devices[i].serial +
+              '</div><br>';
+        }
         deviceBySerial[devices[i].serial] = devices[i];
       }
       document.getElementById("id01").innerHTML = out;

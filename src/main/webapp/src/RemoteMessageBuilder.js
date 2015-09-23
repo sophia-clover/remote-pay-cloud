@@ -6,7 +6,7 @@
  * @param {string} packagename -the packagename used in constructing the messages
  * @constructor
  */
-function RemoteMessageBuilder(defaultPackageName){
+function RemoteMessageBuilder(defaultPackageName) {
 
     this.defaultPackageName = defaultPackageName;
 
@@ -19,16 +19,16 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {string} packageName - an override of the package name (optional)
      * @returns {json} the constructed message - a json object
      */
-    this.buildRemoteMessage = function(method, type, payload, packageName) {
+    this.buildRemoteMessage = function (method, type, payload, packageName) {
         var lanMessage = {};
-        if(method) lanMessage.method = method;
+        if (method) lanMessage.method = method;
         lanMessage.packageName = this.defaultPackageName; //"com.clover.remote.protocol.websocket";
-        if(packageName)lanMessage.packageName = packageName;
+        if (packageName)lanMessage.packageName = packageName;
         // This is how they are doing the payload...
-        if(!payload)payload = { "method" : method };
+        if (!payload)payload = {"method": method};
         lanMessage.payload = JSON.stringify(payload);
         lanMessage.type = RemoteMessageBuilder.COMMAND;
-        if(type)lanMessage.type = type;
+        if (type)lanMessage.type = type;
         // There is an 'id' in the java instance, but I do not see it being used right now.
         return lanMessage;
     };
@@ -39,7 +39,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - an order object
      * @returns {json} the constructed message
      */
-    this.buildTxStart = function(payload) {
+    this.buildTxStart = function (payload) {
         payload.method = LanMethod.TX_START;
         return this.buildRemoteMessage(LanMethod.TX_START, RemoteMessageBuilder.COMMAND, payload);
     }
@@ -49,7 +49,7 @@ function RemoteMessageBuilder(defaultPackageName){
      *
      * @returns {json} the constructed message
      */
-    this.buildDiscoveryRequest = function() {
+    this.buildDiscoveryRequest = function () {
         return this.buildRemoteMessage(LanMethod.DISCOVERY_REQUEST);
     }
 
@@ -59,7 +59,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - the signature verified object
      * @returns {json} the constructed message
      */
-    this.buildSignatureVerified = function(payload) {
+    this.buildSignatureVerified = function (payload) {
         payload.method = LanMethod.SIGNATURE_VERIFIED;
         return this.buildRemoteMessage(LanMethod.SIGNATURE_VERIFIED, RemoteMessageBuilder.COMMAND, payload);
     }
@@ -70,9 +70,20 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - the signature verified object
      * @returns {json} the constructed message
      */
-    this.buildPaymentVoid = function(payload) {
+    this.buildPaymentVoid = function (payload) {
         payload.method = LanMethod.PAYMENT_VOIDED;
         return this.buildRemoteMessage(LanMethod.PAYMENT_VOIDED, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
+     * Builds a signature verified message
+     *
+     * @param {json} payload - the signature verified object
+     * @returns {json} the constructed message
+     */
+    this.buildVoidPayment = function (payload) {
+        payload.method = LanMethod.VOID_PAYMENT;
+        return this.buildRemoteMessage(LanMethod.VOID_PAYMENT, RemoteMessageBuilder.COMMAND, payload);
     }
 
     /**
@@ -81,7 +92,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - the message
      * @returns {json} the constructed message
      */
-    this.buildTerminalMessage = function(payload) {
+    this.buildTerminalMessage = function (payload) {
         payload.method = LanMethod.TERMINAL_MESSAGE;
         return this.buildRemoteMessage(LanMethod.TERMINAL_MESSAGE, RemoteMessageBuilder.COMMAND, payload);
     }
@@ -92,7 +103,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - the message
      * @returns {json} the constructed message
      */
-    this.buildPrintText = function(payload) {
+    this.buildPrintText = function (payload) {
         payload.method = LanMethod.PRINT_TEXT;
         return this.buildRemoteMessage(LanMethod.PRINT_TEXT, RemoteMessageBuilder.COMMAND, payload);
     }
@@ -103,7 +114,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - the message
      * @returns {json} the constructed message
      */
-    this.buildPrintImage = function(payload) {
+    this.buildPrintImage = function (payload) {
         payload.method = LanMethod.PRINT_IMAGE;
         return this.buildRemoteMessage(LanMethod.PRINT_IMAGE, RemoteMessageBuilder.COMMAND, payload);
     }
@@ -113,7 +124,7 @@ function RemoteMessageBuilder(defaultPackageName){
      *
      * @returns {json} the constructed message
      */
-    this.buildShowWelcomeScreen = function() {
+    this.buildShowWelcomeScreen = function () {
         return this.buildRemoteMessage(LanMethod.SHOW_WELCOME_SCREEN, RemoteMessageBuilder.COMMAND);
     }
 
@@ -122,7 +133,7 @@ function RemoteMessageBuilder(defaultPackageName){
      *
      * @returns {json} the constructed message
      */
-    this.buildFinishCancel = function() {
+    this.buildFinishCancel = function () {
         return this.buildRemoteMessage(LanMethod.FINISH_CANCEL, RemoteMessageBuilder.COMMAND);
     }
 
@@ -131,7 +142,7 @@ function RemoteMessageBuilder(defaultPackageName){
      *
      * @returns {json} the constructed message
      */
-    this.buildShowThankYouScreen = function() {
+    this.buildShowThankYouScreen = function () {
         return this.buildRemoteMessage(LanMethod.SHOW_THANK_YOU_SCREEN, RemoteMessageBuilder.COMMAND);
     }
 
@@ -140,7 +151,7 @@ function RemoteMessageBuilder(defaultPackageName){
      *
      * @returns {json} the constructed message
      */
-    this.buildShowReceiptScreen = function() {
+    this.buildShowReceiptScreen = function () {
         return this.buildRemoteMessage(LanMethod.SHOW_RECEIPT_SCREEN, RemoteMessageBuilder.COMMAND);
     }
 
@@ -150,7 +161,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - an order object
      * @returns {json} the constructed message
      */
-    this.buildShowOrderScreen = function(payload) {
+    this.buildShowOrderScreen = function (payload) {
         payload.method = LanMethod.SHOW_ORDER_SCREEN;
         return this.buildRemoteMessage(LanMethod.SHOW_ORDER_SCREEN, RemoteMessageBuilder.COMMAND, payload);
     }
@@ -159,7 +170,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @private
      * @returns {json} the ping message
      */
-    this.buildPing = function() {
+    this.buildPing = function () {
         return this.buildRemoteMessage(null, RemoteMessageBuilder.PING);
     }
 
@@ -167,7 +178,16 @@ function RemoteMessageBuilder(defaultPackageName){
      * @private
      * @returns {json} the ping message
      */
-    this.buildPong = function() {
+    this.buildKeyPress = function (payload) {
+        payload.method = LanMethod.KEY_PRESS;
+        return this.buildRemoteMessage(LanMethod.KEY_PRESS, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
+     * @private
+     * @returns {json} the ping message
+     */
+    this.buildPong = function () {
         return this.buildRemoteMessage(null, RemoteMessageBuilder.PONG);
     }
 
@@ -177,7 +197,7 @@ function RemoteMessageBuilder(defaultPackageName){
      * @param {json} payload - the message
      * @returns {json} the constructed message
      */
-    this.buildShutdown = function() {
+    this.buildShutdown = function () {
         return this.buildRemoteMessage(LanMethod.SHUTDOWN, RemoteMessageBuilder.COMMAND);
     }
 }
@@ -193,7 +213,8 @@ RemoteMessageBuilder.PONG = "PONG";
  * @see com.clover.remote.protocol.LanMethod (java API)
  * @constructor
  */
-function LanMethod(){};
+function LanMethod() {
+};
 /** The transaction start method type */
 LanMethod.TX_START = "TX_START";
 /** The key pressed method type */
@@ -218,7 +239,7 @@ LanMethod.VERIFY_SIGNATURE = "VERIFY_SIGNATURE";
 LanMethod.SIGNATURE_VERIFIED = "SIGNATURE_VERIFIED";
 /** The payment voided method type */
 LanMethod.PAYMENT_VOIDED = "PAYMENT_VOIDED";
-/** The print payment reuest method type */
+/** The print payment request method type */
 LanMethod.PRINT_PAYMENT = "PRINT_PAYMENT";
 /** The print merchant payment copy method type */
 LanMethod.PRINT_PAYMENT_MERCHANT_COPY = "PRINT_PAYMENT_MERCHANT_COPY";
@@ -253,3 +274,61 @@ LanMethod.VOID_PAYMENT = "VOID_PAYMENT";
  * This is a special type only present in the cloud adaptor.
  */
 LanMethod.SHUTDOWN = "SHUTDOWN";
+
+/**
+ * The acknowledgement method type
+ * This is a special type only present in the cloud adaptor.
+ */
+LanMethod.ACK = "ACK";
+
+
+/**
+ * Enumeration of void reason codes
+ *
+ * @readonly
+ * @enum {string}
+ */
+var VoidReason = {
+    USER_CANCEL: "USER_CANCEL",
+    TRANSPORT_ERROR: "TRANSPORT_ERROR",
+    REJECT_SIGNATURE: "REJECT_SIGNATURE",
+    REJECT_PARTIAL_AUTH: "REJECT_PARTIAL_AUTH",
+    NOT_APPROVED: "NOT_APPROVED",
+    FAILED: "FAILED",
+    AUTH_CLOSED_NEW_CARD: "AUTH_CLOSED_NEW_CARD",
+    REJECT_DUPLICATE: "REJECT_DUPLICATE"
+};
+
+// com.clover.remote.terminal.KeyPress
+/**
+ * Enumeration of key press codes
+ *
+ * @readonly
+ * @enum {string}
+ */
+var KeyPress = {
+    NONE: "NONE",
+    ENTER: "ENTER",
+    ESC: "ESC",
+    BACKSPACE: "BACKSPACE",
+    TAB: "TAB",
+    STAR: "STAR",
+
+    BUTTON_1: "BUTTON_1",
+    BUTTON_2: "BUTTON_2",
+    BUTTON_3: "BUTTON_3",
+    BUTTON_4: "BUTTON_4",
+    BUTTON_5: "BUTTON_5",
+    BUTTON_6: "BUTTON_6",
+
+    DIGIT_1: "DIGIT_1",
+    DIGIT_2: "DIGIT_2",
+    DIGIT_3: "DIGIT_3",
+    DIGIT_4: "DIGIT_4",
+    DIGIT_5: "DIGIT_5",
+    DIGIT_6: "DIGIT_6",
+    DIGIT_7: "DIGIT_7",
+    DIGIT_8: "DIGIT_8",
+    DIGIT_9: "DIGIT_9",
+    DIGIT_0: "DIGIT_0"
+}
