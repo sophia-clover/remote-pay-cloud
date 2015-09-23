@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: CloverOAuth</title>
+    <title>JSDoc: Class: CloverError</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: CloverOAuth</h1>
+    <h1 class="page-title">Class: CloverError</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-        CloverOAuth
+        CloverError
         </h2>
         
     
@@ -42,20 +42,14 @@
 
     
 
-    <h4 class="name" id="CloverOAuth"><span class="type-signature"></span>new CloverOAuth<span class="signature">(configuration)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="CloverError"><span class="type-signature"></span>new CloverError<span class="signature">(code, message, cause)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Library to facilitate OAuth authentication.
-
-All of the Clover rest calls will require that the application has an oauth token.  This
-object makes obtaining and using a token clearer.
-
-The constructor sets up the object, and may throw an error if the clientId is not present on the
-     passed configuration.
+    Error class for Clover specific errors.
 </div>
 
 
@@ -91,13 +85,13 @@ The constructor sets up the object, and may throw an error if the clientId is no
 
         <tr>
             
-                <td class="name"><code>configuration</code></td>
+                <td class="name"><code>code</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">map</span>
+<span class="param-type">string</span>
 
 
             
@@ -107,11 +101,53 @@ The constructor sets up the object, and may throw an error if the clientId is no
 
             
 
-            <td class="description last">an object of the form
- {
-     "clientId": the_id_for_your_clover_application, required
-     "domain" : the clover server url. if unset, defaulted to CloverOAuth.defaultDomain
- }</td>
+            <td class="description last">a code to classify the error.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the error message</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cause</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the original cause of the error if this wraps some lower level system error.</td>
         </tr>
 
     
@@ -152,7 +188,7 @@ The constructor sets up the object, and may throw an error if the clientId is no
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CloverOAuth.js.html">CloverOAuth.js</a>, <a href="CloverOAuth.js.html#line17">line 17</a>
+        <a href="CloverError.js.html">CloverError.js</a>, <a href="CloverError.js.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -196,13 +232,13 @@ The constructor sets up the object, and may throw an error if the clientId is no
 
         
             
-<h4 class="name" id=".defaultDomain"><span class="type-signature">(static) </span>defaultDomain<span class="type-signature"></span></h4>
+<h4 class="name" id=".COMMUNICATION_ERROR"><span class="type-signature">(static) </span>COMMUNICATION_ERROR<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    the default clover domain/url
+    COMMUNICATION_ERROR
 </div>
 
 
@@ -240,7 +276,7 @@ The constructor sets up the object, and may throw an error if the clientId is no
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CloverOAuth.js.html">CloverOAuth.js</a>, <a href="CloverOAuth.js.html#line116">line 116</a>
+        <a href="CloverError.js.html">CloverError.js</a>, <a href="CloverError.js.html#line31">line 31</a>
     </li></ul></dd>
     
 
@@ -250,97 +286,6 @@ The constructor sets up the object, and may throw an error if the clientId is no
 
     
 </dl>
-
-
-
-
-
-
-        
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id="getAccessToken"><span class="type-signature"></span>getAccessToken<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Attempt to get the security token
-This function attempts to extract an OAuth token from the
-request/response.
-It will create/set the userInfo object with associated keys.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CloverOAuth.js.html">CloverOAuth.js</a>, <a href="CloverOAuth.js.html#line25">line 25</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -349,24 +294,14 @@ It will create/set the userInfo object with associated keys.
 
         
             
+<h4 class="name" id=".DEVICE_OFFLINE"><span class="type-signature">(static) </span>DEVICE_OFFLINE<span class="type-signature"></span></h4>
 
-    
-
-    <h4 class="name" id="getURLParams"><span class="type-signature"></span>getURLParams<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
 
 
 
 <div class="description">
-    Grab the parameters from the url string.
+    DEVICE_OFFLINE
 </div>
-
-
-
-
-
-
 
 
 
@@ -403,7 +338,7 @@ It will create/set the userInfo object with associated keys.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CloverOAuth.js.html">CloverOAuth.js</a>, <a href="CloverOAuth.js.html#line68">line 68</a>
+        <a href="CloverError.js.html">CloverError.js</a>, <a href="CloverError.js.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -413,16 +348,6 @@ It will create/set the userInfo object with associated keys.
 
     
 </dl>
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -431,20 +356,14 @@ It will create/set the userInfo object with associated keys.
 
         
             
-
-    
-
-    <h4 class="name" id="hasToken"><span class="type-signature"></span>hasToken<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-
-    
+<h4 class="name" id=".DISCOVERY_TIMEOUT"><span class="type-signature">(static) </span>DISCOVERY_TIMEOUT<span class="type-signature"></span></h4>
 
 
 
 
-
-
-
-
+<div class="description">
+    DISCOVERY_TIMEOUT
+</div>
 
 
 
@@ -481,7 +400,7 @@ It will create/set the userInfo object with associated keys.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CloverOAuth.js.html">CloverOAuth.js</a>, <a href="CloverOAuth.js.html#line82">line 82</a>
+        <a href="CloverError.js.html">CloverError.js</a>, <a href="CloverError.js.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -497,39 +416,195 @@ It will create/set the userInfo object with associated keys.
 
 
 
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
         
-<div class="param-desc">
-    true if the security token is set
+            
+<h4 class="name" id=".INCOMPLETE_CONFIGURATION"><span class="type-signature">(static) </span>INCOMPLETE_CONFIGURATION<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    INCOMPLETE_CONFIGURATION
 </div>
 
 
 
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
 
 
-    </dd>
-</dl>
+
+
+<dl class="details">
 
     
 
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CloverError.js.html">CloverError.js</a>, <a href="CloverError.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
 
 
         
+            
+<h4 class="name" id=".INVALID_DATA"><span class="type-signature">(static) </span>INVALID_DATA<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    INVALID_DATA
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CloverError.js.html">CloverError.js</a>, <a href="CloverError.js.html#line21">line 21</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".NOT_IMPLEMENTED"><span class="type-signature">(static) </span>NOT_IMPLEMENTED<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    NOT_IMPLEMENTED
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CloverError.js.html">CloverError.js</a>, <a href="CloverError.js.html#line23">line 23</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
     
 
     

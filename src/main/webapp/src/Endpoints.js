@@ -29,7 +29,7 @@ function Endpoints(cloverOAuth) {
     }
 
     /**
-     * Builds the endpoint to send the message tothe server to let the device know we want to talk to it.
+     * Builds the endpoint to send the message to the server to let the device know we want to talk to it.
      * @param {string} merchantId - the id of the merchant to use when getting the device list.
      * @returns {string} endpoint - the url to use alert a device that we want to communicate with it
      */
@@ -44,6 +44,7 @@ function Endpoints(cloverOAuth) {
     /**
      * Does variable replacement on a template
      *
+     * @private
      * @param {string} template - a template string that will have tags replaced
      * @param {map} variableMap - a named map of tag to value for the replacement process
      * @returns {string}
@@ -58,9 +59,11 @@ function Endpoints(cloverOAuth) {
     }
 
     /**
+     *
      * Does simple escaping to facilitate string replacement in a url
      * @param {string} stringToGoIntoTheRegex - the unescaped regex
      * @returns {XML|string|void} - the escaped regex
+     * @private
      */
     this.escapeRegExp = function(stringToGoIntoTheRegex) {
         return stringToGoIntoTheRegex.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');

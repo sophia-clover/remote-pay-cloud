@@ -38,6 +38,8 @@ function Clover(configuration) {
     this.device.messageBuilder = new RemoteMessageBuilder("com.clover.remote.protocol.lan");
     // Echo all messages sent and received.
     this.device.echoAllMessages = false;
+    this.pauseBetweenDiscovery = 3000;
+    this.numberOfDiscoveryMessagesToSend = 10;
 
     this.configuration = configuration;
 
@@ -91,7 +93,21 @@ function Clover(configuration) {
      *  If there is not enough configuration information to connect to the device, then Clover.incompleteConfiguration
      *  will be called.
      *
-     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.
+     *  If the device is not connected to the push server, the callback will be called with the first parameter of a
+     *  CloverError with a code of CloverError.DEVICE_OFFLINE.
+     *
+     *  If there is a communication error retrieving the device websocket connection point or device info, the callback
+     *  will be called with the first parameter of a CloverError with a code of CloverError.COMMUNICATION_ERROR.
+     *
+     *  If the configuration of the device is incomplete, the callback will be called with the first parameter of a
+     *  CloverError with a code of CloverError.INCOMPLETE_CONFIGURATION.
+     *
+     *  If the device is contacted, but does not respond to a discovery request, the callback will be called with the first parameter of a
+     *  CloverError with a code of CloverError.DISCOVERY_TIMEOUT.
+     *
+     * @param callBackOnDeviceReady - callback function called when the device is ready for operations.  The
+     *  callback function can be called with several possible results.
+     *
      *  Adheres to error first paradigm.
      */
     this.initDeviceConnection = function (callBackOnDeviceReady) {
@@ -124,7 +140,7 @@ function Clover(configuration) {
             this.persistConfiguration();
 
             // We have the device url, contact the device
-            this.contactDevice();
+            this.contactDevice(callBackOnDeviceReady);
         } else {
             // Otherwise we must have the oauth token to get the information we need at the very least.
             // Either we already have it...
@@ -194,10 +210,9 @@ function Clover(configuration) {
                                 }
                             },
                             function (error) {
-                                // TODO: Might want to create a new CloverError here.
-                                callBackOnDeviceReady(error);
                                 if (callBackOnDeviceReady) {
-                                    callBackOnDeviceReady(error);
+                                    callBackOnDeviceReady(new CloverError(CloverError.COMMUNICATION_ERROR,
+                                        "Error getting device ws endpoint", error));
                                 } else {
                                     console.log(error);
                                 }
@@ -233,7 +248,14 @@ function Clover(configuration) {
                                 // recurse
                                 me.initDeviceConnectionInternal(callBackOnDeviceReady);
                             }
-                            , callBackOnDeviceReady
+                            , function (error) {
+                                if (callBackOnDeviceReady) {
+                                    callBackOnDeviceReady(new CloverError(CloverError.COMMUNICATION_ERROR,
+                                        "Error getting device information", error));
+                                } else {
+                                    console.log(error);
+                                }
+                            }
                         );
                     } else {
                         //Nothing left to try.  Either error out or get more info from the user.
@@ -270,7 +292,8 @@ function Clover(configuration) {
 
     /**
      * Loads the configuration that was stored.  This implementation just grabs the
-     * configuration from a cookie.
+     * configuration from a cookie.  Reimplementation of this function could provide
+     * configuration from a server or even a UI.
      *
      * @param callback - the error first callback that will be passed to Clover.incompleteConfiguration
      *  if no configuration could be loaded.
@@ -291,7 +314,8 @@ function Clover(configuration) {
 
     /**
      * Stores the configuration for later retrieval.  This implementation just drops the
-     * configuration into a cookie.
+     * configuration into a cookie.  Reimplementation of this function could provide
+     * server or some other type of cloud persistence.
      */
     this.persistConfiguration = function () {
         Clover.writeConfigurationToCookie(this.configuration);
@@ -299,7 +323,16 @@ function Clover(configuration) {
 
 
     /**
-     * We can override this to pop up a window to let the user enter any missing information.
+     * This can be overridden to provide any missing configuration information to this.configuration (
+     * through a UI or a call to the server, etc...), after which a call to
+     * Clover.initDeviceConnection would need to be made to continue attempting to connect to the device.
+     *
+     * Note that if an overridden implementation does NOT properly provide configuration, and a call is made to
+     * Clover.initDeviceConnection, there is the possibility of creating a recursive loop that would
+     * impact the performance of the application, and could make the browser unstable.
+     *
+     * Any override of this function should ensure that configuration information is complete before making
+     * the call to Clover.initDeviceConnection.
      *
      * @param {string} message - an error message.  This could be ignored.
      * @param {CloverConfig} [configuration] - the configuration that is incomplete.
@@ -348,7 +381,7 @@ function Clover(configuration) {
      *
      * @private
      */
-    this.contactDevice = function () {
+    this.contactDevice = function (callBackOnDeviceReady) {
         var me = this;
 
         this.device.on(LanMethod.DISCOVERY_RESPONSE,
@@ -372,13 +405,17 @@ function Clover(configuration) {
                         me.device.dicoveryMessagesSent++;
 
                         // Arbitrary decision that 10 messages is long enough to wait.
-                        if (me.device.dicoveryMessagesSent > 10) {
-                            console.log("Something is wrong.  we are getting pong messages, but no discovery response." +
+                        if (me.device.dicoveryMessagesSent > me.numberOfDiscoveryMessagesToSend) {
+                            var seconds = (me.numberOfDiscoveryMessagesToSend * me.pauseBetweenDiscovery)/1000;
+                            var message = "No discovery response after " + seconds + " seconds";
+                            console.log(message +
                                 "  Shutting down the connection.");
                             me.device.disconnectFromDevice();
                             clearInterval(me.device.discoveryTimerId);
+                            callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
+                                "No discovery response after 30 seconds"));
                         }
-                    }, 3000
+                    }, me.pauseBetweenDiscovery
                 );
             console.log('device opened');
             console.log("Communication channel open.");
@@ -524,7 +561,6 @@ function Clover(configuration) {
                 "request": txnInfo
             });
         }
-
     }
 
     /**
@@ -584,10 +620,18 @@ function Clover(configuration) {
      * @param {Payment} payment - the payment information returned from a call to 'sale'
      * @param {VoidReason} REASON - the reason for the void.  Typically "USER_CANCEL",
      *  see the VoidReason object.
-     * @param {requestCallback} completionCallback
+     * @param {requestCallback} completionCallback`
      */
     this.voidTransaction = function (payment, voidReason, completionCallback) {
         var callbackPayload = {"request":{"payment":payment, "voidReason":voidReason}};
+
+        // Temporary - Will be replaced by employee on backend
+        if(!payment.hasOwnProperty("employee")){
+            payment["employee"] = {
+                "id": "DFLTEMPLOYEE"
+            }
+        }
+
         var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         try {
             this.device.sendVoidPayment(payment, voidReason, uuid);
@@ -649,7 +693,6 @@ function Clover(configuration) {
                 "request": callbackPayload
             });
         }
-
     }
 
     /**
@@ -657,6 +700,26 @@ function Clover(configuration) {
      */
     this.saleWithCashback = function (saleInfo, completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
+    }
+
+
+    /**
+     * Sends an escape code to the device.  The behavior of the device when this is called is
+     * dependant on the current state of the device.
+     */
+    this.sendCancel = function (completionCallback) {
+        var callbackPayload = {"request":"cancel"};
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        try {
+            this.device.sendKeyPress(KeyPress.ESC, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.KEY_PRESS,
+                "Failure attempting to cancel", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
     }
 
     //////////
@@ -956,13 +1019,13 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Clover.html">Clover</a></li><li><a href="CloverOAuth.html">CloverOAuth</a></li><li><a href="Endpoints.html">Endpoints</a></li><li><a href="LanMethod.html">LanMethod</a></li><li><a href="RemoteMessageBuilder.html">RemoteMessageBuilder</a></li><li><a href="WebSocketDevice.html">WebSocketDevice</a></li></ul><h3>Global</h3><ul><li><a href="global.html#VoidReason">VoidReason</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Clover.html">Clover</a></li><li><a href="CloverError.html">CloverError</a></li><li><a href="CloverOAuth.html">CloverOAuth</a></li><li><a href="Endpoints.html">Endpoints</a></li><li><a href="LanMethod.html">LanMethod</a></li><li><a href="RemoteMessageBuilder.html">RemoteMessageBuilder</a></li><li><a href="WebSocketDevice.html">WebSocketDevice</a></li></ul><h3>Global</h3><ul><li><a href="global.html#KeyPress">KeyPress</a></li><li><a href="global.html#VoidReason">VoidReason</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Mon Sep 21 2015 14:43:16 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Wed Sep 23 2015 12:53:43 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>
