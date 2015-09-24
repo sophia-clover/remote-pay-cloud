@@ -34,11 +34,10 @@
         "oauthToken" : "4576ef43-a375-f7b4-b3eb-94735dcb4b08",
         "domain" : "https://dev1.dev.clover.com/",
         "merchantId" : "BBFF8NBCXEMDT",
-        "deviceSerialId" : "C030UQ50550081",
-        "autoVerifySignature" : false
+        "deviceSerialId" : "C030UQ50550081"
       });
 
-  // Since we set the 'autoVerifySignature' flag in the configuration, add a callback to verify the signature.
+  // Since we set the 'autoVerifySignature' flag in the request, add a callback to verify the signature.
   // This function *may* be called during the sale process, depending on the type of payment taken.
   clover.device.once(LanMethod.VERIFY_SIGNATURE,
       function (message) {
@@ -80,7 +79,8 @@
     } else {
       var mySale = {
         "amount": 12345, //the amount of a sale, including tax
-        "tipAmount": 123 // - the amount of a tip.  Added to the amount for the total.
+        "tipAmount": 123, // - the amount of a tip.  Added to the amount for the total.
+        "autoVerifySignature" : false // for this transaction, do NOT auto verify the signature
       }
 
       // Call the device to take payment, after the payment is complete, call the

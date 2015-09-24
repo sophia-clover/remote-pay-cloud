@@ -482,6 +482,16 @@ function Clover(configuration) {
         if (txnInfo.hasOwnProperty("orderId")) {
             payIntent.orderId = txnInfo.orderId;
         }
+        var autoVerifySignature = this.configuration.autoVerifySignature;
+        if( txnInfo.hasOwnProperty("autoVerifySignature") )
+        {
+            if( txnInfo.autoVerifySignature === true )
+            {
+                autoVerifySignature = true;
+            }
+            // remove the property, it is only used here.
+            delete txnInfo.autoVerifySignature;
+        }
         payIntent.amount = txnInfo.amount;
         payIntent.tipAmount = txnInfo.tipAmount;
 
@@ -503,7 +513,7 @@ function Clover(configuration) {
                     // This has the potential to 'stall out' the
                     // sale processing if the user of the API does not register
                     // a callback for this message, and verify the signature themselves.
-                    if(me.configuration.autoVerifySignature) {
+                    if(autoVerifySignature) {
                         me.device.sendSignatureVerified(payment);
                     }
                 } catch (error) {
@@ -886,6 +896,9 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {string} [orderId] - an id for this sale or refund
  * @property {string} [employeeId] - the valid Clover id of an employee recognized by the device.  Represents the
  *  employee making this sale or refund.
+ * @property {boolean} [autoVerifySignature] - optional override to allow either automatic signature verification
+ *  {true}, or expect that the caller has registered a listener for the request for signature verification {false}.
+ *  This will override the internal object flag autoVerifySignature.
  */
 
 /**
