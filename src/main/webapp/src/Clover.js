@@ -489,8 +489,6 @@ function Clover(configuration) {
             {
                 autoVerifySignature = true;
             }
-            // remove the property, it is only used here.
-            delete txnInfo.autoVerifySignature;
         }
         payIntent.amount = txnInfo.amount;
         payIntent.tipAmount = txnInfo.tipAmount;
