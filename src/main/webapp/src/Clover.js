@@ -15,6 +15,19 @@ function Clover(configuration) {
 
     this.configuration = configuration;
 
+    /*
+    The following is a bit elaborate, but I want it to be clear that the default of
+    this value is 'true', and that it is only false if explicitly set.
+     */
+    if( this.configuration.hasOwnProperty("autoVerifySignature") &&
+        this.configuration.autoVerifySignature != null &&
+        this.configuration.autoVerifySignature === false ) {
+        this.configuration.autoVerifySignature = false;
+    } else {
+        this.configuration.autoVerifySignature = true;
+    }
+
+
     this.sale_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "PAYMENT",
@@ -487,7 +500,12 @@ function Clover(configuration) {
                     var payment = JSON.parse(payload.payment);
                     // Already an object...hmmm
                     signature = payload.signature;
-                    me.device.sendSignatureVerified(payment);
+                    // This has the potential to 'stall out' the
+                    // sale processing if the user of the API does not register
+                    // a callback for this message, and verify the signature themselves.
+                    if(me.configuration.autoVerifySignature) {
+                        me.device.sendSignatureVerified(payment);
+                    }
                 } catch (error) {
                     var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
                         "Failure attempting to send signature verification", error);
@@ -979,5 +997,6 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {string} [merchantId] - the merchant id.
  * @property {string} [deviceSerialId] - the serial id of the device to use.
  * @property {string} [clientId] - the Clover application id to use when obtaining the oauth token.
- *
+ * @property {boolean} [autoVerifySignature] - if set to false, a callback must be registered for
+ *  signature verification requests.  This defaults to true.
  */
