@@ -644,6 +644,35 @@ function Clover(configuration) {
     }
 
     /**
+     *
+     * @param refundRequest - orderId, paymentId, [amount]
+     * @param {requestCallback} completionCallback
+     */
+    this.refundPayment = function (refundRequest, completionCallback) {
+        var callbackPayload = {"request":refundRequest};
+
+        this.device.once(LanMethod.REFUND_RESPONSE,
+            function(message) {
+                callbackPayload.response = {};
+                var payload = JSON.parse(message.payload);
+                callbackPayload.response.orderId = payload.orderId;
+                callbackPayload.response.paymentId = payload.paymentId;
+                callbackPayload.response.code = payload.code;
+                if(payload.refund) callbackPayload.response.refund =  JSON.parse(payload.refund);
+                completionCallback(null, callbackPayload);
+            }
+        );
+        try {
+            this.device.sendRefund(refundRequest.orderId, refundRequest.paymentId, refundRequest["amount"]);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.REFUND_REQUEST,
+                "Failure attempting to send refund request", error);
+            callbackPayload["code"] =  "ERROR";
+            completionCallback(cloverError, callbackPayload);
+        }
+    }
+
+    /**
      * Print an array of strings on the device
      *
      * @param {string[]} textLines - an array of strings to print
