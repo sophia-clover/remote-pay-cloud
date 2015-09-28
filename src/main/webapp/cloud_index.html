@@ -8,6 +8,7 @@
   <script src="src/xmlHttpSupport.js"></script>
   <script src="src/CardEntryMethods.js"></script>
   <script src="src/CloverOAuth.js"></script>
+  <script src="src/CloverError.js"></script>
   <script src="src/Clover.js"></script>
   <script src="src/WebSocketDevice.js"></script>
   <script src="src/Endpoints.js"></script>
@@ -26,8 +27,8 @@
 <p>
   The intention of this page is to illustrate the use of the 'Clover Cloud-POS API' from within a web application
   that is entirely html/javascript.<br/>
-  There is additional functionality included to allow for use of the Clover webhook callback api.  This functionality
-  is implemented in java as a set of servlets.   The only direct user interaction with this functionality is to save
+  There is additional functionality included to allow for use of the Clover webhook callback api. This functionality
+  is implemented in java as a set of servlets. The only direct user interaction with this functionality is to save
   the user authentication token to the server fto allow use with the Clover REST API when obtaining additional details
   about events in the webhook callback.
 </p>
@@ -68,10 +69,12 @@
   <button id="pair_button" onclick="handshakeDevice(getSelectedDevice())">Pair Device</button>
 
 <div id="unpair_button" style="display:none">
-  <button id="unpair_btn" onclick="device.disconnectFromDevice()">Unpair Device</button><br/>
+  <button id="unpair_btn" onclick="device.disconnectFromDevice()">Unpair Device</button>
+  <br/>
   <button onclick="device.sendTerminalMessage(document.getElementById('termMsg').value)">Put message on device</button>
   <input type="text" name="termMsg" id="termMsg" value="Test Message"><br>
-  <button id="save_cfg_btn" onclick="Clover.writeConfigurationToCookie(getConfig())">Save Configuration</button><br/>
+  <button id="save_cfg_btn" onclick="Clover.writeConfigurationToCookie(getConfig())">Save Configuration</button>
+  <br/>
 </div>
 
 </p>
@@ -100,9 +103,14 @@
 
     <button onclick="device.sendKeyPress(KeyPress.ESC)">Send a Cancel</button>
 
-    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, guid())">Void the last payment we saw.</button>
+    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, guid())">Void the last payment
+      we saw.
+    </button>
 
-    <button onclick="device.sendPrintText(['line 1', 'line2', 'A much longer line 3 that demonstrates the effect you will see when you try to print a very long line of text'])">Print some text</button>
+    <button
+        onclick="device.sendPrintText(['line 1', 'line2', 'A much longer line 3 that demonstrates the effect you will see when you try to print a very long line of text'])">
+      Print some text
+    </button>
   </p>
 
   <p id="add_item" style="display:none">
@@ -155,10 +163,10 @@
   var cloverOAuth = new CloverOAuth(config);
 
   function shutdown() {
-    if(device) {
+    if (device) {
       try {
         device.disconnectFromDevice()
-      }catch(e){
+      } catch (e) {
         //eat it
       }
     }
@@ -170,7 +178,7 @@
       domain: cloverOAuth.configuration.domain,
       oauthToken: cloverOAuth.getAccessToken(),
       merchantId: cloverOAuth.getURLParams()["merchant_id"],
-      deviceSerialId : getSelectedDevice().serial
+      deviceSerialId: getSelectedDevice().serial
     };
   }
 
@@ -437,7 +445,7 @@
             // backwards compatibility.  If the property is NOT included, then
             // we will assume an earlier version of the protocol on the server,
             // and assume that the notification WAS SENT.
-            if(!data.hasOwnProperty('sent') || data.sent) {
+            if (!data.hasOwnProperty('sent') || data.sent) {
               var url = data.host + '/support/cs?token=' + data.token;
 
               displayUIFeedBack("Server responded with information on how to contact device.<br/>" +
@@ -534,7 +542,7 @@
       var i;
       for (i = 0; i < devices.length; i++) {
         var style = 'device_enabled';
-        if(devices[i].model != "Clover_C100") {
+        if (devices[i].model != "Clover_C100") {
           out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
               '<input type="radio" name="device" value="' +
               devices[i].serial + '"  ' +
@@ -595,8 +603,12 @@
       authMapping[cloverOAuth.getURLParams()["merchant_id"]] = cloverOAuth.getAccessToken();
       xmlHttpSupport.postData(
           "./saveauth", //endpoint,
-          function(data) { console.log(data) }, //onDataLoaded,
-          function(data) { console.error(data) }, //onError,
+          function (data) {
+            console.log(data)
+          }, //onDataLoaded,
+          function (data) {
+            console.error(data)
+          }, //onError,
           authMapping);
     }
 

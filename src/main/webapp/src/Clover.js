@@ -49,7 +49,7 @@ function Clover(configuration) {
     //****************************************
     this.device.on(WebSocketDevice.ALL_MESSAGES,
         function (message) {
-            if (message['type'] != 'PONG') {
+            if ((message['type'] != 'PONG') && (message['type'] != 'PING')) {
                 console.log(message);
             }
         }
@@ -501,54 +501,60 @@ function Clover(configuration) {
         /**
          * Wire in automatic signature verification for now
          */
-        this.device.once(LanMethod.VERIFY_SIGNATURE,
-            function (message) {
-                try {
-                    var payload = JSON.parse(message.payload);
-                    var payment = JSON.parse(payload.payment);
-                    // Already an object...hmmm
-                    signature = payload.signature;
-                    // This has the potential to 'stall out' the
-                    // sale processing if the user of the API does not register
-                    // a callback for this message, and verify the signature themselves.
-                    if(autoVerifySignature) {
-                        me.device.sendSignatureVerified(payment);
-                    }
-                } catch (error) {
-                    var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
-                        "Failure attempting to send signature verification", error);
-                    txnRequestCallback(cloverError, {
-                        "code": "ERROR",
-                        "signature": signature,
-                        "request": txnInfo
-                    });
-                }
-            }
-        );
-        this.device.once(LanMethod.FINISH_OK,
-            function (message) {
+        var verifySignatureCB = function (message) {
+            try {
                 var payload = JSON.parse(message.payload);
-                var txnInfo = JSON.parse(payload[txnName]);//payment, credit
-                var callbackPayload = {};
-                callbackPayload.request = payIntent;
-                callbackPayload[txnName] = txnInfo;
-                callbackPayload.signature = signature;
-                callbackPayload.code = txnInfo.result;
+                var payment = JSON.parse(payload.payment);
+                // Already an object...hmmm
+                signature = payload.signature;
+                // This has the potential to 'stall out' the
+                // sale processing if the user of the API does not register
+                // a callback for this message, and verify the signature themselves.
+                if(autoVerifySignature) {
+                    me.device.sendSignatureVerified(payment);
+                }
+            } catch (error) {
+                var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
+                    "Failure attempting to send signature verification", error);
+                txnRequestCallback(cloverError, {
+                    "code": "ERROR",
+                    "signature": signature,
+                    "request": txnInfo
+                });
+            }
+        };
+        this.device.once(LanMethod.VERIFY_SIGNATURE,verifySignatureCB);
+        var finishOKCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListener(LanMethod.VERIFY_SIGNATURE, verifySignatureCB );
+            me.device.removeListener(LanMethod.FINISH_CANCEL, finishCancelCB );
 
-                txnRequestCallback(null, callbackPayload);
-                me.device.sendShowWelcomeScreen();
-            }
-        );
-        this.device.once(LanMethod.FINISH_CANCEL,
-            function (message) {
-                var callbackPayload = {};
-                callbackPayload.request = payIntent;
-                callbackPayload.signature = signature;
-                callbackPayload.code = "CANCEL";
-                txnRequestCallback(null, callbackPayload);
-                me.device.sendShowWelcomeScreen();
-            }
-        );
+            var payload = JSON.parse(message.payload);
+            var txnInfo = JSON.parse(payload[txnName]);//payment, credit
+            var callbackPayload = {};
+            callbackPayload.request = payIntent;
+            callbackPayload[txnName] = txnInfo;
+            callbackPayload.signature = signature;
+            callbackPayload.code = txnInfo.result;
+
+            txnRequestCallback(null, callbackPayload);
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_OK,finishOKCB);
+        var finishCancelCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListener(LanMethod.VERIFY_SIGNATURE, verifySignatureCB );
+            me.device.removeListener(LanMethod.FINISH_OK, finishOKCB );
+
+            var callbackPayload = {};
+            callbackPayload.request = payIntent;
+            callbackPayload.signature = signature;
+            callbackPayload.code = "CANCEL";
+            txnRequestCallback(null, callbackPayload);
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+
         try {
             this.device.sendTXStart(payIntent);
         } catch (error) {
