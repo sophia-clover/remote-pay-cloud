@@ -36,16 +36,15 @@
 
   // Start communication
   // Pass the function that should be called when the device is ready.
-  clover.initDeviceConnection(makeAVoid);
+  clover.initDeviceConnection(makeARefund);
 
   // This will be called when the device is ready
-  function makeAVoid(error) {
+  function makeARefund(error) {
     if (error) {
       var resultDisplay = "";
       resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
-      // Voids are time sensitive, allow user to enter a payment id.
       var paymentId = prompt("Please enter the payment id", "KP018Z3H2AF1W");
       if (paymentId) {
         var orderId = prompt("Please enter the order id", "YCMFN69R55ZS0");
@@ -55,8 +54,7 @@
             "orderId":  orderId
           }
 
-          // Call the device to take payment, after the payment is complete, call the
-          // 'mySaleResult' function
+          // Call the device to issue the refund
           clover.refundPayment(refundRequest, resultCallback);
 
         } else {
@@ -72,7 +70,8 @@
 
   /**
    *
-   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @param error - adheres to the node.js style of error first callbacks.
+   * @param resultData - the result of the operation
    * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
    */
   function resultCallback(error, resultData) {
