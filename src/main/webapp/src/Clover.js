@@ -62,7 +62,7 @@ function Clover(configuration) {
      */
     this.close = function () {
         if (this.device) {
-            this.device.sendShutdown();
+            this.device.disconnectFromDevice();
         }
     }
 
