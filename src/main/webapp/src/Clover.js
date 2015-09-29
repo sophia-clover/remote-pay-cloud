@@ -28,7 +28,7 @@ function Clover(configuration) {
     }
 
     this.configuration.disableRestartTransactionWhenFailed =
-        this.configuration["disableRestartTransactionWhenFailed"]?true:false;
+        Boolean(this.configuration.disableRestartTransactionWhenFailed);
 
     this.sale_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
