@@ -27,21 +27,23 @@ function Clover(configuration) {
         this.configuration.autoVerifySignature = true;
     }
 
+    this.configuration.disableRestartTransactionWhenFailed =
+        Boolean(this.configuration.disableRestartTransactionWhenFailed);
 
     this.sale_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "PAYMENT",
-        // "transactionNo": 300010,
         "taxAmount": 0, // tax amount is included in the amount
-        "cardEntryMethods": CardEntryMethods.ALL
+        "cardEntryMethods": CardEntryMethods.ALL,
+        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed
     };
 
     this.refund_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "CREDIT",
-        // "transactionNo": 300010,
         "taxAmount": 0, // tax amount is included in the amount
-        "cardEntryMethods": CardEntryMethods.ALL
+        "cardEntryMethods": CardEntryMethods.ALL,
+        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed
     };
 
     //****************************************
@@ -1010,4 +1012,6 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {string} [clientId] - the Clover application id to use when obtaining the oauth token.
  * @property {boolean} [autoVerifySignature] - if set to false, a callback must be registered for
  *  signature verification requests.  This defaults to true.
+ * @property {boolean} [disableRestartTransactionWhenFailed] - if set to true, when the device times out
+ *  during a transaction, it will return to the 'Welcome' screen when the customer selects 'ok'
  */
