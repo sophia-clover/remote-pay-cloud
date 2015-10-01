@@ -18,11 +18,10 @@ function Clover(configuration) {
     /*
     Set up a value to help the user of the Clover object know when it is available.
      */
-    var thisClover = this;
     this._isOpen = false;
-    this.device.on(WebSocketDevice.DEVICE_OPEN, function(){thisClover._isOpen = true;});
-    this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){thisClover._isOpen = false;});
-    this.device.on(WebSocketDevice.DEVICE_ERROR, function(){thisClover._isOpen = false;});
+    this.device.on(WebSocketDevice.DEVICE_OPEN,  function(){this._isOpen = true; }.bind(this) );
+    this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){this._isOpen = false;}.bind(this) );
+    this.device.on(WebSocketDevice.DEVICE_ERROR, function(){this._isOpen = false;}.bind(this) );
 
     /**
      * @returns {boolean} true if the device is open and ready for communications, false if the device is closed,
@@ -669,7 +668,7 @@ function Clover(configuration) {
 
     /**
      *
-     * @param refundRequest - orderId, paymentId, [amount]
+     * @param {RefundRequest} refundRequest - the refund request
      * @param {requestCallback} completionCallback
      */
     this.refundPayment = function (refundRequest, completionCallback) {
@@ -975,6 +974,15 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @callback Clover~transactionRequestCallback
  * @param {Error} [error] - null iff there was no error, else an object that contains a code and a message text
  * @param {TransactionResponse} result - data that results from the function.
+ */
+
+/**
+ * @typedef {Object} RefundRequest
+ * @property {string} orderId - the id of the order to refund
+ * @property {string} paymentId - the id of the payment on the order to refund
+ * @property {number} [amount] - the amount to refund.  If not included, the full payment is refunded.  The amount
+ *  cannot exceed the original payment, and if additional constraints apply to this (EX: if a partial refund
+ *  has already been performed then the amount canot exceed the remaining payment amount).
  */
 
 /**
