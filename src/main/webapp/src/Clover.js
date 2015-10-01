@@ -16,6 +16,21 @@ function Clover(configuration) {
     this.configuration = configuration;
 
     /*
+    Set up a value to help the user of the Clover object know when it is available.
+     */
+    var thisClover = this;
+    this._isOpen = false;
+    this.device.on(WebSocketDevice.DEVICE_OPEN, function(){thisClover._isOpen = true;});
+    this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){thisClover._isOpen = false;});
+    this.device.on(WebSocketDevice.DEVICE_ERROR, function(){thisClover._isOpen = false;});
+
+    /**
+     * @returns {boolean} true if the device is open and ready for communications, false if the device is closed,
+     *  or has an error.
+     */
+    this.isOpen = function(){return this._isOpen}
+
+    /*
     The following is a bit elaborate, but I want it to be clear that the default of
     this value is 'true', and that it is only false if explicitly set.
      */
@@ -51,7 +66,7 @@ function Clover(configuration) {
     //****************************************
     this.device.on(WebSocketDevice.ALL_MESSAGES,
         function (message) {
-            if (message['type'] != 'PONG') {
+            if ((message['type'] != 'PONG') && (message['type'] != 'PING')) {
                 console.log(message);
             }
         }
@@ -62,6 +77,7 @@ function Clover(configuration) {
      */
     this.close = function () {
         if (this.device) {
+            this.sendCancel();
             this.device.disconnectFromDevice();
         }
     }
@@ -380,7 +396,7 @@ function Clover(configuration) {
             }
         );
 
-        this.device.onopen = function () {
+        this.device.on(WebSocketDevice.DEVICE_OPEN, function () {
             // The connection to the device is open, but we do not yet know if there is anyone at the other end.
             // Send discovery request messages until we get a discovery response.
             me.device.dicoveryMessagesSent = 0;
@@ -406,7 +422,7 @@ function Clover(configuration) {
                 );
             console.log('device opened');
             console.log("Communication channel open.");
-        }
+        } );
         console.log("Contacting device at " + this.configuration.deviceURL);
         this.device.contactDevice(this.configuration.deviceURL);
     }
@@ -600,7 +616,7 @@ function Clover(configuration) {
                     "messageReceived": true
                 };
                 // Call the callback with the data
-                completionCallback(null, callbackPayload);
+                if(completionCallback) completionCallback(null, callbackPayload);
                 // Show the welcome screen after the acknowledgement.
                 // This might be removed later
                 me.device.sendShowWelcomeScreen();
@@ -709,16 +725,22 @@ function Clover(configuration) {
      */
     this.sendCancel = function (completionCallback) {
         var callbackPayload = {"request":"cancel"};
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
         try {
             this.device.sendKeyPress(KeyPress.ESC, uuid);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.KEY_PRESS,
                 "Failure attempting to cancel", error);
-            completionCallback(cloverError, {
-                "code": "ERROR",
-                "request": callbackPayload
-            });
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
         }
     }
 
