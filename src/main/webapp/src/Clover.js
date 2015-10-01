@@ -519,54 +519,60 @@ function Clover(configuration) {
         /**
          * Wire in automatic signature verification for now
          */
-        this.device.once(LanMethod.VERIFY_SIGNATURE,
-            function (message) {
-                try {
-                    var payload = JSON.parse(message.payload);
-                    var payment = JSON.parse(payload.payment);
-                    // Already an object...hmmm
-                    signature = payload.signature;
-                    // This has the potential to 'stall out' the
-                    // sale processing if the user of the API does not register
-                    // a callback for this message, and verify the signature themselves.
-                    if(autoVerifySignature) {
-                        me.device.sendSignatureVerified(payment);
-                    }
-                } catch (error) {
-                    var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
-                        "Failure attempting to send signature verification", error);
-                    txnRequestCallback(cloverError, {
-                        "code": "ERROR",
-                        "signature": signature,
-                        "request": txnInfo
-                    });
-                }
-            }
-        );
-        this.device.once(LanMethod.FINISH_OK,
-            function (message) {
+        var verifySignatureCB = function (message) {
+            try {
                 var payload = JSON.parse(message.payload);
-                var txnInfo = JSON.parse(payload[txnName]);//payment, credit
-                var callbackPayload = {};
-                callbackPayload.request = payIntent;
-                callbackPayload[txnName] = txnInfo;
-                callbackPayload.signature = signature;
-                callbackPayload.code = txnInfo.result;
+                var payment = JSON.parse(payload.payment);
+                // Already an object...hmmm
+                signature = payload.signature;
+                // This has the potential to 'stall out' the
+                // sale processing if the user of the API does not register
+                // a callback for this message, and verify the signature themselves.
+                if(autoVerifySignature) {
+                    me.device.sendSignatureVerified(payment);
+                }
+            } catch (error) {
+                var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
+                    "Failure attempting to send signature verification", error);
+                txnRequestCallback(cloverError, {
+                    "code": "ERROR",
+                    "signature": signature,
+                    "request": txnInfo
+                });
+            }
+        };
+        this.device.once(LanMethod.VERIFY_SIGNATURE,verifySignatureCB);
+        var finishOKCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListener(LanMethod.VERIFY_SIGNATURE, verifySignatureCB );
+            me.device.removeListener(LanMethod.FINISH_CANCEL, finishCancelCB );
 
-                txnRequestCallback(null, callbackPayload);
-                me.device.sendShowWelcomeScreen();
-            }
-        );
-        this.device.once(LanMethod.FINISH_CANCEL,
-            function (message) {
-                var callbackPayload = {};
-                callbackPayload.request = payIntent;
-                callbackPayload.signature = signature;
-                callbackPayload.code = "CANCEL";
-                txnRequestCallback(null, callbackPayload);
-                me.device.sendShowWelcomeScreen();
-            }
-        );
+            var payload = JSON.parse(message.payload);
+            var txnInfo = JSON.parse(payload[txnName]);//payment, credit
+            var callbackPayload = {};
+            callbackPayload.request = payIntent;
+            callbackPayload[txnName] = txnInfo;
+            callbackPayload.signature = signature;
+            callbackPayload.code = txnInfo.result;
+
+            txnRequestCallback(null, callbackPayload);
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_OK,finishOKCB);
+        var finishCancelCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListener(LanMethod.VERIFY_SIGNATURE, verifySignatureCB );
+            me.device.removeListener(LanMethod.FINISH_OK, finishOKCB );
+
+            var callbackPayload = {};
+            callbackPayload.request = payIntent;
+            callbackPayload.signature = signature;
+            callbackPayload.code = "CANCEL";
+            txnRequestCallback(null, callbackPayload);
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+
         try {
             this.device.sendTXStart(payIntent);
         } catch (error) {
@@ -658,6 +664,35 @@ function Clover(configuration) {
                 "code": "ERROR",
                 "request": callbackPayload
             });
+        }
+    }
+
+    /**
+     *
+     * @param refundRequest - orderId, paymentId, [amount]
+     * @param {requestCallback} completionCallback
+     */
+    this.refundPayment = function (refundRequest, completionCallback) {
+        var callbackPayload = {"request":refundRequest};
+
+        this.device.once(LanMethod.REFUND_RESPONSE,
+            function(message) {
+                callbackPayload.response = {};
+                var payload = JSON.parse(message.payload);
+                callbackPayload.response.orderId = payload.orderId;
+                callbackPayload.response.paymentId = payload.paymentId;
+                callbackPayload.response.code = payload.code;
+                if(payload.refund) callbackPayload.response.refund =  JSON.parse(payload.refund);
+                completionCallback(null, callbackPayload);
+            }
+        );
+        try {
+            this.device.sendRefund(refundRequest.orderId, refundRequest.paymentId, refundRequest["amount"]);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.REFUND_REQUEST,
+                "Failure attempting to send refund request", error);
+            callbackPayload["code"] =  "ERROR";
+            completionCallback(cloverError, callbackPayload);
         }
     }
 
