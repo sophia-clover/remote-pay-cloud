@@ -414,8 +414,10 @@ function Clover(configuration) {
                                 "  Shutting down the connection.");
                             me.device.disconnectFromDevice();
                             clearInterval(me.device.discoveryTimerId);
-                            callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
-                                "No discovery response after 30 seconds"));
+                            if(callBackOnDeviceReady) {
+                                callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
+                                    "No discovery response after 30 seconds"));
+                            }
                         }
                     }, me.pauseBetweenDiscovery
                 );
@@ -641,7 +643,7 @@ function Clover(configuration) {
      * @param {Payment} payment - the payment information returned from a call to 'sale'
      * @param {VoidReason} REASON - the reason for the void.  Typically "USER_CANCEL",
      *  see the VoidReason object.
-     * @param {requestCallback} completionCallback`
+     * @param {requestCallback} completionCallback
      */
     this.voidTransaction = function (payment, voidReason, completionCallback) {
         var callbackPayload = {"request":{"payment":payment, "voidReason":voidReason}};
@@ -699,24 +701,31 @@ function Clover(configuration) {
      * Print an array of strings on the device
      *
      * @param {string[]} textLines - an array of strings to print
+     * @param {requestCallback} [completionCallback]
      */
     this.print = function (textLines, completionCallback) {
         var callbackPayload = {"request":textLines};
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
         try {
             this.device.sendPrintText(textLines, uuid);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.PRINT_TEXT,
                 "Failure attempting to print text", error);
-            completionCallback(cloverError, {
-                "code": "ERROR",
-                "request": callbackPayload
-            });
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
         }
     }
 
     /**
      * Not yet implemented
+     * @param {requestCallback} completionCallback
      */
     this.printReceipt = function (completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
@@ -729,24 +738,31 @@ function Clover(configuration) {
      * width of the image is 384 pixals.
      *
      * @param img an HTML DOM IMG object.
+     * @param {requestCallback} [completionCallback]
      */
     this.printImage = function (img, completionCallback) {
         var callbackPayload = {"request":{"img":{"src": img.src }}};
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
         try {
             this.device.sendPrintImage(img, uuid);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.PRINT_IMAGE,
                 "Failure attempting to print image", error);
-            completionCallback(cloverError, {
-                "code": "ERROR",
-                "request": callbackPayload
-            });
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
         }
     }
 
     /**
      * Not yet implemented
+     * @param {requestCallback} completionCallback
      */
     this.saleWithCashback = function (saleInfo, completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
@@ -756,8 +772,11 @@ function Clover(configuration) {
     /**
      * Sends an escape code to the device.  The behavior of the device when this is called is
      * dependant on the current state of the device.
+     * @param {requestCallback} [completionCallback]
      */
     this.sendCancel = function (completionCallback) {
+        // Note - this is a pattern for sending keystrokes ot the device.
+        // Available keystrokes can be found in KeyPress.
         var callbackPayload = {"request":"cancel"};
         var uuid = null;
         if(completionCallback) {

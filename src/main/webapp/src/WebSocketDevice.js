@@ -358,35 +358,42 @@ WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
 
 // Device state events
 /**
+ * Prefix for events that are local to the device - right now just
+ * for device state events.
+ * @type {string}
+ */
+WebSocketDevice.LOCAL_EVENT = "LOCAL_EVENT";
+
+/**
  * Event emitter key for connection ok messages
  * @type {string}
  */
-WebSocketDevice.CONNECTION_OK = "CONNECTION_OK";
+WebSocketDevice.CONNECTION_OK = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_OK";
 /**
  * Event emitter key for connection error messages
  * @type {string}
  */
-WebSocketDevice.CONNECTION_ERROR = "CONNECTION_ERROR";
+WebSocketDevice.CONNECTION_ERROR = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_ERROR";
 /**
  * Event emitter key for connection warning messages
  * @type {string}
  */
-WebSocketDevice.CONNECTION_WARNING = "CONNECTION_WARNING";
+WebSocketDevice.CONNECTION_WARNING = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_WARNING";
 /**
  * Event emitter key for device error events
  * @type {string}
  */
-WebSocketDevice.DEVICE_ERROR = "DEVICE_ERROR";
+WebSocketDevice.DEVICE_ERROR = WebSocketDevice.LOCAL_EVENT + "_DEVICE_ERROR";
 /**
  * Event emitter key for device open events
  * @type {string}
  */
-WebSocketDevice.DEVICE_OPEN = "DEVICE_OPEN";
+WebSocketDevice.DEVICE_OPEN = WebSocketDevice.LOCAL_EVENT + "_DEVICE_OPEN";
 /**
  * Event emitter key for device close events
  * @type {string}
  */
-WebSocketDevice.DEVICE_CLOSE = "DEVICE_CLOSE";
+WebSocketDevice.DEVICE_CLOSE = WebSocketDevice.LOCAL_EVENT + "_DEVICE_CLOSE";
 
 
 //**************************************************************
