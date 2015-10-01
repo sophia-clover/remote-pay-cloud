@@ -14,10 +14,10 @@ function WebSocketDevice() {
     this.pingIntervalId = null;
     // flag for echoing messages to the console
     this.echoAllMessages = false;
-    // The last time a pong was received
-    this.pongReceivedMillis = 0;
-    // The last time a ping was sent.
-    this.pingSentMillis = 0;
+    // The last time a pong was received, set to current time initially
+    this.pongReceivedMillis = new Date().getTime();
+    // The last time a ping was sent, set to current time initially
+    this.pingSentMillis = new Date().getTime();
     // How often a ping is sent
     this.millisecondsBetweenPings = 10000; // 5 seconds
     // How long should it be before we warn on a dead connection
@@ -32,6 +32,7 @@ function WebSocketDevice() {
     // A queue of messages that may be populated while we attempt to reconnect.
     this.resendQueue = [];
 
+    // Used to emit messages and state of the device
     this.eventEmitter = new EventEmitter();
 
     /**
@@ -153,6 +154,9 @@ function WebSocketDevice() {
      * Called when the connection is OK
      */
     this.connectionOK = function() {
+        var message = "Connection Ok";
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_OK, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
 
     /**
@@ -161,7 +165,9 @@ function WebSocketDevice() {
      *  related to 'pong' responses to a 'ping'
      */
     this.connectionError = function(lag) {
-        console.error("Connection appears to be dead...no response in " + lag + " milliseconds");
+        var message = "Connection appears to be dead...no response in " + lag + " milliseconds";
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_ERROR, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
 
     /**
@@ -170,7 +176,9 @@ function WebSocketDevice() {
      *  related to 'pong' responses to a 'ping'
      */
     this.connectionWarning = function(lag) {
-        console.error("Connection is slow...no response in " + lag + " milliseconds");
+        var message = "Connection is slow...no response in " + lag + " milliseconds";
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_WARNING, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
 
     /**
@@ -178,7 +186,8 @@ function WebSocketDevice() {
      * @param event
      */
     this.onerror = function(event) {
-        console.error(event);
+        this.eventEmitter.emit(WebSocketDevice.DEVICE_ERROR, event);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, event);
     }
 
     /**
@@ -186,7 +195,8 @@ function WebSocketDevice() {
      * @param event
      */
     this.onopen = function(event) {
-        console.info(event);
+        this.eventEmitter.emit(WebSocketDevice.DEVICE_OPEN, event);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, event);
     }
 
     /**
@@ -194,7 +204,8 @@ function WebSocketDevice() {
      * @param event
      */
     this.onclose = function(event) {
-        console.info(event);
+        this.eventEmitter.emit(WebSocketDevice.DEVICE_CLOSE, event);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, event);
     }
 
     /**
@@ -344,6 +355,45 @@ function WebSocketDevice() {
  * a callback to the WebSocketDevice.on function
  */
 WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
+
+// Device state events
+/**
+ * Prefix for events that are local to the device - right now just
+ * for device state events.
+ * @type {string}
+ */
+WebSocketDevice.LOCAL_EVENT = "LOCAL_EVENT";
+
+/**
+ * Event emitter key for connection ok messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_OK = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_OK";
+/**
+ * Event emitter key for connection error messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_ERROR = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_ERROR";
+/**
+ * Event emitter key for connection warning messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_WARNING = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_WARNING";
+/**
+ * Event emitter key for device error events
+ * @type {string}
+ */
+WebSocketDevice.DEVICE_ERROR = WebSocketDevice.LOCAL_EVENT + "_DEVICE_ERROR";
+/**
+ * Event emitter key for device open events
+ * @type {string}
+ */
+WebSocketDevice.DEVICE_OPEN = WebSocketDevice.LOCAL_EVENT + "_DEVICE_OPEN";
+/**
+ * Event emitter key for device close events
+ * @type {string}
+ */
+WebSocketDevice.DEVICE_CLOSE = WebSocketDevice.LOCAL_EVENT + "_DEVICE_CLOSE";
 
 
 //**************************************************************

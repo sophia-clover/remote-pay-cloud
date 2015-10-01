@@ -16,6 +16,20 @@ function Clover(configuration) {
     this.configuration = configuration;
 
     /*
+    Set up a value to help the user of the Clover object know when it is available.
+     */
+    this._isOpen = false;
+    this.device.on(WebSocketDevice.DEVICE_OPEN,  function(){this._isOpen = true; }.bind(this) );
+    this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){this._isOpen = false;}.bind(this) );
+    this.device.on(WebSocketDevice.DEVICE_ERROR, function(){this._isOpen = false;}.bind(this) );
+
+    /**
+     * @returns {boolean} true if the device is open and ready for communications, false if the device is closed,
+     *  or has an error.
+     */
+    this.isOpen = function(){return this._isOpen}
+
+    /*
     The following is a bit elaborate, but I want it to be clear that the default of
     this value is 'true', and that it is only false if explicitly set.
      */
@@ -62,6 +76,7 @@ function Clover(configuration) {
      */
     this.close = function () {
         if (this.device) {
+            this.sendCancel();
             this.device.disconnectFromDevice();
         }
     }
@@ -380,7 +395,7 @@ function Clover(configuration) {
             }
         );
 
-        this.device.onopen = function () {
+        this.device.on(WebSocketDevice.DEVICE_OPEN, function () {
             // The connection to the device is open, but we do not yet know if there is anyone at the other end.
             // Send discovery request messages until we get a discovery response.
             me.device.dicoveryMessagesSent = 0;
@@ -399,14 +414,16 @@ function Clover(configuration) {
                                 "  Shutting down the connection.");
                             me.device.disconnectFromDevice();
                             clearInterval(me.device.discoveryTimerId);
-                            callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
-                                "No discovery response after 30 seconds"));
+                            if(callBackOnDeviceReady) {
+                                callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
+                                    "No discovery response after 30 seconds"));
+                            }
                         }
                     }, me.pauseBetweenDiscovery
                 );
             console.log('device opened');
             console.log("Communication channel open.");
-        }
+        } );
         console.log("Contacting device at " + this.configuration.deviceURL);
         this.device.contactDevice(this.configuration.deviceURL);
     }
@@ -606,7 +623,7 @@ function Clover(configuration) {
                     "messageReceived": true
                 };
                 // Call the callback with the data
-                completionCallback(null, callbackPayload);
+                if(completionCallback) completionCallback(null, callbackPayload);
                 // Show the welcome screen after the acknowledgement.
                 // This might be removed later
                 me.device.sendShowWelcomeScreen();
@@ -626,7 +643,7 @@ function Clover(configuration) {
      * @param {Payment} payment - the payment information returned from a call to 'sale'
      * @param {VoidReason} REASON - the reason for the void.  Typically "USER_CANCEL",
      *  see the VoidReason object.
-     * @param {requestCallback} completionCallback`
+     * @param {requestCallback} completionCallback
      */
     this.voidTransaction = function (payment, voidReason, completionCallback) {
         var callbackPayload = {"request":{"payment":payment, "voidReason":voidReason}};
@@ -653,7 +670,7 @@ function Clover(configuration) {
 
     /**
      *
-     * @param refundRequest - orderId, paymentId, [amount]
+     * @param {RefundRequest} refundRequest - the refund request
      * @param {requestCallback} completionCallback
      */
     this.refundPayment = function (refundRequest, completionCallback) {
@@ -684,24 +701,31 @@ function Clover(configuration) {
      * Print an array of strings on the device
      *
      * @param {string[]} textLines - an array of strings to print
+     * @param {requestCallback} [completionCallback]
      */
     this.print = function (textLines, completionCallback) {
         var callbackPayload = {"request":textLines};
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
         try {
             this.device.sendPrintText(textLines, uuid);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.PRINT_TEXT,
                 "Failure attempting to print text", error);
-            completionCallback(cloverError, {
-                "code": "ERROR",
-                "request": callbackPayload
-            });
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
         }
     }
 
     /**
      * Not yet implemented
+     * @param {requestCallback} completionCallback
      */
     this.printReceipt = function (completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
@@ -714,24 +738,31 @@ function Clover(configuration) {
      * width of the image is 384 pixals.
      *
      * @param img an HTML DOM IMG object.
+     * @param {requestCallback} [completionCallback]
      */
     this.printImage = function (img, completionCallback) {
         var callbackPayload = {"request":{"img":{"src": img.src }}};
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
         try {
             this.device.sendPrintImage(img, uuid);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.PRINT_IMAGE,
                 "Failure attempting to print image", error);
-            completionCallback(cloverError, {
-                "code": "ERROR",
-                "request": callbackPayload
-            });
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
         }
     }
 
     /**
      * Not yet implemented
+     * @param {requestCallback} completionCallback
      */
     this.saleWithCashback = function (saleInfo, completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
@@ -741,19 +772,28 @@ function Clover(configuration) {
     /**
      * Sends an escape code to the device.  The behavior of the device when this is called is
      * dependant on the current state of the device.
+     * @param {requestCallback} [completionCallback]
      */
     this.sendCancel = function (completionCallback) {
+        // Note - this is a pattern for sending keystrokes ot the device.
+        // Available keystrokes can be found in KeyPress.
         var callbackPayload = {"request":"cancel"};
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
         try {
             this.device.sendKeyPress(KeyPress.ESC, uuid);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.KEY_PRESS,
                 "Failure attempting to cancel", error);
-            completionCallback(cloverError, {
-                "code": "ERROR",
-                "request": callbackPayload
-            });
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
         }
     }
 
@@ -953,6 +993,15 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @callback Clover~transactionRequestCallback
  * @param {Error} [error] - null iff there was no error, else an object that contains a code and a message text
  * @param {TransactionResponse} result - data that results from the function.
+ */
+
+/**
+ * @typedef {Object} RefundRequest
+ * @property {string} orderId - the id of the order to refund
+ * @property {string} paymentId - the id of the payment on the order to refund
+ * @property {number} [amount] - the amount to refund.  If not included, the full payment is refunded.  The amount
+ *  cannot exceed the original payment, and if additional constraints apply to this (EX: if a partial refund
+ *  has already been performed then the amount canot exceed the remaining payment amount).
  */
 
 /**
