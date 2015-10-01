@@ -358,7 +358,7 @@ WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
  *
  * @param {json} order - the entire order json object
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -397,7 +397,7 @@ WebSocketDevice.prototype.sendKeyPress = function(keyCode, ackId) {
  *
  * @param {json} payIntent - the payment intention object
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -422,7 +422,7 @@ WebSocketDevice.prototype.sendTXStart = function(payIntent, ackId) {
  *
  * @param {json} payment - the payment object with signature verification fields populated (positively)
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -445,7 +445,7 @@ WebSocketDevice.prototype.sendSignatureVerified = function(payment, ackId) {
  *
  * @param {json} payment - the payment object with signature verification fields populated (negatively)
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -467,7 +467,7 @@ WebSocketDevice.prototype.sendSignatureRejected = function(payment, ackId) {
  *
  * @param {json} payment - the payment object with signature verification fields populated (negatively)
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -485,10 +485,36 @@ WebSocketDevice.prototype.sendVoidPayment = function(payment, voidReason, ackId)
 }
 
 /**
+ * Void a payment
+ *
+ * @param {string} orderId - the id for the order the refund is against
+ * @param {string} paymentId - the id for the payment on the order the refund is against
+ * @param {number} [amount] - the amount that will be refunded.  If not included, the amount of
+ *  the passed payment will be refunded.
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendRefund = function(orderId, paymentId, amount, ackId) {
+    var payload = {};
+    payload.orderId = orderId;
+    payload.paymentId = paymentId;
+    if(amount)payload.amount = amount;
+
+    var lanMessage = this.messageBuilder.buildRefund(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
  * Send a cancellation message
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -505,7 +531,7 @@ WebSocketDevice.prototype.sendFinishCancel = function(ackId) {
  * Send a message to show the 'Thank You' screen
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -522,7 +548,7 @@ WebSocketDevice.prototype.sendShowThankYouScreen = function(ackId) {
  * Send a message to show the 'Welcome' screen
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -539,7 +565,7 @@ WebSocketDevice.prototype.sendShowWelcomeScreen = function(ackId) {
  * Send a message to show the receipt screen from the last order
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -557,7 +583,7 @@ WebSocketDevice.prototype.sendShowReceiptScreen = function(ackId) {
  *
  * @param {string} message - the message to display
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -575,7 +601,7 @@ WebSocketDevice.prototype.sendTerminalMessage = function(message, ackId) {
  * Send a message to ask the device if it is there.
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -593,7 +619,7 @@ WebSocketDevice.prototype.sendDiscoveryRequest = function(ackId) {
  *
  * @param textLines - an  array of strings
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -613,7 +639,7 @@ WebSocketDevice.prototype.sendPrintText = function(textLines, ackId) {
  *
  * @param textLines - an  array of strings
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -631,7 +657,7 @@ WebSocketDevice.prototype.sendShutdown = function() {
  * @param img - an image.  Can be obtained in a manner similar to :
  *  <pre>var img = document.getElementById("img_id");</pre>
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
