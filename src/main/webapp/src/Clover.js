@@ -727,11 +727,30 @@ function Clover(configuration) {
     }
 
     /**
-     * Not yet implemented
-     * @param {requestCallback} completionCallback
+     * Print a receipt from a previous transaction.
+     * @param printRequest
+     * @param completionCallback
      */
-    this.printReceipt = function (completionCallback) {
-        completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
+    this.printReceipt = function (printRequest, completionCallback) {
+        var callbackPayload = {"request":printRequest};
+
+        var finishCancelCB = function (message) {
+            completionCallback(null, callbackPayload);
+            // We could let them do this
+            this.device.sendShowWelcomeScreen();
+        }.bind(this);
+        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+
+        try {
+            this.device.sendShowPaymentReceiptOptions(printRequest.orderId, printRequest.paymentId);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS,
+                "Failure attempting to print receipt", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
     }
 
     /**

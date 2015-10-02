@@ -89,12 +89,23 @@ function RemoteMessageBuilder(defaultPackageName) {
     /**
      * Builds a refund payment message
      *
-     * @param {json} payload - the signature verified object
+     * @param {json} payload - the orderid and paymentid with optional amount
      * @returns {json} the constructed message
      */
     this.buildRefund = function (payload) {
         payload.method = LanMethod.REFUND_REQUEST;
         return this.buildRemoteMessage(LanMethod.REFUND_REQUEST, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
+     * Builds a message to show the receipt options screen for a payment
+     *
+     * @param {json} payload - the orderid and paymentid
+     * @returns {json} the constructed message
+     */
+    this.buildShowPaymentReceiptOptions = function (payload) {
+        payload.method = LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS;
+        return this.buildRemoteMessage(LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS, RemoteMessageBuilder.COMMAND, payload);
     }
 
     /**
@@ -282,6 +293,8 @@ LanMethod.VOID_PAYMENT = "VOID_PAYMENT";
 LanMethod.REFUND_REQUEST = "REFUND_REQUEST";
 /** The refund response method type */
 LanMethod.REFUND_RESPONSE = "REFUND_RESPONSE";
+/** THE OPTIONTYPE TO SHOW THE PAYMENT RECEIPT SCREEN */
+LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS = "SHOW_PAYMENT_RECEIPT_OPTIONS";
 
 /**
  * The shutdown method type
