@@ -498,9 +498,12 @@ function Clover(configuration) {
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
         }
+        /*
+        The ordere id cannot be specified at this time.
         if (txnInfo.hasOwnProperty("orderId")) {
             payIntent.orderId = txnInfo.orderId;
         }
+        */
         var autoVerifySignature = this.configuration.autoVerifySignature;
         if( txnInfo.hasOwnProperty("autoVerifySignature") )
         {
@@ -968,7 +971,6 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @typedef {Object} TransactionRequest
  * @property {integer} amount - the amount of a sale or refund, including tax
  * @property {integer} [tipAmount] - the amount of a tip.  Added to the amount for the total.  Valid for sale operations
- * @property {string} [orderId] - an id for this sale or refund
  * @property {string} [employeeId] - the valid Clover id of an employee recognized by the device.  Represents the
  *  employee making this sale or refund.
  * @property {boolean} [autoVerifySignature] - optional override to allow either automatic signature verification
