@@ -49,7 +49,7 @@
 <div id="ouauth_config">
   Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
   Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth"
-                            value="http://192.168.1.17:9001/"/>
+                            value="https://dev1.dev.clover.com/"/>
   <br/>
   <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
 </div>
@@ -624,8 +624,7 @@
     }
 
     function createNewOrder() {
-      return {
-      };
+      return {};
     }
 
     function getCCPayIntent() {
