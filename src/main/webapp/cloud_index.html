@@ -114,7 +114,7 @@
   </p>
 
   <p id="add_item" style="display:none">
-    <button onclick="addBikeToOrder(currentOrder)">Add a Bike to the Order</button>
+    <button onclick="addCustomItemToOrder(currentOrder, 32100)">Add a $321 custom item to the order</button>
     <button onclick="addCustomItemToOrder(currentOrder, 150)">Add a $1.50 custom item to the order</button>
     <button onclick="if(currentOrder)device.sendShowOrderScreen(currentOrder)">Show the order screen (if there is a
       current order)
@@ -615,44 +615,8 @@
     //*********************************************
     //
     //*********************************************
-    /**
-     * A hardcoded tax rate for the order
-     */
-    function getTaxRate() {
-
-      return {
-        "id": "S00VR686JF5CS", // id for tax
-        "isDefault": false,
-        "rate": 10,
-        "name": "10_PCT_TAX_APPLIED"
-      };
-    }
-
-    function getBikeLineItem() {
-      var lineItem = {
-        "createdTime": new Date().getTime(),
-        "taxRates": {
-          "elements": [getTaxRate()]
-        },
-        "userData": null,
-        "alternateName": "",
-        "exchanged": false,
-        "id": getNewId(),
-        "refunded": false,
-        "price": 20000,
-        "binName": null,
-        "isRevenue": true,
-        "name": "Dawes Touring 20\" Brown",
-        "item": {"id": "YHF0PW2E69K9W"}, // bike item id
-        "printed": false,
-        "itemCode": "dawes1"
-      };
-      return lineItem;
-    }
-
     function getCustomLineItem(amt) {
       var lineItem = {
-        "id": getNewId(),
         "price": amt,
         "name": "Custom Item"
       };
@@ -660,11 +624,7 @@
     }
 
     function createNewOrder() {
-      var orderId = getNewId();
-
-      return {
-        "id": orderId
-      };
+      return {};
     }
 
     function getCCPayIntent() {
@@ -673,7 +633,6 @@
         "amount": currentOrder.total,
         "transactionType": "PAYMENT",
         "transactionNo": 300010,
-        "orderId": currentOrder.id,
         "taxAmount": 0,
         "cardEntryMethods": 15
       };
@@ -685,7 +644,6 @@
         "amount": 10000,
         "transactionType": "PAYMENT",
         "transactionNo": 300010,
-        "orderId": getNewId(),
         "taxAmount": 0,
         "cardEntryMethods": 15
       };
@@ -705,11 +663,6 @@
       device.sendShowOrderScreen(currentOrder);
       enable('add_item');
       displayUIFeedBack("Now you can add the item to the order");
-    }
-
-    function addBikeToOrder(order) {
-      var lineItem = getBikeLineItem();
-      addLineItemToOrder(order, lineItem);
     }
 
     function addCustomItemToOrder(order, amt) {
