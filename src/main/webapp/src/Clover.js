@@ -643,9 +643,9 @@ function Clover(configuration) {
 
     /**
      *
-     * @param {Payment} payment - the payment information returned from a call to 'sale'
-     * @param {VoidReason} REASON - the reason for the void.  Typically "USER_CANCEL",
-     *  see the VoidReason object.
+     * @param {Payment} payment - the payment information returned from a call to 'sale'.
+     *  this can be truncated to be only { "id": paymentId, "order": {"id": orderId}}
+     * @param {VoidReason} REASON - the reason for the void.
      * @param {requestCallback} completionCallback
      */
     this.voidTransaction = function (payment, voidReason, completionCallback) {
@@ -672,7 +672,7 @@ function Clover(configuration) {
     }
 
     /**
-     *
+     * Refund from a previous payment.
      * @param {RefundRequest} refundRequest - the refund request
      * @param {requestCallback} completionCallback
      */
@@ -770,7 +770,6 @@ function Clover(configuration) {
     this.saleWithCashback = function (saleInfo, completionCallback) {
         completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
     }
-
 
     /**
      * Sends an escape code to the device.  The behavior of the device when this is called is
@@ -949,7 +948,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
 /**
  * This callback type is called `requestCallback` and is displayed as a global symbol.  This type
  * of callback adheres to the Node.js convention of 'Error-first' callbacks.
- * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+ *
  *
  * The first argument of the callback is always reserved for an error object.
  * On a successful response, the ‘err’ argument is null. Call the callback and include the successful data only.
@@ -957,6 +956,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * On an unsuccessful response, the ‘err’ argument is set. Call the callback with an actual error object. The
  * error should describe what happened and include enough information to tell the callback what went wrong. Data
  * can still be returned in the other arguments as well, but generally the error is passed alone.
+ * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
  *
  * @callback requestCallback
  * @param {Error} [error] - null iff there was no error, else an object that contains a code and a message text
@@ -1002,7 +1002,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {string} orderId - the id of the order to refund
  * @property {string} paymentId - the id of the payment on the order to refund
  * @property {number} [amount] - the amount to refund.  If not included, the full payment is refunded.  The amount
- *  cannot exceed the original payment, and if additional constraints apply to this (EX: if a partial refund
+ *  cannot exceed the original payment, and additional constraints apply to this (EX: if a partial refund
  *  has already been performed then the amount canot exceed the remaining payment amount).
  */
 
