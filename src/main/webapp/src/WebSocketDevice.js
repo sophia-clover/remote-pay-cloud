@@ -151,7 +151,9 @@ function WebSocketDevice() {
     }
 
     /**
-     * Called when the connection is OK
+     * Called when the connection is OK.
+     * Emits the
+     *  WebSocketDevice.CONNECTION_OK message to registered listeners.
      */
     this.connectionOK = function() {
         var message = "Connection Ok";
@@ -161,6 +163,8 @@ function WebSocketDevice() {
 
     /**
      * Called when the lag on communication has reached an error length
+     * Emits the
+     *  WebSocketDevice.CONNECTION_ERROR message to registered listeners.
      * @param {Number} lag - the number of milliseconds between communication to and from the device.  Measured as
      *  related to 'pong' responses to a 'ping'
      */
@@ -172,6 +176,8 @@ function WebSocketDevice() {
 
     /**
      * Called when the lag on communication has reached a warning length
+     * Emits the
+     *  WebSocketDevice.CONNECTION_WARNING message to registered listeners.
      * @param {Number} lag - the number of milliseconds between communication to and from the device.  Measured as
      *  related to 'pong' responses to a 'ping'
      */
@@ -183,6 +189,8 @@ function WebSocketDevice() {
 
     /**
      * Called on device error
+     * Emits the
+     *  WebSocketDevice.DEVICE_ERROR event to registered listeners.
      * @param event
      */
     this.onerror = function(event) {
@@ -192,6 +200,8 @@ function WebSocketDevice() {
 
     /**
      * Called when the device is opened
+     * Emits the
+     *  WebSocketDevice.DEVICE_OPEN event to registered listeners.
      * @param event
      */
     this.onopen = function(event) {
@@ -201,6 +211,8 @@ function WebSocketDevice() {
 
     /**
      * Called when the device is closed
+     * Emits the
+     *  WebSocketDevice.DEVICE_CLOSE event to registered listeners.
      * @param event
      */
     this.onclose = function(event) {
@@ -286,11 +298,12 @@ function WebSocketDevice() {
     }
 
     /**
-     * Registers event callbacks for message method types.
+     * Registers event callbacks for message method types, and device state.
      *
      * @see LanMethod
      *
-     * @param {string} eventName - one of the LanMethod types
+     * @param {string} eventName - one of the LanMethod types, or one of the
+     *  LOCAL_EVENT types for device state.
      * @param {function} callback - the function called with the event data
      */
     this.on = function (eventName, callback) {
@@ -308,11 +321,13 @@ function WebSocketDevice() {
     }
 
     /**
-     * Registers event callbacks for message method types.
+     * Registers event callbacks for message method types, and device state. The callback will be
+     * called at most once.
      *
      * @see LanMethod
      *
-     * @param {string} eventName - one of the LanMethod types
+     * @param {string} eventName - one of the LanMethod types, or one of the
+     *  LOCAL_EVENT types for device state.
      * @param {function} callback - the function called with the event data
      */
     this.once = function (eventName, callback) {
