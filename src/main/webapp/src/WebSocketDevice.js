@@ -14,10 +14,10 @@ function WebSocketDevice() {
     this.pingIntervalId = null;
     // flag for echoing messages to the console
     this.echoAllMessages = false;
-    // The last time a pong was received
-    this.pongReceivedMillis = 0;
-    // The last time a ping was sent.
-    this.pingSentMillis = 0;
+    // The last time a pong was received, set to current time initially
+    this.pongReceivedMillis = new Date().getTime();
+    // The last time a ping was sent, set to current time initially
+    this.pingSentMillis = new Date().getTime();
     // How often a ping is sent
     this.millisecondsBetweenPings = 10000; // 5 seconds
     // How long should it be before we warn on a dead connection
@@ -32,6 +32,7 @@ function WebSocketDevice() {
     // A queue of messages that may be populated while we attempt to reconnect.
     this.resendQueue = [];
 
+    // Used to emit messages and state of the device
     this.eventEmitter = new EventEmitter();
 
     /**
@@ -150,51 +151,73 @@ function WebSocketDevice() {
     }
 
     /**
-     * Called when the connection is OK
+     * Called when the connection is OK.
+     * Emits the
+     *  WebSocketDevice.CONNECTION_OK message to registered listeners.
      */
     this.connectionOK = function() {
+        var message = "Connection Ok";
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_OK, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
 
     /**
      * Called when the lag on communication has reached an error length
+     * Emits the
+     *  WebSocketDevice.CONNECTION_ERROR message to registered listeners.
      * @param {Number} lag - the number of milliseconds between communication to and from the device.  Measured as
      *  related to 'pong' responses to a 'ping'
      */
     this.connectionError = function(lag) {
-        console.error("Connection appears to be dead...no response in " + lag + " milliseconds");
+        var message = "Connection appears to be dead...no response in " + lag + " milliseconds";
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_ERROR, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
 
     /**
      * Called when the lag on communication has reached a warning length
+     * Emits the
+     *  WebSocketDevice.CONNECTION_WARNING message to registered listeners.
      * @param {Number} lag - the number of milliseconds between communication to and from the device.  Measured as
      *  related to 'pong' responses to a 'ping'
      */
     this.connectionWarning = function(lag) {
-        console.error("Connection is slow...no response in " + lag + " milliseconds");
+        var message = "Connection is slow...no response in " + lag + " milliseconds";
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_WARNING, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
 
     /**
      * Called on device error
+     * Emits the
+     *  WebSocketDevice.DEVICE_ERROR event to registered listeners.
      * @param event
      */
     this.onerror = function(event) {
-        console.error(event);
+        this.eventEmitter.emit(WebSocketDevice.DEVICE_ERROR, event);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, event);
     }
 
     /**
      * Called when the device is opened
+     * Emits the
+     *  WebSocketDevice.DEVICE_OPEN event to registered listeners.
      * @param event
      */
     this.onopen = function(event) {
-        console.info(event);
+        this.eventEmitter.emit(WebSocketDevice.DEVICE_OPEN, event);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, event);
     }
 
     /**
      * Called when the device is closed
+     * Emits the
+     *  WebSocketDevice.DEVICE_CLOSE event to registered listeners.
      * @param event
      */
     this.onclose = function(event) {
-        console.info(event);
+        this.eventEmitter.emit(WebSocketDevice.DEVICE_CLOSE, event);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, event);
     }
 
     /**
@@ -275,11 +298,12 @@ function WebSocketDevice() {
     }
 
     /**
-     * Registers event callbacks for message method types.
+     * Registers event callbacks for message method types, and device state.
      *
      * @see LanMethod
      *
-     * @param {string} eventName - one of the LanMethod types
+     * @param {string} eventName - one of the LanMethod types, or one of the
+     *  LOCAL_EVENT types for device state.
      * @param {function} callback - the function called with the event data
      */
     this.on = function (eventName, callback) {
@@ -297,11 +321,13 @@ function WebSocketDevice() {
     }
 
     /**
-     * Registers event callbacks for message method types.
+     * Registers event callbacks for message method types, and device state. The callback will be
+     * called at most once.
      *
      * @see LanMethod
      *
-     * @param {string} eventName - one of the LanMethod types
+     * @param {string} eventName - one of the LanMethod types, or one of the
+     *  LOCAL_EVENT types for device state.
      * @param {function} callback - the function called with the event data
      */
     this.once = function (eventName, callback) {
@@ -345,6 +371,45 @@ function WebSocketDevice() {
  */
 WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
 
+// Device state events
+/**
+ * Prefix for events that are local to the device - right now just
+ * for device state events.
+ * @type {string}
+ */
+WebSocketDevice.LOCAL_EVENT = "LOCAL_EVENT";
+
+/**
+ * Event emitter key for connection ok messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_OK = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_OK";
+/**
+ * Event emitter key for connection error messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_ERROR = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_ERROR";
+/**
+ * Event emitter key for connection warning messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_WARNING = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_WARNING";
+/**
+ * Event emitter key for device error events
+ * @type {string}
+ */
+WebSocketDevice.DEVICE_ERROR = WebSocketDevice.LOCAL_EVENT + "_DEVICE_ERROR";
+/**
+ * Event emitter key for device open events
+ * @type {string}
+ */
+WebSocketDevice.DEVICE_OPEN = WebSocketDevice.LOCAL_EVENT + "_DEVICE_OPEN";
+/**
+ * Event emitter key for device close events
+ * @type {string}
+ */
+WebSocketDevice.DEVICE_CLOSE = WebSocketDevice.LOCAL_EVENT + "_DEVICE_CLOSE";
+
 
 //**************************************************************
 // Functionality to deal with sending messages
@@ -358,7 +423,7 @@ WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
  *
  * @param {json} order - the entire order json object
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -397,7 +462,7 @@ WebSocketDevice.prototype.sendKeyPress = function(keyCode, ackId) {
  *
  * @param {json} payIntent - the payment intention object
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -422,7 +487,7 @@ WebSocketDevice.prototype.sendTXStart = function(payIntent, ackId) {
  *
  * @param {json} payment - the payment object with signature verification fields populated (positively)
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -445,7 +510,7 @@ WebSocketDevice.prototype.sendSignatureVerified = function(payment, ackId) {
  *
  * @param {json} payment - the payment object with signature verification fields populated (negatively)
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -467,7 +532,7 @@ WebSocketDevice.prototype.sendSignatureRejected = function(payment, ackId) {
  *
  * @param {json} payment - the payment object with signature verification fields populated (negatively)
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -485,10 +550,36 @@ WebSocketDevice.prototype.sendVoidPayment = function(payment, voidReason, ackId)
 }
 
 /**
+ * Void a payment
+ *
+ * @param {string} orderId - the id for the order the refund is against
+ * @param {string} paymentId - the id for the payment on the order the refund is against
+ * @param {number} [amount] - the amount that will be refunded.  If not included, the amount of
+ *  the passed payment will be refunded.
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendRefund = function(orderId, paymentId, amount, ackId) {
+    var payload = {};
+    payload.orderId = orderId;
+    payload.paymentId = paymentId;
+    if(amount)payload.amount = amount;
+
+    var lanMessage = this.messageBuilder.buildRefund(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
  * Send a cancellation message
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -505,7 +596,7 @@ WebSocketDevice.prototype.sendFinishCancel = function(ackId) {
  * Send a message to show the 'Thank You' screen
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -522,7 +613,7 @@ WebSocketDevice.prototype.sendShowThankYouScreen = function(ackId) {
  * Send a message to show the 'Welcome' screen
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -539,7 +630,7 @@ WebSocketDevice.prototype.sendShowWelcomeScreen = function(ackId) {
  * Send a message to show the receipt screen from the last order
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -557,7 +648,7 @@ WebSocketDevice.prototype.sendShowReceiptScreen = function(ackId) {
  *
  * @param {string} message - the message to display
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -575,7 +666,7 @@ WebSocketDevice.prototype.sendTerminalMessage = function(message, ackId) {
  * Send a message to ask the device if it is there.
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -593,7 +684,7 @@ WebSocketDevice.prototype.sendDiscoveryRequest = function(ackId) {
  *
  * @param textLines - an  array of strings
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -613,7 +704,7 @@ WebSocketDevice.prototype.sendPrintText = function(textLines, ackId) {
  *
  * @param textLines - an  array of strings
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
@@ -631,7 +722,7 @@ WebSocketDevice.prototype.sendShutdown = function() {
  * @param img - an image.  Can be obtained in a manner similar to :
  *  <pre>var img = document.getElementById("img_id");</pre>
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT engorced in any way.
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
