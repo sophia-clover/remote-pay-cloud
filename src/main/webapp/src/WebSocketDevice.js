@@ -576,6 +576,30 @@ WebSocketDevice.prototype.sendRefund = function(orderId, paymentId, amount, ackI
 }
 
 /**
+ * Show the recipt options screen for a specific ordereid/paymentid.
+ *
+ * @param {string} orderId - the id for the order
+ * @param {string} paymentId - the id for the payment on the order
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendShowPaymentReceiptOptions = function(orderId, paymentId, ackId) {
+    var payload = {};
+    payload.orderId = orderId;
+    payload.paymentId = paymentId;
+
+    var lanMessage = this.messageBuilder.buildShowPaymentReceiptOptions(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+
+/**
  * Send a cancellation message
  *
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
