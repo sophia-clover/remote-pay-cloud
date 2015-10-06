@@ -727,11 +727,30 @@ function Clover(configuration) {
     }
 
     /**
-     * Not yet implemented
-     * @param {requestCallback} completionCallback
+     * Print a receipt from a previous transaction.
+     * @param printRequest
+     * @param completionCallback
      */
-    this.printReceipt = function (completionCallback) {
-        completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
+    this.printReceipt = function (printRequest, completionCallback) {
+        var callbackPayload = {"request":printRequest};
+
+        var finishCancelCB = function (message) {
+            completionCallback(null, callbackPayload);
+            // We could let them do this
+            this.device.sendShowWelcomeScreen();
+        }.bind(this);
+        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+
+        try {
+            this.device.sendShowPaymentReceiptOptions(printRequest.orderId, printRequest.paymentId);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS,
+                "Failure attempting to print receipt", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
     }
 
     /**
@@ -789,6 +808,35 @@ function Clover(configuration) {
         } catch (error) {
             var cloverError = new CloverError(LanMethod.KEY_PRESS,
                 "Failure attempting to cancel", error);
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
+    /**
+     * Opens the cash drawer
+     *
+     * @param {string} reason - the reason the cash drawer was opened.
+     * @param {requestCallback} [completionCallback]
+     */
+    this.openCashDrawer = function (reason, completionCallback) {
+        // Note - this is a pattern for sending keystrokes ot the device.
+        // Available keystrokes can be found in KeyPress.
+        var callbackPayload = {"request":{"reason":reason}};
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendOpenCashDrawer(reason, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.OPEN_CASH_DRAWER,
+                "Failure attempting to open the cash drawer", error);
             if(completionCallback) {
                 completionCallback(cloverError, {
                     "code": "ERROR",
