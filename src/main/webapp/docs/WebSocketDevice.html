@@ -2248,7 +2248,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line674">line 674</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line721">line 721</a>
     </li></ul></dd>
     
 
@@ -2395,7 +2395,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line587">line 587</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line634">line 634</a>
     </li></ul></dd>
     
 
@@ -2592,6 +2592,184 @@ Emits the
 
     
 
+    <h4 class="name" id="sendOpenCashDrawer"><span class="type-signature"></span>sendOpenCashDrawer<span class="signature">(reason, ackId<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Open the cash drawer (if one is connected).
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>reason</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the reason the drawer was opened</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ackId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">an optional identifier that can be used to track an acknowledgement
+ to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ A "ACK" message will be returned with this identifier as the message id if this
+ parameter is included.  This "ACK" message will be in addition to any other message
+ that may be generated as a result of this message being sent.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line611">line 611</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="sendPrintImage"><span class="type-signature"></span>sendPrintImage<span class="signature">(img, ackId<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
@@ -2735,7 +2913,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line730">line 730</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line777">line 777</a>
     </li></ul></dd>
     
 
@@ -2908,7 +3086,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line692">line 692</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line739">line 739</a>
     </li></ul></dd>
     
 
@@ -3360,6 +3538,215 @@ Emits the
 
     
 
+    <h4 class="name" id="sendShowPaymentReceiptOptions"><span class="type-signature"></span>sendShowPaymentReceiptOptions<span class="signature">(orderId, paymentId, ackId<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Show the recipt options screen for a specific ordereid/paymentid.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>orderId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the id for the order</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>paymentId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the id for the payment on the order</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ackId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">an optional identifier that can be used to track an acknowledgement
+ to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ A "ACK" message will be returned with this identifier as the message id if this
+ parameter is included.  This "ACK" message will be in addition to any other message
+ that may be generated as a result of this message being sent.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line589">line 589</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="sendShowReceiptScreen"><span class="type-signature"></span>sendShowReceiptScreen<span class="signature">(ackId<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
@@ -3476,7 +3863,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line638">line 638</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line685">line 685</a>
     </li></ul></dd>
     
 
@@ -3623,7 +4010,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line604">line 604</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line651">line 651</a>
     </li></ul></dd>
     
 
@@ -3770,7 +4157,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line621">line 621</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line668">line 668</a>
     </li></ul></dd>
     
 
@@ -3943,7 +4330,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line712">line 712</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line759">line 759</a>
     </li></ul></dd>
     
 
@@ -4477,7 +4864,7 @@ Emits the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line656">line 656</a>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line703">line 703</a>
     </li></ul></dd>
     
 
@@ -4881,7 +5268,7 @@ Emits the
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Fri Oct 02 2015 13:55:43 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Tue Oct 06 2015 15:51:44 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>
