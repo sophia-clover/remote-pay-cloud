@@ -109,6 +109,17 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
+     * Builds a message to show the receipt options screen for a payment
+     *
+     * @param {json} payload - the orderid and paymentid
+     * @returns {json} the constructed message
+     */
+    this.buildOpenCashDrawer = function (payload) {
+        payload.method = LanMethod.OPEN_CASH_DRAWER;
+        return this.buildRemoteMessage(LanMethod.OPEN_CASH_DRAWER, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a terminal message (display message for device)
      *
      * @param {json} payload - the message
@@ -295,6 +306,8 @@ LanMethod.REFUND_REQUEST = "REFUND_REQUEST";
 LanMethod.REFUND_RESPONSE = "REFUND_RESPONSE";
 /** THE OPTIONTYPE TO SHOW THE PAYMENT RECEIPT SCREEN */
 LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS = "SHOW_PAYMENT_RECEIPT_OPTIONS";
+/** The type to open the cash drawer */
+LanMethod.OPEN_CASH_DRAWER = "OPEN_CASH_DRAWER";
 
 /**
  * The shutdown method type
