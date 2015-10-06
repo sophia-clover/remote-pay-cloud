@@ -1,0 +1,72 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <script src="src/cloverCloud-min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body onbeforeunload="clover.close()">
+
+<p>
+  This is a simple Example of the Clover High Level Cloud API.  It relies on the device to be running the
+  Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
+  previously obtained.  It makes a connection to a device, and opens the cash drawer.
+</p>
+
+<button onclick="clover.sendCancel(resultCallback)">Send a Cancel</button>
+<button onclick="clover.close()">Close Clover</button>
+
+<!-- this is a place to talk about what is happening while the example is being run -->
+<div id="uiFeedback" style="height: 400px;">
+</div>
+
+<script>
+
+  // Create the Clover object to communicate with the device
+  var clover = new Clover(
+      {
+        "oauthToken" : "4576ef43-a375-f7b4-b3eb-94735dcb4b08",
+        "domain" : "https://dev1.dev.clover.com/",
+        "merchantId" : "BBFF8NBCXEMDT",
+        "deviceSerialId" : "C030UQ50550081"
+      });
+
+  // Start communication
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(openDrawer);
+
+  // This will be called when the device is ready
+  function openDrawer(error) {
+    if(error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      var reason = prompt("Please enter the reason the drawer is being opened", "TEST");
+      // Call the device to take payment, after the payment is complete, call the
+      // 'mySaleResult' function
+      clover.openCashDrawer(reason, resultCallback);
+    }
+  }
+
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function resultCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+</script>
+
+</body>
+</html>

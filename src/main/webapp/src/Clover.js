@@ -818,6 +818,35 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     * Opens the cash drawer
+     *
+     * @param {string} reason - the reason the cash drawer was opened.
+     * @param {requestCallback} [completionCallback]
+     */
+    this.openCashDrawer = function (reason, completionCallback) {
+        // Note - this is a pattern for sending keystrokes ot the device.
+        // Available keystrokes can be found in KeyPress.
+        var callbackPayload = {"request":{"reason":reason}};
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendOpenCashDrawer(reason, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.OPEN_CASH_DRAWER,
+                "Failure attempting to open the cash drawer", error);
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
     //////////
 
     //

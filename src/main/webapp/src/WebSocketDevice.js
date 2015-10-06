@@ -598,6 +598,29 @@ WebSocketDevice.prototype.sendShowPaymentReceiptOptions = function(orderId, paym
     this.sendMessage(lanMessage);
 }
 
+/**
+ * Open the cash drawer (if one is connected).
+ *
+ * @param {string} reason - the reason the drawer was opened
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendOpenCashDrawer = function(reason, ackId) {
+    var payload = {};
+    payload.reason = reason;
+
+    var lanMessage = this.messageBuilder.buildOpenCashDrawer(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+
+
 
 /**
  * Send a cancellation message
