@@ -14,6 +14,9 @@ function Clover(configuration) {
     this.numberOfDiscoveryMessagesToSend = 10;
 
     this.configuration = configuration;
+    if(!this.configuration) {
+        this.configuration = {};
+    }
 
     /*
     Set up a value to help the user of the Clover object know when it is available.
