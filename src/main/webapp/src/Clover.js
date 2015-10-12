@@ -290,6 +290,11 @@ function Clover(configuration) {
                     this.configuration.oauthToken = this.cloverOAuth.getAccessToken();
                     // recurse
                     this.initDeviceConnectionInternal(callBackOnDeviceReady);
+                } else {
+                    if (!this.loadPersistedConfiguration(callBackOnDeviceReady)) {
+                        return;
+                    }
+                    this.initDeviceConnectionInternal(callBackOnDeviceReady);
                 }
             }
         }
