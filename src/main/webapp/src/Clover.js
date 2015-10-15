@@ -47,12 +47,16 @@ function Clover(configuration) {
     this.configuration.disableRestartTransactionWhenFailed =
         Boolean(this.configuration.disableRestartTransactionWhenFailed);
 
+    this.configuration.remotePrint =
+        Boolean(this.configuration.remotePrint);
+
     this.sale_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "PAYMENT",
         "taxAmount": 0, // tax amount is included in the amount
         "cardEntryMethods": CardEntryMethods.ALL,
-        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed
+        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+        "remotePrint":  this.configuration.remotePrint
     };
 
     this.refund_payIntentTemplate = {
@@ -60,7 +64,8 @@ function Clover(configuration) {
         "transactionType": "CREDIT",
         "taxAmount": 0, // tax amount is included in the amount
         "cardEntryMethods": CardEntryMethods.ALL,
-        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed
+        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+        "remotePrint":  this.configuration.remotePrint
     };
 
     //****************************************
@@ -239,6 +244,11 @@ function Clover(configuration) {
                                 me.handleDevices(devices);
                                 // Stations do not support the kiosk/pay display.
                                 // If the user has selected one, then print out a (loud) warning
+                                var myDevice = me.deviceBySerial[me.configuration.deviceSerialId];
+                                if(null == myDevice) {
+                                    callBackOnDeviceReady(new CloverError(CloverError.DEVICE_NOT_FOUND,
+                                        "Device " + deviceSerialId + " not in set returned."));
+                                }
                                 if (me.deviceBySerial[me.configuration.deviceSerialId].model == "Clover_C100") {
                                     console.log(
                                         "Warning - Selected device model (" +
