@@ -1,5 +1,3 @@
-
-
 /**
  * Error class for Clover specific errors.
  *
@@ -29,3 +27,5 @@ CloverError.INCOMPLETE_CONFIGURATION = "incomplete configuration";
 CloverError.DISCOVERY_TIMEOUT = "discovery timeout";
 /** COMMUNICATION_ERROR */
 CloverError.COMMUNICATION_ERROR = "communication error";
+/** INVALID_DATA */
+CloverError.DEVICE_NOT_FOUND = "device not found";

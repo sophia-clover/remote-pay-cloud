@@ -50,6 +50,13 @@ button:active {
     padding: 20px;
 }
 
+.uiFeedback {
+    overflow-y: scroll;
+    border-radius: 25px;
+    border: 2px solid #080808;
+    padding: 20px;
+}
+
 body {
     font-family: Helvetica, Arial, sans-serif;
 }
