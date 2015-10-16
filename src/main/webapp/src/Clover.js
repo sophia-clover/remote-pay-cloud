@@ -590,7 +590,9 @@ function Clover(configuration) {
             callbackPayload.request = payIntent;
             callbackPayload.signature = signature;
             callbackPayload.code = "CANCEL";
-            txnRequestCallback(null, callbackPayload);
+
+            var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
+            txnRequestCallback(error, callbackPayload);
             me.device.sendShowWelcomeScreen();
         };
         this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
