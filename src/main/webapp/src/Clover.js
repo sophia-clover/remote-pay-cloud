@@ -1152,7 +1152,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  *     </ol>
  * </p>
  *
- * @typedef CloverConfig
+ * @typedef {Object} CloverConfig
  * @property {string} [deviceURL] - the web socket url to use when connecting to the device.  Optional
  *  if other configuration values allow this to be obtained.
  * @property {string} [oauthToken] - the authentication token used when communicating with the clover cos
@@ -1166,4 +1166,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  *  signature verification requests.  This defaults to true.
  * @property {boolean} [disableRestartTransactionWhenFailed] - if set to true, when the device times out
  *  during a transaction, it will return to the 'Welcome' screen when the customer selects 'ok'
+ * @property {boolean} [remotePrint] - if set to true, then when the user selects "print" on the print receipt
+ *  screen after a transaction, a PRINT_PAYMENT message will be sent from the device to the API.  To get the
+ *  message, a listener must be registered via Clover.device.on(LanMethod.PRINT_PAYMENT, ...)
  */
