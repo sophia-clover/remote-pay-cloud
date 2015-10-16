@@ -5,8 +5,16 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-  <script src="src/cloverCloud-min.js"></script>
-
+  <script src="src/xmlHttpSupport.js"></script>
+  <script src="src/CardEntryMethods.js"></script>
+  <script src="src/CloverOAuth.js"></script>
+  <script src="src/CloverError.js"></script>
+  <script src="src/Clover.js"></script>
+  <script src="src/WebSocketDevice.js"></script>
+  <script src="src/Endpoints.js"></script>
+  <script src="src/ids.js"></script>
+  <script src="src/eventemitter3_v1_1_1.js"></script>
+  <script src="src/RemoteMessageBuilder.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -318,7 +326,7 @@
 
     // There is a problem with the connection.  A long time has gone by without expected communication
     // with the device.
-    device.connectionError = function (lag) {
+    device.on(WebSocketDevice.CONNECTION_ERROR,  function (lag) {
       document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
       disable('unpair_button');
       disable('process_flow');
@@ -329,16 +337,16 @@
       displayUIFeedBack("There is a problem with the connection.  A long time has gone by without " +
           "expected communication with the device.");
 
-    }
+    });
 
     // There is a problem with the connection. Some time has gone by without expected communication
     // with the device.
-    device.connectionWarning = function (lag) {
+    device.on(WebSocketDevice.CONNECTION_WARNING, function (lag) {
       document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'yellow';
-    }
+    });
 
     // The device connection has been opened
-    device.onopen = function () {
+    device.on(WebSocketDevice.DEVICE_OPEN, function () {
       // The connection to the device is open, but we do not yet know if there is anyone at the other end.
       // Send discovery request messages until we get a discovery response.
       device.dicoveryMessagesSent = 0;
@@ -360,21 +368,20 @@
           );
       console.log('device opened');
       displayUIFeedBack("Communication channel open.  Pausing for 3 seconds before trying to talk to device. ");
-    }
+    });
 
     // The device connection has been closed
-    device.onclose = function (closeEvent) {
+    device.on(WebSocketDevice.DEVICE_CLOSE, function (closeEvent) {
       document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
       enable('pair_button');
       disable('unpair_button');
       disable('process_flow');
       console.log('device closed: ' + closeEvent);
       displayUIFeedBack("The device connection has been closed");
-
-    }
+    });
 
     // There has been an error on the device connection
-    device.onerror = function () {
+    device.on(WebSocketDevice.CONNECTION_ERROR, function () {
       document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';
       enable('pair_button');
       disable('unpair_button');
@@ -383,7 +390,7 @@
       displayUIFeedBack("There has been an error on the device connection, will attempt handshake again...");
 
       handshakeDevice(getSelectedDevice());
-    }
+    });
 
     //******************************************************
     /**

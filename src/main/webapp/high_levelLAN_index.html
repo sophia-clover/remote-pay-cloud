@@ -13,8 +13,8 @@
 <body>
 
 <p>
-  This is a simple Example of the Clover High Level Cloud API.  It relies on the device to be running the
-  Local Network Pay Display app, at the address ws://192.168.1.3:14285.  It makes a direct connection to the
+  This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
+  Local Network Pay Display app, at the address ws://192.168.1.41:14285.  It makes a direct connection to the
   device, and charges $123.45, with a tip of $1.23 ($124.68).  The result of the transaction is displayed below.
 </p>
 
@@ -25,7 +25,7 @@
 <script onbeforeunload="clover.close()">
 
   // Create the Clover object to communicate with the device
-  var clover = new Clover({"deviceURL" : "ws://192.168.1.3:14285"});
+  var clover = new Clover({"deviceURL" : "ws://192.168.1.41:14285"});
 
 
 
