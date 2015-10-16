@@ -29,3 +29,5 @@ CloverError.DISCOVERY_TIMEOUT = "discovery timeout";
 CloverError.COMMUNICATION_ERROR = "communication error";
 /** INVALID_DATA */
 CloverError.DEVICE_NOT_FOUND = "device not found";
+/** INVALID_DATA */
+CloverError.CANCELED = "canceled";
