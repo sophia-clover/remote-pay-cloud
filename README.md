@@ -40,6 +40,11 @@ Generate a certificate
 keytool -genkey -alias jetty6 -keyalg RSA -keystore jetty-ssl.keystore -storepass jetty6 -keypass jetty6 -dname "CN=localhost"
 ```
 
+Prepare the application to run:
+```
+mvn package
+```
+
 Run the app inside a jetty container:
 ```
 mvn jetty:run

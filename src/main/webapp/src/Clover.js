@@ -12,6 +12,8 @@ function Clover(configuration) {
     this.device.echoAllMessages = false;
     this.pauseBetweenDiscovery = 3000;
     this.numberOfDiscoveryMessagesToSend = 10;
+    // This is used to augment the 'isOpen' functionality.
+    this.discoveryResponseReceived = false;
 
     this.configuration = configuration;
     if(!this.configuration) {
@@ -26,6 +28,7 @@ function Clover(configuration) {
     this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){
         this._isOpen = false;
         this.configuration.deviceURL = null;
+        this.discoveryResponseReceived = false;
     }.bind(this) );
     this.device.on(WebSocketDevice.DEVICE_ERROR, function(){
         this._isOpen = false;
@@ -37,10 +40,15 @@ function Clover(configuration) {
     }.bind(this) );
 
     /**
-     * @returns {boolean} true if the device is open and ready for communications, false if the device is closed,
-     *  or has an error.
+     * @returns {boolean} true if the device is open and ready for communications,
+     *  false if the device is closed, or has an error.
      */
-    this.isOpen = function(){return this._isOpen}
+    this.isOpen = function(){
+        // The device must not only be opened, it must have responded with a discovery response
+        // to indicate that not only is the socket communication channel open, but the device
+        // has bootstrapped the functionality to actually respond to messages.
+        return this._isOpen && this.discoveryResponseReceived;
+    }
 
     /*
     The following is a bit elaborate, but I want it to be clear that the default of
@@ -413,12 +421,14 @@ function Clover(configuration) {
      */
     this.contactDevice = function (callBackOnDeviceReady) {
         var me = this;
+        this.discoveryResponseReceived = false;
 
         this.device.once(LanMethod.DISCOVERY_RESPONSE,
             function (message) {
                 // This id is set when the discovery request is sent when the device 'onopen' is called.
                 clearInterval(me.device.discoveryTimerId);
                 me.device.discoveryTimerId = null;
+                me.discoveryResponseReceived = true;
                 console.log("Device has responded to discovery message.");
                 console.log(message);
             }
