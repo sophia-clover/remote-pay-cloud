@@ -21,6 +21,7 @@
 
 <button onclick="clover.sendCancel(resultCallback)">Send a Cancel</button>
 <button onclick="clover.close()">Close Clover</button>
+<button onclick="clover.initDeviceConnection(makeASale)">Init connection and make a sale again</button>
 
 <!-- this is a place to talk about what is happening while the example is being run -->
 <div id="uiFeedback" style="height: 400px;">
@@ -31,7 +32,7 @@
   // Create the Clover object to communicate with the device
   var clover = new Clover(
       {
-        "oauthToken" : "4576ef43-a375-f7b4-b3eb-94735dcb4b08",
+        "oauthToken" : "f41035d0-43ee-771c-92a2-721195c00f6a",
         "domain" : "https://dev1.dev.clover.com/",
         "merchantId" : "BBFF8NBCXEMDT",
         "deviceSerialId" : "C030UQ50550081"
