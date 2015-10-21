@@ -40,6 +40,8 @@ function Clover(configuration) {
     this.device.echoAllMessages = false;
     this.pauseBetweenDiscovery = 3000;
     this.numberOfDiscoveryMessagesToSend = 10;
+    // This is used to augment the 'isOpen' functionality.
+    this.discoveryResponseReceived = false;
 
     this.configuration = configuration;
     if(!this.configuration) {
@@ -51,14 +53,30 @@ function Clover(configuration) {
      */
     this._isOpen = false;
     this.device.on(WebSocketDevice.DEVICE_OPEN,  function(){this._isOpen = true; }.bind(this) );
-    this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){this._isOpen = false;}.bind(this) );
-    this.device.on(WebSocketDevice.DEVICE_ERROR, function(){this._isOpen = false;}.bind(this) );
+    this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){
+        this._isOpen = false;
+        this.configuration.deviceURL = null;
+        this.discoveryResponseReceived = false;
+    }.bind(this) );
+    this.device.on(WebSocketDevice.DEVICE_ERROR, function(){
+        this._isOpen = false;
+        this.device.forceClose();
+    }.bind(this) );
+    this.device.on(WebSocketDevice.CONNECTION_ERROR, function(){
+        this._isOpen = false;
+        this.device.forceClose();
+    }.bind(this) );
 
     /**
-     * @returns {boolean} true if the device is open and ready for communications, false if the device is closed,
-     *  or has an error.
+     * @returns {boolean} true if the device is open and ready for communications,
+     *  false if the device is closed, or has an error.
      */
-    this.isOpen = function(){return this._isOpen}
+    this.isOpen = function(){
+        // The device must not only be opened, it must have responded with a discovery response
+        // to indicate that not only is the socket communication channel open, but the device
+        // has bootstrapped the functionality to actually respond to messages.
+        return this._isOpen &amp;&amp; this.discoveryResponseReceived;
+    }
 
     /*
     The following is a bit elaborate, but I want it to be clear that the default of
@@ -431,55 +449,53 @@ function Clover(configuration) {
      */
     this.contactDevice = function (callBackOnDeviceReady) {
         var me = this;
+        this.discoveryResponseReceived = false;
 
-        this.device.on(LanMethod.DISCOVERY_RESPONSE,
+        this.device.once(LanMethod.DISCOVERY_RESPONSE,
             function (message) {
                 // This id is set when the discovery request is sent when the device 'onopen' is called.
                 clearInterval(me.device.discoveryTimerId);
+                me.device.discoveryTimerId = null;
+                me.discoveryResponseReceived = true;
                 console.log("Device has responded to discovery message.");
                 console.log(message);
             }
         );
 
-        this.device.on(WebSocketDevice.DEVICE_OPEN, function () {
+        this.device.once(WebSocketDevice.DEVICE_OPEN, function () {
             // The connection to the device is open, but we do not yet know if there is anyone at the other end.
             // Send discovery request messages until we get a discovery response.
             me.device.dicoveryMessagesSent = 0;
-            me.device.discoveryTimerId =
-                setInterval(
-                    function () {
-                        console.log("Sending 'discovery' message to device.");
-                        me.device.sendMessage(me.device.messageBuilder.buildDiscoveryRequest());
-                        me.device.dicoveryMessagesSent++;
+            if(!me.device.discoveryTimerId) {
+                me.device.discoveryTimerId =
+                    setInterval(
+                        function () {
+                            console.log("Sending 'discovery' message to device.");
+                            me.device.sendMessage(me.device.messageBuilder.buildDiscoveryRequest());
+                            me.device.dicoveryMessagesSent++;
 
-                        // Arbitrary decision that 10 messages is long enough to wait.
-                        if (me.device.dicoveryMessagesSent > me.numberOfDiscoveryMessagesToSend) {
-                            var seconds = (me.numberOfDiscoveryMessagesToSend * me.pauseBetweenDiscovery)/1000;
-                            var message = "No discovery response after " + seconds + " seconds";
-                            console.log(message +
-                                "  Shutting down the connection.");
-                            me.device.disconnectFromDevice();
-                            clearInterval(me.device.discoveryTimerId);
-                            if(callBackOnDeviceReady) {
-                                callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
-                                    "No discovery response after 30 seconds"));
+                            // Arbitrary decision that 10 messages is long enough to wait.
+                            if (me.device.dicoveryMessagesSent > me.numberOfDiscoveryMessagesToSend) {
+                                var seconds = (me.numberOfDiscoveryMessagesToSend * me.pauseBetweenDiscovery) / 1000;
+                                var message = "No discovery response after " + seconds + " seconds";
+                                console.log(message +
+                                    "  Shutting down the connection.");
+                                me.device.disconnectFromDevice();
+                                clearInterval(me.device.discoveryTimerId);
+                                me.device.discoveryTimerId = null;
+                                if (callBackOnDeviceReady) {
+                                    callBackOnDeviceReady(new CloverError(CloverError.DISCOVERY_TIMEOUT,
+                                        "No discovery response after 30 seconds"));
+                                }
                             }
-                        }
-                    }, me.pauseBetweenDiscovery
-                );
+                        }, me.pauseBetweenDiscovery
+                    );
+            }
             console.log('device opened');
             console.log("Communication channel open.");
         } );
         console.log("Contacting device at " + this.configuration.deviceURL);
         this.device.contactDevice(this.configuration.deviceURL);
-    }
-
-    /**
-     * Can be used to manually set a function to be called one time when the device gets a DISCOVERY_RESPONSE.
-     * @param tellMeWhenDeviceIsReady - callback function called when the device is ready for operations.
-     */
-    this.notifyWhenDeviceIsReady = function (tellMeWhenDeviceIsReady) {
-        this.device.once(LanMethod.DISCOVERY_RESPONSE, tellMeWhenDeviceIsReady);
     }
 
     /**
@@ -565,6 +581,30 @@ function Clover(configuration) {
         var me = this;
         // We will hold on to the signature since we are not showing it to the user.
         var signature = null;
+
+        // Holds all the callbacks so that they can be removed later, if
+        // They need to be.  Callbacks need to be removed in the 'end states'
+        // that do not visit ALL the callback.
+        var allCallBacks = [];
+
+        var deviceErrorCB = function(event) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            var error = new CloverError(CloverError.DEVICE_ERROR, event);
+            txnRequestCallback(error, null);
+        };
+        this.device.on(WebSocketDevice.DEVICE_ERROR, deviceErrorCB);
+        allCallBacks.push({"event":WebSocketDevice.DEVICE_ERROR, "callback":deviceErrorCB});
+
+        var connectionErrorCB = function(message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            var error = new CloverError(CloverError.COMMUNICATION_ERROR, message);
+            txnRequestCallback(error, null);
+        };
+        this.device.on(WebSocketDevice.CONNECTION_ERROR, connectionErrorCB);
+        allCallBacks.push({"event":WebSocketDevice.CONNECTION_ERROR, "callback":connectionErrorCB});
+
         //Wire in the handler for completion to be called once.
         /**
          * Wire in automatic signature verification for now
@@ -592,10 +632,11 @@ function Clover(configuration) {
             }
         };
         this.device.once(LanMethod.VERIFY_SIGNATURE,verifySignatureCB);
+        allCallBacks.push({"event":LanMethod.VERIFY_SIGNATURE, "callback":verifySignatureCB});
+
         var finishOKCB = function (message) {
             // Remove obsolete listeners.  This is an end state
-            me.device.removeListener(LanMethod.VERIFY_SIGNATURE, verifySignatureCB );
-            me.device.removeListener(LanMethod.FINISH_CANCEL, finishCancelCB );
+            me.device.removeListeners(allCallBacks);
 
             var payload = JSON.parse(message.payload);
             var txnInfo = JSON.parse(payload[txnName]);//payment, credit
@@ -609,19 +650,23 @@ function Clover(configuration) {
             me.device.sendShowWelcomeScreen();
         };
         this.device.once(LanMethod.FINISH_OK,finishOKCB);
+        allCallBacks.push({"event":LanMethod.FINISH_OK, "callback":finishOKCB});
+
         var finishCancelCB = function (message) {
             // Remove obsolete listeners.  This is an end state
-            me.device.removeListener(LanMethod.VERIFY_SIGNATURE, verifySignatureCB );
-            me.device.removeListener(LanMethod.FINISH_OK, finishOKCB );
+            me.device.removeListeners(allCallBacks);
 
             var callbackPayload = {};
             callbackPayload.request = payIntent;
             callbackPayload.signature = signature;
             callbackPayload.code = "CANCEL";
-            txnRequestCallback(null, callbackPayload);
+
+            var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
+            txnRequestCallback(error, callbackPayload);
             me.device.sendShowWelcomeScreen();
         };
         this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+        allCallBacks.push({"event":LanMethod.FINISH_CANCEL, "callback":finishCancelCB});
 
         try {
             this.device.sendTXStart(payIntent);
@@ -1214,7 +1259,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Fri Oct 16 2015 08:50:26 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Wed Oct 21 2015 11:09:43 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>

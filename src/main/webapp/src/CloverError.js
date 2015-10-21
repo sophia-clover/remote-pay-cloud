@@ -27,9 +27,9 @@ CloverError.INCOMPLETE_CONFIGURATION = "incomplete configuration";
 CloverError.DISCOVERY_TIMEOUT = "discovery timeout";
 /** COMMUNICATION_ERROR */
 CloverError.COMMUNICATION_ERROR = "communication error";
-/** COMMUNICATION_ERROR */
+/** DEVICE_ERROR */
 CloverError.DEVICE_ERROR = "device error";
-/** INVALID_DATA */
+/** DEVICE_NOT_FOUND */
 CloverError.DEVICE_NOT_FOUND = "device not found";
-/** INVALID_DATA */
+/** CANCELED */
 CloverError.CANCELED = "canceled";

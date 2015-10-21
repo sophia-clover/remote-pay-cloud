@@ -347,7 +347,7 @@ function WebSocketDevice() {
     }
 
     /**
-     * Unregisters an set of event callbacks.
+     * Unregisters a set of event callbacks.
      *
      * @param {Array} listeners - an array of objects of the form {"event":LanMethod.FINISH_OK, "callback":finishOKCB}
      */
@@ -655,9 +655,6 @@ WebSocketDevice.prototype.sendOpenCashDrawer = function(reason, ackId) {
 
     this.sendMessage(lanMessage);
 }
-
-
-
 
 /**
  * Send a cancellation message

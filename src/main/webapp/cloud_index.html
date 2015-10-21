@@ -488,7 +488,7 @@
     function displayUIFeedBack(infoMessage) {
       var orig = document.getElementById("uiFeedback").innerHTML;
 
-      document.getElementById("uiFeedback").innerHTML = infoMessage + "<br/>" + orig;
+      document.getElementById("uiFeedback").innerHTML = Date() + ": " + infoMessage + "<br/>" + orig;
     }
 
     //*********************************************
