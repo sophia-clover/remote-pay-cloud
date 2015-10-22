@@ -19,11 +19,14 @@ function WebSocketDevice() {
     // The last time a ping was sent, set to current time initially
     this.pingSentMillis = new Date().getTime();
     // How often a ping is sent
-    this.millisecondsBetweenPings = 10000; // 5 seconds
+    this.millisecondsBetweenPings = 5000; // 5 seconds
     // How long should it be before we warn on a dead connection
     this.deadConnectionWarnThreshold = this.millisecondsBetweenPings * 3;
     // How long should it be before we error on a dead connection
-    this.deadConnectionErrorThreshold = this.millisecondsBetweenPings * 20; // Is 1 minute reasonable?
+    this.deadConnectionErrorThreshold = this.deadConnectionWarnThreshold * 2;
+    // How long should it be before we shut down on a dead connection
+    this.deadConnectionShutdownThreshold = this.deadConnectionErrorThreshold * 2;
+
     // Flag to indicate if we attempt reconnects
     this.reconnect = true;
     this.reconnectAttempts = 0;
@@ -42,6 +45,10 @@ function WebSocketDevice() {
      */
     this.contactDevice = function(ws_address) {
         var me = this;
+        // Reset the timestamp values
+        this.pongReceivedMillis = new Date().getTime();
+        this.pingSentMillis = new Date().getTime();
+
         /*
          * Start the websocket connection to the device
          */
@@ -55,7 +62,6 @@ function WebSocketDevice() {
                 //        selectedDevice.websocket_direct
                 ws_address
             );
-
             this.deviceSocket.onopen = function (event) {
                 this.reconnecting = false;
                 me.reconnectAttempts = 0;
@@ -147,7 +153,9 @@ function WebSocketDevice() {
                 }
             }
         }
-        this.connectionOK();
+        else {
+            this.connectionOK();
+        }
     }
 
     /**
@@ -170,6 +178,12 @@ function WebSocketDevice() {
      */
     this.connectionError = function(lag) {
         var message = "Connection appears to be dead...no response in " + lag + " milliseconds";
+        // Protect users from themselves.  If the connection lag has exceeded an absolute maximum
+        // without response, shut it down.
+        if(lag > this.deadConnectionShutdownThreshold) {
+            message += "  This exceeds the system maximum wait, shutting down.";
+            this.forceClose();
+        }
         this.eventEmitter.emit(WebSocketDevice.CONNECTION_ERROR, message);
         this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
     }
@@ -226,6 +240,18 @@ function WebSocketDevice() {
     this.disconnectFromDevice = function() {
         clearInterval(this.pingIntervalId);
         this.sendShutdown();
+    }
+
+    /**
+     * Do not really want to ever have to do this, but it is
+     * sometimes needed.  The above #WebSocketDevice.disconnectFromDevice
+     * is how this should be closed.  That sends a message to the device
+     * to tell it that we are closing.  But this may be needed if the
+     * device is not responsive.
+     */
+    this.forceClose = function() {
+        this.disconnectFromDevice();
+        this.deviceSocket.close();
     }
 
     /**
@@ -318,6 +344,17 @@ function WebSocketDevice() {
      */
     this.removeListener = function (eventName, callback) {
         this.eventEmitter.removeListener(eventName, callback);
+    }
+
+    /**
+     * Unregisters a set of event callbacks.
+     *
+     * @param {Array} listeners - an array of objects of the form {"event":LanMethod.FINISH_OK, "callback":finishOKCB}
+     */
+    this.removeListeners = function (listeners) {
+        for(var idx=0;idx<listeners.length;idx++){
+            this.removeListener(listeners[idx].event, listeners[idx.callback]);
+        }
     }
 
     /**
@@ -618,9 +655,6 @@ WebSocketDevice.prototype.sendOpenCashDrawer = function(reason, ackId) {
 
     this.sendMessage(lanMessage);
 }
-
-
-
 
 /**
  * Send a cancellation message

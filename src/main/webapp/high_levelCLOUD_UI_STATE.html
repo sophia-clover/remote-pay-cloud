@@ -15,7 +15,7 @@
 <p>
   This is an example of the Clover High Level Cloud API. It relies on the device to be running the
   Cloud Pay Display app. It uses the device serial id to identify the device. It makes a connection to
-  a device, and voids a payment made in an earlier operation. The result of the transaction is displayed
+  a device, and prints a receipt for a payment made in an earlier operation. The result of the transaction is displayed
   below.
 </p>
 
@@ -28,38 +28,37 @@
   // Create the Clover object to communicate with the device
   var clover = new Clover(
       {
-        "oauthToken": "1da96c3e-0fd2-9b4f-3223-a234d844af33",
+        "oauthToken": "ab6a7769-81c4-585c-1e05-fdb95c47757d",
         "domain": "https://dev1.dev.clover.com/",
         "merchantId": "BBFF8NBCXEMDT",
-        "deviceSerialId": "C030UQ50550081"
+        "deviceSerialId": "C031UQ52340065"
       });
 
   // Start communication
   // Pass the function that should be called when the device is ready.
-  clover.initDeviceConnection(makeAVoid);
+  clover.initDeviceConnection(printAReceipt);
 
   // This will be called when the device is ready
-  function makeAVoid(error) {
+  function printAReceipt(error) {
     if (error) {
       var resultDisplay = "";
       resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
-      // Voids are time sensitive, allow user to enter a payment id.
-      var paymentId = prompt("Please enter the payment id", "KP018Z3H2AF1W");
+      var paymentId = prompt("Please enter the payment id", "SZYDNRB1DGXT6");
       if (paymentId) {
-        var orderId = prompt("Please enter the order id", "YCMFN69R55ZS0");
+        var orderId = prompt("Please enter the order id", "M5MMQGBCMZD72");
         if (orderId) {
-          var payment = {
-            "id": paymentId,
-            "order": {
-              "id": orderId
-            }
+          var printRequest = {
+            "paymentId": paymentId,
+            "orderId":  orderId
           }
 
-          // Call the device to take payment, after the payment is complete, call the
-          // 'mySaleResult' function
-          clover.voidTransaction(payment, VoidReason.USER_CANCEL, resultCallback);
+          // Listen for UI_STATE messages
+          clover.device.on(LanMethod.UI_STATE, onUiState);
+
+          // Call the device to issue the refund
+          clover.printReceipt(printRequest, resultCallback);
 
         } else {
           resultDisplay = "User canceled test";
@@ -72,9 +71,26 @@
     }
   }
 
+  function onUiState(message) {
+    var payload = JSON.parse(message.payload);
+    if(payload.uiState == "RECEIPT_OPTIONS" && payload.uiDirection == "ENTER") {
+      onReceiptOptions(payload);
+    }
+  }
+
+  function onReceiptOptions(payload) {
+    var ui_display = "<p>"+payload.uiText+"</p>";
+    for(var i=0; i<payload.inputOptions.length; i++){
+      ui_display += "<button id='btn" + i +
+          "' onclick='clover.device.sendKeyPress(\"" + payload.inputOptions[i].keyPress + "\")'>"+payload.inputOptions[i].description+"</button>";
+    }
+    document.getElementById("uiFeedback").innerHTML = ui_display;
+  }
+
   /**
    *
-   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @param error - adheres to the node.js style of error first callbacks.
+   * @param resultData - the result of the operation
    * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
    */
   function resultCallback(error, resultData) {
@@ -85,6 +101,7 @@
     document.getElementById("uiFeedback").innerHTML = resultDisplay;
   }
 </script>
+
 
 </body>
 </html>

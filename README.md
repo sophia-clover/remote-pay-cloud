@@ -35,14 +35,25 @@ The "Simple" examples require information that can be obtained by running the "C
     
 You must have maven and a JDK installed.
 
-Build the app:
+Generate a certificate
+```
+keytool -genkey -alias jetty6 -keyalg RSA -keystore jetty-ssl.keystore -storepass jetty6 -keypass jetty6 -dname "CN=localhost"
+```
+
+Prepare the application to run:
 ```
 mvn package
 ```
+
 Run the app inside a jetty container:
 ```
-java -jar target/dependency/jetty-runner.jar target/*.war
+mvn jetty:run
 ```
+
+You will need to configure your browser to accept the certificate you generated in order to test using the SSL 
+url (https://localhost:8443)
+
+Note that the ports can be changed in the maven build file (pom.xml)
 
 ## Make a Transaction
 

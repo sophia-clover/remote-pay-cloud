@@ -15,14 +15,22 @@
 <p>
   This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
   Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
-  previously obtained.  It makes a connection to a device, and charges $123.45, with a tip of $1.23 ($124.68).
-  The result of the transaction is displayed below.
+  previously obtained.  An additional flag is passed to indicate that receipts should not be printed from the
+  device, instead a PRINT_PAYMENT message is posted.  The lower display shows the receipt information
+  returned.
+
+  It makes a connection to a device, and charges $123.45, with a tip of $1.23 ($124.68).
+  The result of the transaction is displayed in the upper display.
 </p>
 
 <button onclick="clover.sendCancel(resultCallback)">Send a Cancel</button>
+<button onclick="clover.close()">Close Clover</button>
 
 <!-- this is a place to talk about what is happening while the example is being run -->
 <div id="uiFeedback" style="height: 400px;">
+</div>
+
+<div id="receiptFeedback" class="uiFeedback" style="height: 400px;">
 </div>
 
 <script>
@@ -30,11 +38,12 @@
   // Create the Clover object to communicate with the device
   var clover = new Clover(
       {
-        "oauthToken" : "4576ef43-a375-f7b4-b3eb-94735dcb4b08",
-        "domain" : "https://dev1.dev.clover.com/",
-        "merchantId" : "BBFF8NBCXEMDT",
+        "oauthToken" : "c109f2a0-7bff-ab14-2841-159ed9f01556",
+        "domain" : "https://sandbox.dev.clover.com/",
+        "merchantId" : "VKYQ0RVGMYHRR",
         "deviceSerialId" : "C030UQ50550081",
-        "disableRestartTransactionWhenFailed" : true
+        "remotePrint" : true // This is an odd flag.  'Remote' in this case is from the standpoint of the device,
+          // so 'local' from the standpoint of this web page.
       });
 
   // Start communication
@@ -53,6 +62,9 @@
         "tipAmount": 123 // - the amount of a tip.  Added to the amount for the total.
       }
 
+      // I want to see the receipt info.  Register a listener
+      clover.device.on(LanMethod.PRINT_PAYMENT, receiptCallback);
+
       // Call the device to take payment, after the payment is complete, call the
       // 'mySaleResult' function
       clover.sale(mySale, resultCallback);
@@ -70,6 +82,20 @@
     if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
     resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
     document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function receiptCallback(message) {
+    // do something with this.
+    var resultDisplay = "";
+    var payload = JSON.parse(message.payload);
+    var order = JSON.parse(payload.order);
+    resultDisplay += "<pre>"+JSON.stringify(order, null, 4) + "</pre>";
+    document.getElementById("receiptFeedback").innerHTML = resultDisplay;
   }
 </script>
 
