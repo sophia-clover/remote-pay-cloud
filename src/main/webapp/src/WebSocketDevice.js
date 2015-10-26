@@ -30,7 +30,7 @@ function WebSocketDevice() {
     // Flag to indicate if we attempt reconnects
     this.reconnect = true;
     this.reconnectAttempts = 0;
-    this.numberOfReconnectAttemptsBeforeWeGiveUp = 20;
+    this.numberOfReconnectAttemptsBeforeWeGiveUp = 5;
     this.timebetweenReconnectAttempts = 6000;
     // A queue of messages that may be populated while we attempt to reconnect.
     this.resendQueue = [];
