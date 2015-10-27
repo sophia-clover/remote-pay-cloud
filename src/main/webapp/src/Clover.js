@@ -540,6 +540,9 @@ function Clover(configuration) {
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
         }
+        if (txnInfo.hasOwnProperty("transactionNo")) {
+            payIntent.transactionNo = txnInfo.transactionNo;
+        }
         /*
         The ordere id cannot be specified at this time.
         if (txnInfo.hasOwnProperty("orderId")) {
