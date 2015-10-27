@@ -40,7 +40,7 @@
 <div id="ouauth_config">
   Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
   Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth"
-                            value="https://dev1.dev.clover.com/"/>
+                            value="https://sandbox.dev.clover.com/"/>
   <br/>
   <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
 </div>
@@ -94,7 +94,7 @@
 
     <button onclick="device.sendKeyPress(KeyPress.ESC)">Send a Cancel</button>
 
-    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, guid())">Void the last payment
+    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, CloverID.guid())">Void the last payment
       we saw.
     </button>
 
