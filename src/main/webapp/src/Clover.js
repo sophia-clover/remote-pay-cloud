@@ -102,6 +102,9 @@ function Clover(configuration) {
      */
     this.close = function () {
         if (this.device) {
+            if(this.device.discoveryTimerId){
+                clearInterval(this.device.discoveryTimerId);
+            }
             this.sendCancel();
             this.device.disconnectFromDevice();
         }
@@ -139,12 +142,17 @@ function Clover(configuration) {
      *  Adheres to error first paradigm.
      */
     this.initDeviceConnection = function (callBackOnDeviceReady) {
-        if (callBackOnDeviceReady) {
-            this.device.once(LanMethod.DISCOVERY_RESPONSE, function (message) {
-                callBackOnDeviceReady(null, message)
-            });
+        if(!this.isOpen()) {
+            if (callBackOnDeviceReady) {
+                this.device.once(LanMethod.DISCOVERY_RESPONSE, function (message) {
+                    callBackOnDeviceReady(null, message)
+                });
+            }
+            return this.initDeviceConnectionInternal(callBackOnDeviceReady);
         }
-        return this.initDeviceConnectionInternal(callBackOnDeviceReady);
+        else {
+            callBackOnDeviceReady();
+        }
     }
     /**
      * Called to initialize the device for communications.
@@ -531,6 +539,9 @@ function Clover(configuration) {
         }
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
+        }
+        if (txnInfo.hasOwnProperty("transactionNo")) {
+            payIntent.transactionNo = txnInfo.transactionNo;
         }
         /*
         The ordere id cannot be specified at this time.
