@@ -488,17 +488,17 @@ function Clover(configuration) {
      *  passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
      */
     this.sale = function (saleInfo, saleRequestCallback) {
-        var paymentId = null;
+        var externalPaymentId = null;
         if(saleInfo.hasOwnProperty('requestId') && saleInfo.requestId != null) {
-            paymentId = saleInfo.requestId;
+            externalPaymentId = saleInfo.requestId;
         } else {
-            paymentId = CloverID.getNewId();
+            externalPaymentId = CloverID.getNewId();
         }
-        saleInfo.paymentId = paymentId;
+        saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
             this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
         }
-        return paymentId;
+        return externalPaymentId;
     }
 
     /**
@@ -550,13 +550,13 @@ function Clover(configuration) {
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
         }
-        if (txnInfo.hasOwnProperty("paymentId")) {
-            if(!CloverID.isValidBase32Id(txnInfo.paymentId)) {
-                var error = new CloverError(CloverError.INVALID_DATA, "id is invalid - '" + txnInfo.paymentId + "'");
+        if (txnInfo.hasOwnProperty("externalPaymentId")) {
+            if(txnInfo.externalPaymentId.length > 32) {
+                var error = new CloverError(CloverError.INVALID_DATA, "id is invalid - '" + txnInfo.externalPaymentId + "'");
                 txnRequestCallback(error, null);
                 return;
             }
-            payIntent.paymentId = txnInfo.paymentId;
+            payIntent.externalPaymentId = txnInfo.externalPaymentId;
         }
         /*
         The ordere id cannot be specified at this time.
