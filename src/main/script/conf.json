@@ -4,6 +4,7 @@
       "../webapp/src/Clover.js",
       "../webapp/src/CloverError.js",
       "../webapp/src/CloverOAuth.js",
+      "../webapp/src/CloverID.js",
       "../webapp/src/Endpoints.js",
       "../webapp/src/RemoteMessageBuilder.js",
       "../webapp/src/WebSocketDevice.js"

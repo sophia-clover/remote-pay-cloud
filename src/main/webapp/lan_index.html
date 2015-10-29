@@ -437,7 +437,7 @@
       "userData": null,
       "alternateName": "",
       "exchanged": false,
-      "id": getNewId(),
+      "id": CloverID.getNewId(),
       "refunded": false,
       "price": 20000,
       "binName": null,
@@ -452,7 +452,7 @@
 
   function getCustomLineItem(amt) {
     var lineItem = {
-      "id": getNewId(),
+      "id": CloverID.getNewId(),
       "price": amt,
       "name": "Custom Item"
     };
@@ -460,7 +460,7 @@
   }
 
   function createNewOrder() {
-    var orderId = getNewId();
+    var orderId = CloverID.getNewId();
 
     return {
       "id": orderId
@@ -485,7 +485,7 @@
       "amount": 10000,
       "transactionType": "PAYMENT",
       "transactionNo": 300010,
-      "orderId": getNewId(),
+      "orderId": CloverID.getNewId(),
       "taxAmount": 0,
       "cardEntryMethods": 15
     };

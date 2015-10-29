@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Endpoints</title>
+    <title>JSDoc: Class: CloverID</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Endpoints</h1>
+    <h1 class="page-title">Class: CloverID</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-        Endpoints
+        CloverID
         </h2>
         
     
@@ -42,14 +42,14 @@
 
     
 
-    <h4 class="name" id="Endpoints"><span class="type-signature"></span>new Endpoints<span class="signature">(cloverOAuth)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="CloverID"><span class="type-signature"></span>new CloverID<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Utility to centralize endpoints.
+    A utility class to create Clover compatible identifiers, and guids.
 </div>
 
 
@@ -58,57 +58,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>cloverOAuth</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="CloverOAuth.html">CloverOAuth</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">used to obtain the access token and the domain for building the endpoints. If
- we change this to load endpoints, the access token will still be needed, and the initial endpoint will
- still need a domain/url to use as well.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -144,7 +93,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Endpoints.js.html">Endpoints.js</a>, <a href="Endpoints.js.html#line10">line 10</a>
+        <a href="CloverID.js.html">CloverID.js</a>, <a href="CloverID.js.html#line8">line 8</a>
     </li></ul></dd>
     
 
@@ -188,16 +137,26 @@
 
         
             
-<h4 class="name" id="cloverOAuth"><span class="type-signature"></span>cloverOAuth<span class="type-signature"></span></h4>
+<h4 class="name" id=".BASE_32_DIGITS"><span class="type-signature">(static) </span>BASE_32_DIGITS<span class="type-signature"> :Array.&lt;string></span></h4>
 
 
 
 
 <div class="description">
-    The object that provides the access token and the configurtion with the domain.
+    The legal set of characters used to generate a clover id.
 </div>
 
 
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;string></span>
+
+
+        </li>
+    </ul>
 
 
 
@@ -232,7 +191,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Endpoints.js.html">Endpoints.js</a>, <a href="Endpoints.js.html#line15">line 15</a>
+        <a href="CloverID.js.html">CloverID.js</a>, <a href="CloverID.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -259,71 +218,18 @@
 
     
 
-    <h4 class="name" id="getAlertDeviceEndpoint"><span class="type-signature"></span>getAlertDeviceEndpoint<span class="signature">(merchantId)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id=".getNewId"><span class="type-signature">(static) </span>getNewId<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
 
     
 
 
 
-<div class="description">
-    Builds the endpoint to send the message to the server to let the device know we want to talk to it.
-</div>
 
 
 
 
 
 
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>merchantId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">the id of the merchant to use when getting the device list.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -359,7 +265,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Endpoints.js.html">Endpoints.js</a>, <a href="Endpoints.js.html#line36">line 36</a>
+        <a href="CloverID.js.html">CloverID.js</a>, <a href="CloverID.js.html#line31">line 31</a>
     </li></ul></dd>
     
 
@@ -386,7 +292,7 @@
 
         
 <div class="param-desc">
-    endpoint - the url to use alert a device that we want to communicate with it
+    a clover compatible ID.
 </div>
 
 
@@ -412,15 +318,111 @@
 
     
 
-    <h4 class="name" id="getDevicesEndpoint"><span class="type-signature"></span>getDevicesEndpoint<span class="signature">(merchantId)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id=".guid"><span class="type-signature">(static) </span>guid<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
 
     
 
 
 
-<div class="description">
-    The endpoint used to obtain a list of devices
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CloverID.js.html">CloverID.js</a>, <a href="CloverID.js.html#line60">line 60</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    a guid - see https://en.wikipedia.org/wiki/Globally_unique_identifier
 </div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".isValidBase32Id"><span class="type-signature">(static) </span>isValidBase32Id<span class="signature">(id)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
 
 
 
@@ -455,7 +457,7 @@
 
         <tr>
             
-                <td class="name"><code>merchantId</code></td>
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
@@ -471,7 +473,7 @@
 
             
 
-            <td class="description last">the id of the merchant to use when getting the device list.</td>
+            <td class="description last">a string id to test</td>
         </tr>
 
     
@@ -512,7 +514,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Endpoints.js.html">Endpoints.js</a>, <a href="Endpoints.js.html#line23">line 23</a>
+        <a href="CloverID.js.html">CloverID.js</a>, <a href="CloverID.js.html#line44">line 44</a>
     </li></ul></dd>
     
 
@@ -539,7 +541,7 @@
 
         
 <div class="param-desc">
-    endpoint - the url to use to retreive the devices
+    true if the id is a clover compatible ID.
 </div>
 
 
@@ -550,7 +552,7 @@
     </dt>
     <dd>
         
-<span class="param-type">string</span>
+<span class="param-type">boolean</span>
 
 
     </dd>

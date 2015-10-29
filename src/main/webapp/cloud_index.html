@@ -12,7 +12,7 @@
   <script src="src/Clover.js"></script>
   <script src="src/WebSocketDevice.js"></script>
   <script src="src/Endpoints.js"></script>
-  <script src="src/ids.js"></script>
+  <script src="src/CloverID.js"></script>
   <script src="src/eventemitter3_v1_1_1.js"></script>
   <script src="src/RemoteMessageBuilder.js"></script>
 
@@ -103,7 +103,7 @@
 
     <button onclick="device.sendKeyPress(KeyPress.ESC)">Send a Cancel</button>
 
-    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, guid())">Void the last payment
+    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, CloverID.guid())">Void the last payment
       we saw.
     </button>
 
