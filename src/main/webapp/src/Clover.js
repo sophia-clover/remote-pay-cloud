@@ -484,11 +484,21 @@ function Clover(configuration) {
      * @param {TransactionRequest} saleInfo - the information for the sale
      * @param {Clover~transactionRequestCallback} saleRequestCallback - the callback that receives the sale completion
      *  information.
+     * @return {string} paymentId - identifier used for the payment once the transaction is completed.  This may be
+     *  passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
      */
     this.sale = function (saleInfo, saleRequestCallback) {
+        var externalPaymentId = null;
+        if(saleInfo.hasOwnProperty('requestId') && saleInfo.requestId != null) {
+            externalPaymentId = saleInfo.requestId;
+        } else {
+            externalPaymentId = CloverID.getNewId();
+        }
+        saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
             this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
         }
+        return externalPaymentId;
     }
 
     /**
@@ -540,8 +550,13 @@ function Clover(configuration) {
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
         }
-        if (txnInfo.hasOwnProperty("transactionNo")) {
-            payIntent.transactionNo = txnInfo.transactionNo;
+        if (txnInfo.hasOwnProperty("externalPaymentId")) {
+            if(txnInfo.externalPaymentId.length > 32) {
+                var error = new CloverError(CloverError.INVALID_DATA, "id is invalid - '" + txnInfo.externalPaymentId + "'");
+                txnRequestCallback(error, null);
+                return;
+            }
+            payIntent.externalPaymentId = txnInfo.externalPaymentId;
         }
         /*
         The ordere id cannot be specified at this time.
@@ -707,7 +722,7 @@ function Clover(configuration) {
             }
         };
         // Generate the uuid so we can filter properly
-        uuid = guid();
+        uuid = CloverID.guid();
         // Register the callback.
         this.device.on(LanMethod.ACK, genericAckCallback);
         // return the uuid so the caller of this function can use
@@ -1098,10 +1113,12 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {boolean} [autoVerifySignature] - optional override to allow either automatic signature verification
  *  {true}, or expect that the caller has registered a listener for the request for signature verification {false}.
  *  This will override the internal object flag autoVerifySignature.
+ * @property {string} [requestId] - optional CloverID compatible identifier used for the payment once the transaction
+ *  is completed.  See @CloverID
  */
 
 /**
- * The response to a sale
+ * The response to a sale or naked refund
  *
  * @typedef {Object} TransactionResponse
  * @property {string} code - the result code for the transaction - "SUCCESS", "CANCEL", "ERROR"
