@@ -5,7 +5,9 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-  <script src="src/cloverCloud-min.js"></script>
+    <!-- following for testing only -->
+   <script src="testConfigBase.js"></script>
+    <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -25,13 +27,8 @@
 <script>
 
   // Create the Clover object to communicate with the device
-  var clover = new Clover(
-      {
-        "oauthToken" : "c109f2a0-7bff-ab14-2841-159ed9f01556",
-        "domain" : "https://sandbox.dev.clover.com/",
-        "merchantId" : "VKYQ0RVGMYHRR",
-        "deviceSerialId" : "C030UQ50550081"
-      });
+  var config = copyConfig();
+  var clover = new Clover(config);
 
   imageIsLoaded = false
   // Make sure the image is fully loaded.

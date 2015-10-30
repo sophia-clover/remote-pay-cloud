@@ -5,7 +5,9 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-  <script src="src/cloverCloud-min.js"></script>
+    <!-- following for testing only -->
+   <script src="testConfigBase.js"></script>
+    <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -34,7 +36,7 @@
 <script>
 
   // Create the Clover object to communicate with the device
-  var clover = new Clover({"deviceURL" : "ws://10.249.30.247:14285"});
+  var clover = new Clover(defaultLANconfig);
 
   // Start communication
   // Pass the function that should be called when the device is ready.
