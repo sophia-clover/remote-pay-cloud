@@ -5,6 +5,9 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
+
   <script src="src/xmlHttpSupport.js"></script>
   <script src="src/CardEntryMethods.js"></script>
   <script src="src/CloverOAuth.js"></script>
@@ -12,14 +15,23 @@
   <script src="src/Clover.js"></script>
   <script src="src/WebSocketDevice.js"></script>
   <script src="src/Endpoints.js"></script>
-  <script src="src/ids.js"></script>
+  <script src="src/CloverID.js"></script>
   <script src="src/eventemitter3_v1_1_1.js"></script>
   <script src="src/RemoteMessageBuilder.js"></script>
+
+  <script>
+    function initStuff(config) {
+      var domain = document.getElementById("cloverUrl_oauth");
+      domain.value = config.domain;
+      var clientId = document.getElementById("clientId_oauth");
+      clientId.value = config.clientId;
+    }
+  </script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
 
-<body onbeforeunload="shutdown()">
+<body onbeforeunload="shutdown()" onload="initStuff(defaultConfiguration)">
 <h1>Web Socket Cloud Remote API Example</h1>
 
 <a href="./docs">Developer documents</a><br/>
@@ -49,7 +61,7 @@
 <div id="ouauth_config">
   Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
   Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth"
-                            value="https://sandbox.dev.clover.com/"/>
+                            onload="this.value=defaultConfiguration.domain"/>
   <br/>
   <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
 </div>
@@ -103,7 +115,7 @@
 
     <button onclick="device.sendKeyPress(KeyPress.ESC)">Send a Cancel</button>
 
-    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, guid())">Void the last payment
+    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, CloverID.guid())">Void the last payment
       we saw.
     </button>
 
@@ -144,6 +156,7 @@
 </div>
 
 <script>
+  initStuff(defaultConfiguration);
 
   /**
    * This is the configuration for the app.  These values must be set.

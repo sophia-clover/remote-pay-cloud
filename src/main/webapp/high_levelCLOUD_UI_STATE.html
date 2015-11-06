@@ -5,7 +5,9 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-  <script src="src/cloverCloud-min.js"></script>
+    <!-- following for testing only -->
+   <script src="testConfigBase.js"></script>
+    <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -26,13 +28,8 @@
 <script>
 
   // Create the Clover object to communicate with the device
-  var clover = new Clover(
-      {
-        "oauthToken": "ab6a7769-81c4-585c-1e05-fdb95c47757d",
-        "domain": "https://dev1.dev.clover.com/",
-        "merchantId": "BBFF8NBCXEMDT",
-        "deviceSerialId": "C031UQ52340065"
-      });
+  var config = copyConfig();
+  var clover = new Clover(config);
 
   // Start communication
   // Pass the function that should be called when the device is ready.
