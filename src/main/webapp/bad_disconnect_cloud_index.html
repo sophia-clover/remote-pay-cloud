@@ -20,17 +20,19 @@
   <script src="src/RemoteMessageBuilder.js"></script>
 
   <script>
-
-
-
-
-
+    function initStuff(config) {
+      var domain = document.getElementById("cloverUrl_oauth");
+      domain.value = config.domain;
+      var clientId = document.getElementById("clientId_oauth");
+      clientId.value = config.clientId;
+    }
   </script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
 
-<body onbeforeunload="shutdown()" onload="initStuff(defaultConfiguration)">
+<!--body onbeforeunload="shutdown()" onload="initStuff(defaultConfiguration)" -->
+<body onload="initStuff(defaultConfiguration)">
 <h1>Web Socket Cloud Remote API Example</h1>
 
 <a href="./docs">Developer documents</a><br/>
@@ -38,6 +40,10 @@
 <p>
   The intention of this page is to illustrate the use of the 'Clover Cloud-POS API' from within a web application
   that is entirely html/javascript.<br/>
+
+  Note that this example intentionally does NOT close the connection to the device when the page is unloaded from
+  the browser.
+
   There is additional functionality included to allow for use of the Clover webhook callback api. This functionality
   is implemented in java as a set of servlets. The only direct user interaction with this functionality is to save
   the user authentication token to the server fto allow use with the Clover REST API when obtaining additional details
@@ -56,12 +62,14 @@
   page on the app as "App ID".
 </div>
 
-
-
-
-
-
-
+<!-- Let the user enter their app id and the clover server (it might be a dev server, or their own) -->
+<div id="ouauth_config">
+  Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
+  Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth"
+                            onload="this.value=defaultConfiguration.domain"/>
+  <br/>
+  <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
+</div>
 
 <!-- A container to put the device(s) into to allow the user to select one for use -->
 <div id="device_box" style="display:none">
@@ -153,7 +161,7 @@
 </div>
 
 <script>
-
+  initStuff(defaultConfiguration);
 
   /**
    * This is the configuration for the app.  These values must be set.
@@ -161,7 +169,10 @@
    * The clientId is the web app id for your clover application.
    * The domain is the url to the clover server
    */
-  var config = defaultLANconfig;
+  var config = {
+    clientId: document.getElementById("clientId_oauth").value, // this is the app id
+    domain: document.getElementById("cloverUrl_oauth").value   // this is the url to the clover domain (https://www.clover.com)
+  };
 
   /**
    * This is a utility to make the oauth process simpler.
@@ -190,10 +201,10 @@
   }
 
   function checkOAuth() {
-    var newConfig = defaultLANconfig;
-
-
-
+    var newConfig = {
+      clientId: document.getElementById("clientId_oauth").value, // this is the app id
+      domain: document.getElementById("cloverUrl_oauth").value // this is the url to the clover domain (http://www.clover.com)
+    };
     var cloverOAuth = new CloverOAuth(newConfig);
     cloverOAuth.getAccessToken();
   }
@@ -203,7 +214,7 @@
   }
   else {
 
-
+    disable("ouauth_config");
     enable("device_box");
     displayUIFeedBack("You need to select the device to communicate with.");
 
@@ -321,6 +332,7 @@
         function (message) {
           // This id is set when the discovery request is sent when the device 'onopen' is called.
           clearInterval(device.discoveryTimerId);
+          device.discoveryTimerId = null;
           document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'green';
           enable('unpair_button');
           enable('process_flow');
@@ -357,24 +369,29 @@
       // The connection to the device is open, but we do not yet know if there is anyone at the other end.
       // Send discovery request messages until we get a discovery response.
       device.dicoveryMessagesSent = 0;
-      device.discoveryTimerId =
-          setInterval(
-              function () {
-                displayUIFeedBack("Sending 'discovery' message to device.");
-                device.sendMessage(device.messageBuilder.buildDiscoveryRequest());
-                device.dicoveryMessagesSent++;
+      if(!device.discoveryTimerId) {
+        device.discoveryTimerId =
+            setInterval(
+                function () {
+                  displayUIFeedBack("Sending 'discovery' message to device.");
+                  device.sendMessage(device.messageBuilder.buildDiscoveryRequest());
+                  device.dicoveryMessagesSent++;
 
-                // Arbitrary decision that 10 messages is long enough to wait.
-                if (device.dicoveryMessagesSent > 10) {
-                  displayUIFeedBack("Something is wrong.  we are getting pong messages, but no discovery response." +
-                      "  Shutting down the connection.");
-                  device.disconnectFromDevice();
-                  clearInterval(device.discoveryTimerId);
-                }
-              }, 3000
-          );
+                  // Arbitrary decision that 10 messages is long enough to wait.
+                  if (device.dicoveryMessagesSent > 10) {
+                    displayUIFeedBack("Something is wrong.  we are getting pong messages, but no discovery response." +
+                        "  Shutting down the connection.");
+                    clearInterval(device.discoveryTimerId);
+                    device.discoveryTimerId = null;
+                    device.disconnectFromDevice();
+                    device.forceClose();
+                  }
+                }, 3000
+            );
+      }
       console.log('device opened');
-      displayUIFeedBack("Communication channel open.  Pausing for 3 seconds before trying to talk to device. ");
+      device.sendMessage(device.messageBuilder.buildDiscoveryRequest());
+      displayUIFeedBack("Communication channel open.  Trying to talk to device. ");
     });
 
     // The device connection has been closed
