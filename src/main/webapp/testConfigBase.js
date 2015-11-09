@@ -24,7 +24,7 @@ var exampleConfigurations =
     },
     "localhost_C021UQ52340078" : {
         "clientId" : "3RPTN642FHXTC",
-        "oauthToken" : "f41035d0-43ee-771c-92a2-721195c00f6a",
+        "oauthToken" : "4628c1c1-b329-641b-03fd-4e90f3d1d8a0",
         "domain" : "http://192.168.1.123:9001/",
         "merchantId" : "BBFF8NBCXEMDT",
         "deviceSerialId" : "C021UQ52340078"
