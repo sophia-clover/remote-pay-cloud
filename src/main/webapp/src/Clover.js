@@ -97,6 +97,14 @@ function Clover(configuration) {
         }
     );
 
+    this.getAutoVerifySignature = function() {
+        if( this.configuration.hasOwnProperty("autoVerifySignature") &&
+            this.configuration.autoVerifySignature != null &&
+            this.configuration.autoVerifySignature === false ) {
+            return false;
+        } return true;
+    }
+
     /**
      * Closes the connection to the Clover device.
      */
@@ -563,7 +571,7 @@ function Clover(configuration) {
             payIntent.orderId = txnInfo.orderId;
         }
         */
-        var autoVerifySignature = this.configuration.autoVerifySignature;
+        var autoVerifySignature = this.getAutoVerifySignature();
         if( txnInfo.hasOwnProperty("autoVerifySignature") )
         {
             if( txnInfo.autoVerifySignature === true )
