@@ -19,9 +19,9 @@ function WebSocketDevice() {
     // The last time a ping was sent, set to current time initially
     this.pingSentMillis = new Date().getTime();
     // How often a ping is sent
-    this.millisecondsBetweenPings = 5000; // 5 seconds
+    this.millisecondsBetweenPings = 2500; // 5 seconds
     // How long should it be before we warn on a dead connection
-    this.deadConnectionWarnThreshold = this.millisecondsBetweenPings * 3;
+    this.deadConnectionWarnThreshold = this.millisecondsBetweenPings * 1;
     // How long should it be before we error on a dead connection
     this.deadConnectionErrorThreshold = this.deadConnectionWarnThreshold * 2;
     // How long should it be before we shut down on a dead connection
@@ -57,81 +57,101 @@ function WebSocketDevice() {
             // can include the device id to contact, and let the server determine how to get
             // to the device (it is doing that now , but it is hardcoded)
             // deviceSocket = new WebSocket("ws://localhost:18000");
-            this.deviceSocket = new WebSocket(
-                //        "ws://192.168.0.56:49152"
-                //        selectedDevice.websocket_direct
-                ws_address
-            );
-            this.deviceSocket.onopen = function (event) {
-                this.reconnecting = false;
-                me.reconnectAttempts = 0;
-                // Set up the ping for every 5 seconds
-                me.pingIntervalId = setInterval(function () {
-                    me.checkDeadConnection();
-                    me.ping();
-                }, me.millisecondsBetweenPings);
-                me.onopen(event);
-            };
+            try {
+                console.log("contacting device");
+                this.deviceSocket = new WebSocket(
+                    //        "ws://192.168.0.56:49152"
+                    //        selectedDevice.websocket_direct
+                    ws_address
+                );
+                console.log("this.deviceSocket = " + this.deviceSocket);
+                this.deviceSocket.onopen = function (event) {
+                    console.log("deviceSocket.onopen");
+                    this.reconnecting = false;
+                    me.reconnectAttempts = 0;
+                    // Set up the ping for every X seconds
+                    me.pingIntervalId = setInterval(function () {
+                        me.checkDeadConnection();
+                        me.ping();
+                    }, me.millisecondsBetweenPings);
+                    me.onopen(event);
+                };
 
-            this.deviceSocket.onmessage = function (event) {
-                var jsonMessage = JSON.parse(event.data);
-                me.receiveMessage(jsonMessage);
-            }
+                this.deviceSocket.onmessage = function (event) {
+                    console.log("deviceSocket.onmessage");
+                    var jsonMessage = JSON.parse(event.data);
+                    me.receiveMessage(jsonMessage);
+                }
 
-            this.deviceSocket.onerror = function (event) {
-                if(me.reconnect) {
+                this.deviceSocket.onerror = function (event) {
+                    console.error("deviceSocket.onerror");
+                    console.error(event);
+                    if(me.reconnect) {
 
-                    ///////////////////////////
-                    // Dealing with the very strange 401 error in secure web sockets
-                    if(!me.triedToFix401) {
-                        // Try to deal with the issue where the browser has cached
-                        // an old certificate somehow.  There is no indication of this
-                        // in the error, so just try to fix it, even if there is some
-                        // other error.
-                        var wssUrl = me.deviceSocket.url;
-                        if (wssUrl.indexOf("wss") > -1) {
-                            var httpsUrl = wssUrl.replace("wss", "https");
-                            if (!me.xmlHttpSupport) {
-                                me.xmlHttpSupport = new XmlHttpSupport();
+                        ///////////////////////////
+                        // Dealing with the very strange 401 error in secure web sockets
+                        if(!me.triedToFix401) {
+                            // Try to deal with the issue where the browser has cached
+                            // an old certificate somehow.  There is no indication of this
+                            // in the error, so just try to fix it, even if there is some
+                            // other error.
+                            console.error("Attempt to fix possible cached certificate issue.");
+                            var wssUrl = me.deviceSocket.url;
+                            if (wssUrl.indexOf("wss") > -1) {
+                                var httpsUrl = wssUrl.replace("wss", "https");
+                                if (!me.xmlHttpSupport) {
+                                    me.xmlHttpSupport = new XmlHttpSupport();
+                                }
+                                me.xmlHttpSupport.getData(httpsUrl,
+                                    me.startupReconnect.bind(me),
+                                    me.startupReconnect.bind(me));
+                                    // console.log.bind(console), console.log.bind(console));
+                                me.triedToFix401 = true;
                             }
-                            me.xmlHttpSupport.getData(httpsUrl, console.log.bind(console), console.log.bind(console));
-                            me.triedToFix401 = true;
+                        }
+                        ///////////////////////////
+                        else {
+                            me.startupReconnect(this.timebetweenReconnectAttempts);
                         }
                     }
-                    ///////////////////////////
-
-                    if(me.reconnectAttempts < me.numberOfReconnectAttemptsBeforeWeGiveUp) {
-                        me.reconnectAttempts++;
-                        setTimeout(
-                            function(){
-                                me.reconnectAttempts++;
-                                me.attemptReconnect();
-                            }, me.timebetweenReconnectAttempts );
-                    }
                     else {
-                        console.error("Exceeded number of reconnect attempts, giving up. There are " +
-                            me.resendQueue.length + " messages that were queued, but not sent.");
-                        me.reconnectAttempts = 0;
                         me.onerror(event);
                     }
                 }
-                else {
-                    me.onerror(event);
-                }
-            }
 
-            this.deviceSocket.onclose = function (event) {
-                try {
-                    clearInterval(this.pingIntervalId);
-                }catch(e){
-                    console.error(e);
+                this.deviceSocket.onclose = function (event) {
+                    try {
+                        console.log("Clearing ping thread");
+                        clearInterval(this.pingIntervalId);
+                    }catch(e){
+                        console.error(e);
+                    }
+                    me.onclose(event);
                 }
-                me.onclose(event);
+            } catch (error) {
+                console.log(error);
             }
-            console.log("contacting device");
         }
         else {
             alert("Select a device first");
+        }
+    }
+
+    this.startupReconnect = function(delay) {
+        if(!delay)delay=1;
+        if (this.reconnectAttempts < this.numberOfReconnectAttemptsBeforeWeGiveUp) {
+            this.reconnectAttempts++;
+            setTimeout(
+                function () {
+                    this.reconnectAttempts++;
+                    this.attemptReconnect();
+                }.bind(this), delay);
+        }
+        else {
+            console.error("Exceeded number of reconnect attempts, giving up. There are " +
+                this.resendQueue.length + " messages that were queued, but not sent.");
+            this.reconnectAttempts = 0;
+            this.onerror(event);
         }
     }
 
@@ -238,8 +258,7 @@ function WebSocketDevice() {
      * Called to initiate disconnect from the device
      */
     this.disconnectFromDevice = function() {
-        clearInterval(this.pingIntervalId);
-        this.sendShutdown();
+        this.forceClose();
     }
 
     /**
@@ -250,7 +269,8 @@ function WebSocketDevice() {
      * device is not responsive.
      */
     this.forceClose = function() {
-        this.disconnectFromDevice();
+        clearInterval(this.pingIntervalId);
+        this.sendShutdown();
         this.deviceSocket.close();
     }
 
@@ -264,7 +284,9 @@ function WebSocketDevice() {
             // wantto, because it appears
             // the connection may have gone stale.
             clearInterval(this.pingIntervalId);
-            this.deviceSocket.close();
+            if(this.deviceSocket.readyState == WebSocket.OPEN) {
+                this.deviceSocket.close();
+            }
         }
         this.reconnecting = true;
         console.log("attempting reconnect...");
@@ -281,9 +303,13 @@ function WebSocketDevice() {
         if(this.echoAllMessages) {
             console.log("sending message:" + stringMessage)
         }
+        // If the deviceSocket is closed or closing, we may try to reconnect
         if(this.deviceSocket.readyState == WebSocket.CLOSING || this.deviceSocket.readyState == WebSocket.CLOSED) {
+            // If we are set up to try to reconnect
             if(this.reconnect) {
+                // Push the message we just got on a resend queue
                 this.resendQueue.push(stringMessage);
+                // If we are not already trying to reconnect, try now
                 if(!this.reconnecting) {
                     this.attemptReconnect();
                 }
@@ -294,9 +320,11 @@ function WebSocketDevice() {
             }
         }
         else {
+            // If there is anything in the resend queue, send it now.
             while(this.resendQueue.length > 0) {
                 this.deviceSocket.send(this.resendQueue.shift());
             }
+            // send the message that was passed in.
             this.deviceSocket.send(stringMessage);
         }
     }
