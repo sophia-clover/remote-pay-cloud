@@ -229,7 +229,7 @@ function Clover(configuration) {
                                 // we will assume an earlier version of the protocol on the server,
                                 // and assume that the notification WAS SENT.
                                 if (!data.hasOwnProperty('sent') || data.sent) {
-                                    var url = data.host + '/remote_pay/cs?token=' + data.token;
+                                    var url = data.host + Endpoints.WEBSOCKET_PATH + '?token=' + data.token;
                                     me.device.messageBuilder = new RemoteMessageBuilder(
                                         "com.clover.remote.protocol.websocket");
 
