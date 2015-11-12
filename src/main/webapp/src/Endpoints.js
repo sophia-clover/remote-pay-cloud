@@ -103,3 +103,6 @@ Endpoints.DEVICE_ID_KEY = "devId";
 Endpoints.DEVICE_ID_PATH = Endpoints.DEVICE_PATH + "/{"+Endpoints.DEVICE_ID_KEY+"}";
 
 Endpoints.REMOTE_PAY_PATH = Endpoints.MERCHANT_V2_PATH + "/remote_pay";
+
+Endpoints.WEBSOCKET_PATH = "/support/remote_pay/cs";
+
