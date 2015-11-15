@@ -97,6 +97,14 @@ function Clover(configuration) {
         }
     );
 
+    this.getAutoVerifySignature = function() {
+        if( this.configuration.hasOwnProperty("autoVerifySignature") &&
+            this.configuration.autoVerifySignature != null &&
+            this.configuration.autoVerifySignature === false ) {
+            return false;
+        } return true;
+    }
+
     /**
      * Closes the connection to the Clover device.
      */
@@ -221,7 +229,7 @@ function Clover(configuration) {
                                 // we will assume an earlier version of the protocol on the server,
                                 // and assume that the notification WAS SENT.
                                 if (!data.hasOwnProperty('sent') || data.sent) {
-                                    var url = data.host + '/support/cs?token=' + data.token;
+                                    var url = data.host + Endpoints.WEBSOCKET_PATH + '?token=' + data.token;
                                     me.device.messageBuilder = new RemoteMessageBuilder(
                                         "com.clover.remote.protocol.websocket");
 
@@ -472,7 +480,6 @@ function Clover(configuration) {
                     );
             }
             console.log('device opened');
-            console.log("Communication channel open.");
         } );
         console.log("Contacting device at " + this.configuration.deviceURL);
         this.device.contactDevice(this.configuration.deviceURL);
@@ -564,7 +571,7 @@ function Clover(configuration) {
             payIntent.orderId = txnInfo.orderId;
         }
         */
-        var autoVerifySignature = this.configuration.autoVerifySignature;
+        var autoVerifySignature = this.getAutoVerifySignature();
         if( txnInfo.hasOwnProperty("autoVerifySignature") )
         {
             if( txnInfo.autoVerifySignature === true )

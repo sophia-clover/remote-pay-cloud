@@ -458,7 +458,7 @@
             // we will assume an earlier version of the protocol on the server,
             // and assume that the notification WAS SENT.
             if (!data.hasOwnProperty('sent') || data.sent) {
-              var url = data.host + '/support/cs?token=' + data.token;
+              var url = data.host + Endpoints.WEBSOCKET_PATH + '?token=' + data.token;
 
               displayUIFeedBack("Server responded with information on how to contact device.<br/>" +
                   "The following can be used to configure the simple examples:<br/>" +
@@ -569,17 +569,19 @@
 
     // Show a signature so the user can ask for a credit card and verify it.
     function displaySignature(signature) {
-      var canvas = document.getElementById("myCanvas");
-      // reset the canvas
-      canvas.width = canvas.width;
-      var ctx = canvas.getContext("2d");
+      if(signature) {
+        var canvas = document.getElementById("myCanvas");
+        // reset the canvas
+        canvas.width = canvas.width;
+        var ctx = canvas.getContext("2d");
 
-      for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
-        var stroke = signature.strokes[strokeIndex];
-        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-        for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
-          ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
-          ctx.stroke();
+        for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
+          var stroke = signature.strokes[strokeIndex];
+          ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+          for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
+            ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
+            ctx.stroke();
+          }
         }
       }
       enable("signaturePane");
