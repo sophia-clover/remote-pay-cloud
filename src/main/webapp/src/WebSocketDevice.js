@@ -21,7 +21,7 @@ function WebSocketDevice() {
     // How often a ping is sent
     this.millisecondsBetweenPings = 2500; // 5 seconds
     // How long should it be before we warn on a dead connection
-    this.deadConnectionWarnThreshold = this.millisecondsBetweenPings * 1;
+    this.deadConnectionWarnThreshold = this.millisecondsBetweenPings * 2;
     // How long should it be before we error on a dead connection
     this.deadConnectionErrorThreshold = this.deadConnectionWarnThreshold * 2;
     // How long should it be before we shut down on a dead connection
@@ -299,7 +299,7 @@ function WebSocketDevice() {
      * @private
      */
     this.sendMessage = function(message) {
-        var stringMessage = JSON.stringify(message);
+        var stringMessage = message==null?null:JSON.stringify(message);
         if(this.echoAllMessages) {
             console.log("sending message:" + stringMessage)
         }
@@ -308,7 +308,9 @@ function WebSocketDevice() {
             // If we are set up to try to reconnect
             if(this.reconnect) {
                 // Push the message we just got on a resend queue
-                this.resendQueue.push(stringMessage);
+                if (stringMessage) {
+                    this.resendQueue.push(stringMessage);
+                }
                 // If we are not already trying to reconnect, try now
                 if(!this.reconnecting) {
                     this.attemptReconnect();
@@ -320,12 +322,28 @@ function WebSocketDevice() {
             }
         }
         else {
-            // If there is anything in the resend queue, send it now.
-            while(this.resendQueue.length > 0) {
-                this.deviceSocket.send(this.resendQueue.shift());
+            // If the websocket is not completely connected yet, put the message on the queue and call sendMessage again
+            // with a null message.  That way the message order will be correct.  If another message comes through
+            // before the timeout expires, the queue will be drained first, so the message will go throgh in order, and
+            // the send that results from the timeout will do nothing.
+            if (this.deviceSocket.readyState == WebSocket.CONNECTING) {
+                // The message is not null, put it on the queue and call
+                // send again.
+                if (stringMessage) {
+                    this.resendQueue.push(stringMessage);
+                    var me = this;
+                    setTimeout(me.sendMessage.bind(me), millisecondsBetweenPings);
+                }
+            } else {
+                // If there is anything in the resend queue, send it now.
+                while (this.resendQueue.length > 0) {
+                    this.deviceSocket.send(this.resendQueue.shift());
+                }
+                // If a message was passed, send it.
+                if (stringMessage) {
+                    this.deviceSocket.send(stringMessage);
+                }
             }
-            // send the message that was passed in.
-            this.deviceSocket.send(stringMessage);
         }
     }
 

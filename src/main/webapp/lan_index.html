@@ -20,11 +20,12 @@
   <script src="src/RemoteMessageBuilder.js"></script>
 
   <script>
+    function initStuff(config) {
 
 
 
 
-
+    }
   </script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
@@ -163,8 +164,11 @@
    */
   var config = defaultLANconfig;
 
+
+
+
   /**
-   * This is a utility to make the oauth process simpler.
+   * This is a utility to make the auth process simpler.
    *
    */
   var cloverOAuth = new CloverOAuth(config);
@@ -563,17 +567,19 @@
 
     // Show a signature so the user can ask for a credit card and verify it.
     function displaySignature(signature) {
-      var canvas = document.getElementById("myCanvas");
-      // reset the canvas
-      canvas.width = canvas.width;
-      var ctx = canvas.getContext("2d");
+      if(signature) {
+        var canvas = document.getElementById("myCanvas");
+        // reset the canvas
+        canvas.width = canvas.width;
+        var ctx = canvas.getContext("2d");
 
-      for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
-        var stroke = signature.strokes[strokeIndex];
-        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-        for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
-          ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
-          ctx.stroke();
+        for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
+          var stroke = signature.strokes[strokeIndex];
+          ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+          for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
+            ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
+            ctx.stroke();
+          }
         }
       }
       enable("signaturePane");
