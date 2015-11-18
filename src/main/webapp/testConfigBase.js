@@ -8,6 +8,13 @@ var exampleConfigurations =
         "merchantId" : "VKYQ0RVGMYHRR",
         "deviceSerialId" : "C030UQ53460719"
     },
+    "sandbox_booker_C030UQ53460719" : {
+        "clientId" : "1VE8EKDBFSHKA",
+        "oauthToken" : "211f96ae-2121-00e9-eb50-80995787fefa",
+        "domain" : "https://sandbox.dev.clover.com/",
+        "merchantId" : "D5PKQ077KW3CY",
+        "deviceSerialId" : "C030UQ53460719"
+    },
     "localhost_C030UQ50550081" : {
         "clientId" : "930REZDGX0N8T",
         "oauthToken" : "98b9d13f-4339-86d3-7dae-9a16d540ee81",
@@ -44,7 +51,7 @@ var exampleConfigurations =
         "deviceSerialId" : "C021UQ52340078"
     }
 };
-var defaultConfiguration = exampleConfigurations.sandbox_C030UQ53460719;
+var defaultConfiguration = exampleConfigurations.sandbox_booker_C030UQ53460719;
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,

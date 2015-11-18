@@ -633,7 +633,7 @@ WebSocketDevice.prototype.sendVoidPayment = function(payment, voidReason, ackId)
 }
 
 /**
- * Void a payment
+ * Refund a payment, partial or complete
  *
  * @param {string} orderId - the id for the order the refund is against
  * @param {string} paymentId - the id for the payment on the order the refund is against
@@ -652,6 +652,31 @@ WebSocketDevice.prototype.sendRefund = function(orderId, paymentId, amount, ackI
     if(amount)payload.amount = amount;
 
     var lanMessage = this.messageBuilder.buildRefund(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * Adjust a payment
+ *
+ * @param {string} orderId - the id for the order the adjust is against
+ * @param {string} paymentId - the id for the payment on the order the adjust is against
+ * @param {number} tipAmount - the amount that will be adjusted.
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendTipAdjust = function(orderId, paymentId, tipAmount, ackId) {
+    var payload = {};
+    payload.orderId = orderId;
+    payload.paymentId = paymentId;
+    payload.tipAmount = tipAmount;
+
+    var lanMessage = this.messageBuilder.buildTipAdjust(payload);
     // If an id is included, then an "ACK" message will be sent for this message
     if(ackId) lanMessage.id = ackId;
 

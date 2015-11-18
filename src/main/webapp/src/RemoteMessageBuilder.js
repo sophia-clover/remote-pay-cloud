@@ -98,6 +98,17 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
+     * Builds a tip adjust payment message
+     *
+     * @param {json} payload - the orderid and paymentid with amount
+     * @returns {json} the constructed message
+     */
+    this.buildTipAdjust = function (payload) {
+        payload.method = LanMethod.TIP_ADJUST;
+        return this.buildRemoteMessage(LanMethod.TIP_ADJUST, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a message to show the receipt options screen for a payment
      *
      * @param {json} payload - the orderid and paymentid
@@ -308,6 +319,8 @@ LanMethod.REFUND_RESPONSE = "REFUND_RESPONSE";
 LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS = "SHOW_PAYMENT_RECEIPT_OPTIONS";
 /** The type to open the cash drawer */
 LanMethod.OPEN_CASH_DRAWER = "OPEN_CASH_DRAWER";
+/** The tip adjust request method type */
+LanMethod.TIP_ADJUST = "TIP_ADJUST";
 
 /**
  * The shutdown method type

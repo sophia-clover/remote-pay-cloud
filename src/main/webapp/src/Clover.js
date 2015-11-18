@@ -77,6 +77,15 @@ function Clover(configuration) {
         "remotePrint":  this.configuration.remotePrint
     };
 
+    this.auth_payIntentTemplate = {
+        "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+        "transactionType": "AUTH",
+        "taxAmount": 0, // tax amount is included in the amount
+        "cardEntryMethods": CardEntryMethods.ALL,
+        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+        "remotePrint":  this.configuration.remotePrint
+    };
+
     this.refund_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "CREDIT",
@@ -507,6 +516,30 @@ function Clover(configuration) {
         }
         return externalPaymentId;
     }
+
+    /**
+     * Auth
+     *
+     * @param {TransactionRequest} saleInfo - the information for the sale
+     * @param {Clover~transactionRequestCallback} saleRequestCallback - the callback that receives the sale completion
+     *  information.
+     * @return {string} paymentId - identifier used for the payment once the transaction is completed.  This may be
+     *  passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
+     */
+    this.auth = function (saleInfo, saleRequestCallback) {
+        var externalPaymentId = null;
+        if(saleInfo.hasOwnProperty('requestId') && saleInfo.requestId != null) {
+            externalPaymentId = saleInfo.requestId;
+        } else {
+            externalPaymentId = CloverID.getNewId();
+        }
+        saleInfo.externalPaymentId = externalPaymentId;
+        if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
+            this.internalTx(saleInfo, saleRequestCallback, this.auth_payIntentTemplate, "payment");
+        }
+        return externalPaymentId;
+    }
+
 
     /**
      * Refund AKA credit
@@ -943,6 +976,26 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     * @param {TipAdjustRequest} tipAdjustRequest - the refund request
+     * @param {requestCallback} completionCallback
+     */
+    this.tipAdjust = function(tipAdjustRequest, completionCallback) {
+        var callbackPayload = {"request":tipAdjustRequest};
+
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        try {
+            this.device.sendTipAdjust(tipAdjustRequest.orderId, tipAdjustRequest.paymentId, tipAdjustRequest.tipAmount, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.TIP_ADJUST,
+                "Failure attempting to send tip adjust", error);
+            callbackPayload["code"] =  "ERROR";
+            completionCallback(cloverError, callbackPayload);
+        }
+    }
+
+
+
     //////////
 
     //
@@ -962,13 +1015,6 @@ function Clover(configuration) {
     // * Not yet implemented
     // */
     //this.adjustAuth = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    //
-    ///**
-    // * Not yet implemented
-    // */
-    //this.tipAdjust = function() {
     //    throw new Error("Not yet implemented");
     //}
     //
@@ -1150,6 +1196,13 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {number} [amount] - the amount to refund.  If not included, the full payment is refunded.  The amount
  *  cannot exceed the original payment, and additional constraints apply to this (EX: if a partial refund
  *  has already been performed then the amount canot exceed the remaining payment amount).
+ */
+
+/**
+ * @typedef {Object} TipAdjustRequest
+ * @property {string} orderId - the id of the order to adjust
+ * @property {string} paymentId - the id of the payment on the order to adjust
+ * @property {number} tipAmount - the amount to adjust.
  */
 
 /**
