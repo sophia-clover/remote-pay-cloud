@@ -380,7 +380,8 @@
               }, 3000
           );
       console.log('device opened');
-      displayUIFeedBack("Communication channel open.  Pausing for 3 seconds before trying to talk to device. ");
+      displayUIFeedBack("Communication channel open.");
+      device.sendMessage(device.messageBuilder.buildDiscoveryRequest());
     });
 
     // The device connection has been closed
