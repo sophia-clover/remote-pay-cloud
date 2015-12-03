@@ -836,9 +836,9 @@ function Clover(configuration) {
             if(completionCallback) {
                 var payload = JSON.parse(message.payload);
                 var txnInfo = JSON.parse(payload[txnName]);//refund
-                var callbackPayload = {};
-                callbackPayload[txnName] = txnInfo;
-                callbackPayload.code = txnInfo.result;
+                callbackPayload.response = {};
+                callbackPayload.response[txnName] = txnInfo;
+                callbackPayload.response.code = txnInfo.result;
 
                 completionCallback(null, callbackPayload);
             }
@@ -851,8 +851,8 @@ function Clover(configuration) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
             if(completionCallback) {
-                var callbackPayload = {};
-                callbackPayload.code = "CANCEL";
+                callbackPayload.response = {};
+                callbackPayload.response.code = "CANCEL";
 
                 var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
                 completionCallback(error, callbackPayload);
