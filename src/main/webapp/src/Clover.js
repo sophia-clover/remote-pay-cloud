@@ -599,7 +599,7 @@ function Clover(configuration) {
             payIntent.externalPaymentId = txnInfo.externalPaymentId;
         }
         /*
-        The ordere id cannot be specified at this time.
+        The order id cannot be specified at this time.
         if (txnInfo.hasOwnProperty("orderId")) {
             payIntent.orderId = txnInfo.orderId;
         }
@@ -807,18 +807,61 @@ function Clover(configuration) {
      */
     this.refundPayment = function (refundRequest, completionCallback) {
         var callbackPayload = {"request":refundRequest};
+        var txnName = 'refund';
 
-        this.device.once(LanMethod.REFUND_RESPONSE,
-            function(message) {
+        var me = this;
+        // Holds all the callbacks so that they can be removed later, if
+        // They need to be.  Callbacks need to be removed in the 'end states'
+        // that do not visit ALL the callback.
+        var allCallBacks = [];
+
+        // TODO:  Remove in future version?
+        var refundResponseCB = function(message) {
+            if(completionCallback) {
                 callbackPayload.response = {};
                 var payload = JSON.parse(message.payload);
                 callbackPayload.response.orderId = payload.orderId;
                 callbackPayload.response.paymentId = payload.paymentId;
                 callbackPayload.response.code = payload.code;
-                if(payload.refund) callbackPayload.response.refund =  JSON.parse(payload.refund);
+                if (payload.refund) callbackPayload.response.refund = JSON.parse(payload.refund);
                 completionCallback(null, callbackPayload);
             }
-        );
+        }
+        this.device.once(LanMethod.REFUND_RESPONSE,refundResponseCB);
+        allCallBacks.push({"event":LanMethod.REFUND_RESPONSE, "callback":refundResponseCB});
+
+        var finishOKCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            if(completionCallback) {
+                var payload = JSON.parse(message.payload);
+                var txnInfo = JSON.parse(payload[txnName]);//refund
+                callbackPayload.response = {};
+                callbackPayload.response[txnName] = txnInfo;
+                callbackPayload.response.code = txnInfo.result;
+
+                completionCallback(null, callbackPayload);
+            }
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_OK,finishOKCB);
+        allCallBacks.push({"event":LanMethod.FINISH_OK, "callback":finishOKCB});
+
+        var finishCancelCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            if(completionCallback) {
+                callbackPayload.response = {};
+                callbackPayload.response.code = "CANCEL";
+
+                var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
+                completionCallback(error, callbackPayload);
+            }
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+        allCallBacks.push({"event":LanMethod.FINISH_CANCEL, "callback":finishCancelCB});
+
         try {
             this.device.sendRefund(refundRequest.orderId, refundRequest.paymentId, refundRequest["amount"]);
         } catch (error) {
