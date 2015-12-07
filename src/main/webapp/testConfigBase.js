@@ -31,7 +31,7 @@ var exampleConfigurations =
     },
     "sandboxdev_C031UQ52340065" : {
         "clientId" : "3BZPZ6A6FQ8ZM",
-        "oauthToken" : "98b9d13f-4339-86d3-7dae-9a16d540ee81",
+        "oauthToken" : "26e60115-33d8-9773-6247-9d84541117e2",
         "domain" : "https://sandboxdev.dev.clover.com/",
         "merchantId" : "VKYQ0RVGMYHRR",
         "deviceSerialId" : "C031UQ52340065"
@@ -65,7 +65,7 @@ var exampleConfigurations =
         "deviceSerialId" : "C021UQ52340078"
     }
 };
-var defaultConfiguration = exampleConfigurations.localhost_C030UQ50550081;
+var defaultConfiguration = exampleConfigurations.sandboxdev_C031UQ52340065;
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,

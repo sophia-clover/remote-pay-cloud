@@ -332,7 +332,7 @@ function WebSocketDevice() {
                 if (stringMessage) {
                     this.resendQueue.push(stringMessage);
                     var me = this;
-                    setTimeout(me.sendMessage.bind(me), millisecondsBetweenPings);
+                    setTimeout(me.sendMessage.bind(me), me.millisecondsBetweenPings);
                 }
             } else {
                 // If there is anything in the resend queue, send it now.
