@@ -33,3 +33,5 @@ CloverError.DEVICE_ERROR = "device error";
 CloverError.DEVICE_NOT_FOUND = "device not found";
 /** CANCELED */
 CloverError.CANCELED = "canceled";
+/** General Error */
+CloverError.ERROR = "error";

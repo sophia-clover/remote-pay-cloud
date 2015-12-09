@@ -586,6 +586,16 @@ function Clover(configuration) {
         } else if (!isInt(txnInfo.tipAmount)) {
             txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
                 "if paymentInfo has 'tipAmount', the value must be an integer"));
+            return;
+        }
+        if (txnInfo.hasOwnProperty("tippableAmount")) {
+            if (!isInt(txnInfo.tippableAmount)) {
+                txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
+                    "if paymentInfo has 'tippableAmount', the value must be an integer"));
+                return;
+            } else {
+                payIntent.tippableAmount = txnInfo.tippableAmount;
+            }
         }
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
@@ -633,6 +643,15 @@ function Clover(configuration) {
         };
         this.device.on(WebSocketDevice.DEVICE_ERROR, deviceErrorCB);
         allCallBacks.push({"event":WebSocketDevice.DEVICE_ERROR, "callback":deviceErrorCB});
+
+        var generalErrorCB = function(message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            var error = new CloverError(CloverError.ERROR, event);
+            txnRequestCallback(error, null);
+        };
+        this.device.on(LanMethod.ERROR, generalErrorCB);
+        allCallBacks.push({"event":LanMethod.ERROR, "callback":generalErrorCB});
 
         var connectionErrorCB = function(message) {
             // Remove obsolete listeners.  This is an end state
@@ -1204,6 +1223,8 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @typedef {Object} TransactionRequest
  * @property {integer} amount - the amount of a sale or refund, including tax
  * @property {integer} [tipAmount] - the amount of a tip.  Added to the amount for the total.  Valid for sale operations
+ * @property {integer} [tippableAmount] - the amount that calculated tips are based on.  If not set then 'amount'
+ *  is used. Valid for sale operations
  * @property {string} [employeeId] - the valid Clover id of an employee recognized by the device.  Represents the
  *  employee making this sale or refund.
  * @property {boolean} [autoVerifySignature] - optional override to allow either automatic signature verification
