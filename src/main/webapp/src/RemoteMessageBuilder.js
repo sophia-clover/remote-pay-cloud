@@ -336,6 +336,12 @@ LanMethod.SHUTDOWN = "SHUTDOWN";
  */
 LanMethod.ACK = "ACK";
 
+/**
+ * The acknowledgement method type
+ * This is a special type only present in the cloud adaptor.
+ */
+LanMethod.ERROR = "ERROR";
+
 
 /**
  * Enumeration of void reason codes

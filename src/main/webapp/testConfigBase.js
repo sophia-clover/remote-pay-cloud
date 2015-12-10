@@ -65,7 +65,7 @@ var exampleConfigurations =
         "deviceSerialId" : "C021UQ52340078"
     }
 };
-var defaultConfiguration = exampleConfigurations.sandboxdev_C031UQ52340065;
+var defaultConfiguration = exampleConfigurations.dev1_C031UQ52340045;
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,
