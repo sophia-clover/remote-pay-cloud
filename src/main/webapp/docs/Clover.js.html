@@ -105,6 +105,15 @@ function Clover(configuration) {
         "remotePrint":  this.configuration.remotePrint
     };
 
+    this.auth_payIntentTemplate = {
+        "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+        "transactionType": "AUTH",
+        "taxAmount": 0, // tax amount is included in the amount
+        "cardEntryMethods": CardEntryMethods.ALL,
+        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+        "remotePrint":  this.configuration.remotePrint
+    };
+
     this.refund_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "CREDIT",
@@ -537,6 +546,30 @@ function Clover(configuration) {
     }
 
     /**
+     * Auth
+     *
+     * @param {TransactionRequest} saleInfo - the information for the sale
+     * @param {Clover~transactionRequestCallback} saleRequestCallback - the callback that receives the sale completion
+     *  information.
+     * @return {string} paymentId - identifier used for the payment once the transaction is completed.  This may be
+     *  passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
+     */
+    this.auth = function (saleInfo, saleRequestCallback) {
+        var externalPaymentId = null;
+        if(saleInfo.hasOwnProperty('requestId') &amp;&amp; saleInfo.requestId != null) {
+            externalPaymentId = saleInfo.requestId;
+        } else {
+            externalPaymentId = CloverID.getNewId();
+        }
+        saleInfo.externalPaymentId = externalPaymentId;
+        if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
+            this.internalTx(saleInfo, saleRequestCallback, this.auth_payIntentTemplate, "payment");
+        }
+        return externalPaymentId;
+    }
+
+
+    /**
      * Refund AKA credit
      *
      * @param {TransactionRequest} refundInfo - amount is refunded
@@ -581,6 +614,16 @@ function Clover(configuration) {
         } else if (!isInt(txnInfo.tipAmount)) {
             txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
                 "if paymentInfo has 'tipAmount', the value must be an integer"));
+            return;
+        }
+        if (txnInfo.hasOwnProperty("tippableAmount")) {
+            if (!isInt(txnInfo.tippableAmount)) {
+                txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
+                    "if paymentInfo has 'tippableAmount', the value must be an integer"));
+                return;
+            } else {
+                payIntent.tippableAmount = txnInfo.tippableAmount;
+            }
         }
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
@@ -594,7 +637,7 @@ function Clover(configuration) {
             payIntent.externalPaymentId = txnInfo.externalPaymentId;
         }
         /*
-        The ordere id cannot be specified at this time.
+        The order id cannot be specified at this time.
         if (txnInfo.hasOwnProperty("orderId")) {
             payIntent.orderId = txnInfo.orderId;
         }
@@ -628,6 +671,15 @@ function Clover(configuration) {
         };
         this.device.on(WebSocketDevice.DEVICE_ERROR, deviceErrorCB);
         allCallBacks.push({"event":WebSocketDevice.DEVICE_ERROR, "callback":deviceErrorCB});
+
+        var generalErrorCB = function(message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            var error = new CloverError(CloverError.ERROR, message);
+            txnRequestCallback(error, null);
+        };
+        this.device.on(LanMethod.ERROR, generalErrorCB);
+        allCallBacks.push({"event":LanMethod.ERROR, "callback":generalErrorCB});
 
         var connectionErrorCB = function(message) {
             // Remove obsolete listeners.  This is an end state
@@ -802,18 +854,61 @@ function Clover(configuration) {
      */
     this.refundPayment = function (refundRequest, completionCallback) {
         var callbackPayload = {"request":refundRequest};
+        var txnName = 'refund';
 
-        this.device.once(LanMethod.REFUND_RESPONSE,
-            function(message) {
+        var me = this;
+        // Holds all the callbacks so that they can be removed later, if
+        // They need to be.  Callbacks need to be removed in the 'end states'
+        // that do not visit ALL the callback.
+        var allCallBacks = [];
+
+        // TODO:  Remove in future version?
+        var refundResponseCB = function(message) {
+            if(completionCallback) {
                 callbackPayload.response = {};
                 var payload = JSON.parse(message.payload);
                 callbackPayload.response.orderId = payload.orderId;
                 callbackPayload.response.paymentId = payload.paymentId;
                 callbackPayload.response.code = payload.code;
-                if(payload.refund) callbackPayload.response.refund =  JSON.parse(payload.refund);
+                if (payload.refund) callbackPayload.response.refund = JSON.parse(payload.refund);
                 completionCallback(null, callbackPayload);
             }
-        );
+        }
+        this.device.once(LanMethod.REFUND_RESPONSE,refundResponseCB);
+        allCallBacks.push({"event":LanMethod.REFUND_RESPONSE, "callback":refundResponseCB});
+
+        var finishOKCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            if(completionCallback) {
+                var payload = JSON.parse(message.payload);
+                var txnInfo = JSON.parse(payload[txnName]);//refund
+                callbackPayload.response = {};
+                callbackPayload.response[txnName] = txnInfo;
+                callbackPayload.response.code = txnInfo.result;
+
+                completionCallback(null, callbackPayload);
+            }
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_OK,finishOKCB);
+        allCallBacks.push({"event":LanMethod.FINISH_OK, "callback":finishOKCB});
+
+        var finishCancelCB = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            if(completionCallback) {
+                callbackPayload.response = {};
+                callbackPayload.response.code = "CANCEL";
+
+                var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
+                completionCallback(error, callbackPayload);
+            }
+            me.device.sendShowWelcomeScreen();
+        };
+        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+        allCallBacks.push({"event":LanMethod.FINISH_CANCEL, "callback":finishCancelCB});
+
         try {
             this.device.sendRefund(refundRequest.orderId, refundRequest.paymentId, refundRequest["amount"]);
         } catch (error) {
@@ -971,6 +1066,26 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     * @param {TipAdjustRequest} tipAdjustRequest - the refund request
+     * @param {requestCallback} completionCallback
+     */
+    this.tipAdjust = function(tipAdjustRequest, completionCallback) {
+        var callbackPayload = {"request":tipAdjustRequest};
+
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        try {
+            this.device.sendTipAdjust(tipAdjustRequest.orderId, tipAdjustRequest.paymentId, tipAdjustRequest.tipAmount, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.TIP_ADJUST,
+                "Failure attempting to send tip adjust", error);
+            callbackPayload["code"] =  "ERROR";
+            completionCallback(cloverError, callbackPayload);
+        }
+    }
+
+
+
     //////////
 
     //
@@ -990,13 +1105,6 @@ function Clover(configuration) {
     // * Not yet implemented
     // */
     //this.adjustAuth = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    //
-    ///**
-    // * Not yet implemented
-    // */
-    //this.tipAdjust = function() {
     //    throw new Error("Not yet implemented");
     //}
     //
@@ -1143,6 +1251,8 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @typedef {Object} TransactionRequest
  * @property {integer} amount - the amount of a sale or refund, including tax
  * @property {integer} [tipAmount] - the amount of a tip.  Added to the amount for the total.  Valid for sale operations
+ * @property {integer} [tippableAmount] - the amount that calculated tips are based on.  If not set then 'amount'
+ *  is used. Valid for sale operations
  * @property {string} [employeeId] - the valid Clover id of an employee recognized by the device.  Represents the
  *  employee making this sale or refund.
  * @property {boolean} [autoVerifySignature] - optional override to allow either automatic signature verification
@@ -1178,6 +1288,13 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {number} [amount] - the amount to refund.  If not included, the full payment is refunded.  The amount
  *  cannot exceed the original payment, and additional constraints apply to this (EX: if a partial refund
  *  has already been performed then the amount canot exceed the remaining payment amount).
+ */
+
+/**
+ * @typedef {Object} TipAdjustRequest
+ * @property {string} orderId - the id of the order to adjust
+ * @property {string} paymentId - the id of the payment on the order to adjust
+ * @property {number} tipAmount - the amount to adjust.
  */
 
 /**
@@ -1294,7 +1411,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Sun Nov 15 2015 12:42:59 GMT-0700 (MST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Dec 10 2015 09:38:29 GMT-0700 (MST)
 </footer>
 
 <script> prettyPrint(); </script>
