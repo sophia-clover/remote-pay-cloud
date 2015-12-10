@@ -647,7 +647,7 @@ function Clover(configuration) {
         var generalErrorCB = function(message) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
-            var error = new CloverError(CloverError.ERROR, event);
+            var error = new CloverError(CloverError.ERROR, message);
             txnRequestCallback(error, null);
         };
         this.device.on(LanMethod.ERROR, generalErrorCB);
