@@ -63,6 +63,13 @@ var exampleConfigurations =
         "domain" : "https://dev1.dev.clover.com/",
         "merchantId" : "BBFF8NBCXEMDT",
         "deviceSerialId" : "C021UQ52340078"
+    },
+    "sandboxdev_C021UQ52340078" : {
+        "clientId" : "3BZPZ6A6FQ8ZM",
+        "oauthToken" : "6e6313e8-ff33-8662-7ff2-3a6690e0ff14",
+        "domain" : "https://sandboxdev.dev.clover.com/",
+        "merchantId" : "VKYQ0RVGMYHRR",
+        "deviceSerialId" : "C021UQ52340078"
     }
 };
 var defaultConfiguration = exampleConfigurations.dev1_C031UQ52340045;

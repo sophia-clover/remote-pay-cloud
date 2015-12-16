@@ -15,14 +15,24 @@ function XmlHttpSupport() {
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4)
                 if (xmlhttp.status == 200) {
-                    // alert("userInfo is " + xmlhttp.responseText );
-                    var data = JSON.parse(xmlhttp.responseText);
-                    // displayDevices(devices);
-                    onDataLoaded(data);
+                        try {
+                        if(onDataLoaded) {
+                            var data = JSON.parse(xmlhttp.responseText);
+                            // displayDevices(devices);
+                            onDataLoaded(data);
+                        }
+                    } catch(e) {
+                        console.log(e);
+                        if(onDataLoaded) {
+                            onDataLoaded({});
+                        }
+                    }
                 }
                 else {
                     // console.log("error");
-                    onError("status returned was not 200");
+                    if(onError) {
+                        onError("status returned was not 200");
+                    }
                 }
         }
     }
@@ -67,6 +77,13 @@ function XmlHttpSupport() {
      */
     this.getData = function(endpoint, onDataLoaded, onError) {
         this.doXmlHttp("GET", endpoint, onDataLoaded, onError)
+    }
+
+    /**
+     * Make the REST call to get the data
+     */
+    this.options = function(endpoint, onSuccess, onError) {
+        this.doXmlHttp("OPTIONS", endpoint, onSuccess, onError)
     }
 
     /**
