@@ -13,6 +13,15 @@
 
 <a href="./docs">Developer documents</a><br/>
 
+<p>
+  The examples use different methods to establish a connection with the device.<br/>
+  <ul>
+    <li>a merchant may need to log in to the Clover server</li>
+    <li>an oauth token may be used</li>
+    <li>a saved configuration may be loaded from a persistent store (example stores information in a cookie)</li>
+  </ul>
+</p>
+
 <ul>
   <!-- Table until security issue can be resolved -->
   <!--
@@ -20,7 +29,7 @@
   <ul>
     <li><a href="./lan_index.html">Local Network Example</a><br/></li>
 
-    <li><a href="high_levelLAN_index.html">Simple Example - Local Network Pay Display using deviceURL</a><br/></li>
+    <li><a href="LAN_index.html">Simple Example - Local Network Pay Display using deviceURL</a><br/></li>
 
     <li><a href="high_levelLAN_printImage.html">Simple Example - Local Network Pay Display using deviceURL. Print Image on receipt</a><br/></li>
 
@@ -32,35 +41,39 @@
   <ul>
     <li><a href="./cloud_index.html">Main Example</a><br/></li>
 
-    <li><a href="high_levelCLOUD_sale.html">Sale, authorized using clientId, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="sale3.html">Sale, requires login to Clover</a><br/></li>
 
-    <li><a href="high_levelCLOUD3_sale.html">Sale, authorized using oauthToken, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="sale.html">Sale, using a previously obtained oauthToken</a><br/></li>
 
-    <li><a href="high_levelCLOUD3_sale_withPaymentID.html">Sale, with paymentId passed in</a><br/></li>
+    <li><a href="sale_withPaymentID.html">Sale, with paymentId passed in</a><br/></li>
 
-    <li><a href="high_levelCLOUD3_sale_remote_receipt.html">Sale, return receipt info to POS</a><br/></li>
+    <li><a href="sale_withTipAdjust.html">Sale, with tip adjustment</a><br/></li>
 
-    <li><a href="high_levelCLOUD3_saleTimeout.html">Sale timeout to welcome screen, authorized using oauthToken, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="sale_custom_tip.html">Sale, custom tip amount</a><br/></li>
 
-    <li><a href="high_levelCLOUD_printReceipt.html">Print a receipt from a previous payment, authorized using oauthToken, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="sale_remote_receipt.html">Sale, return receipt info to POS</a><br/></li>
 
-    <li><a href="high_levelCLOUD_UI_STATE.html">Print a receipt from a previous payment, display UI options</a><br/></li>
+    <li><a href="saleTimeout.html">Sale timeout to welcome screen</a><br/></li>
 
-    <li><a href="high_levelCLOUD_openCashDrawer.html">Open the cash drawer</a><br/></li>
+    <li><a href="printReceipt.html">Print a receipt from a previous payment</a><br/></li>
 
-    <li><a href="high_levelCLOUD3_sale_manualSigVerify.html">Sale with manual signature verification, authorized using oauthToken, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="UI_STATE.html">Print a receipt from a previous payment, display UI options</a><br/></li>
 
-    <li><a href="high_levelCLOUD3_sale_manualSigVerify2.html">Sale with manual signature verification (per transaction), authorized using oauthToken, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="openCashDrawer.html">Open the cash drawer</a><br/></li>
 
-    <li><a href="high_levelCLOUD4_sale.html">Sale, authorized using saved oauthToken, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="sale_manualSigVerify.html">Sale with manual signature verification</a><br/></li>
 
-    <li><a href="high_levelCLOUD_printImage.html">Print Image on receipt, authorized using oauthToken, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="sale_manualSigVerify2.html">Sale with manual signature verification (per transaction)</a><br/></li>
 
-    <li><a href="high_levelCLOUD_naked_refund.html">(Naked) Credit/Refund, authorized using clientId, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="sale2.html">Sale, authorized using saved information</a><br/></li>
 
-    <li><a href="high_levelCLOUD_refund.html">Refund, authorized using clientId, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="printImage.html">Print Image on receipt</a><br/></li>
 
-    <li><a href="high_levelCLOUD_void.html">Void, authorized using clientId, domain, merchantId, deviceSerialId</a><br/></li>
+    <li><a href="naked_refund.html">(Naked) Credit/Refund</a><br/></li>
+
+    <li><a href="refund.html">Refund</a><br/></li>
+
+    <li><a href="void.html">Void</a><br/></li>
 
     <li><a href="bad_disconnect_cloud_index.html">Test connection instability</a><br/></li>
 

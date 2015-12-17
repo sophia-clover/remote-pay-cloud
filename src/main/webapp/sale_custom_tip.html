@@ -1,0 +1,91 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
+
+  <!--<script src="src/cloverCloud-min.js"></script>-->
+
+  <script src="src/xmlHttpSupport.js"></script>
+  <script src="src/CardEntryMethods.js"></script>
+  <script src="src/CloverOAuth.js"></script>
+  <script src="src/CloverError.js"></script>
+  <script src="src/Clover.js"></script>
+  <script src="src/WebSocketDevice.js"></script>
+  <script src="src/Endpoints.js"></script>
+  <script src="src/CloverID.js"></script>
+  <script src="src/eventemitter3_v1_1_1.js"></script>
+  <script src="src/RemoteMessageBuilder.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body onbeforeunload="clover.close()">
+
+<p>
+  This is an example of the Clover High Level Cloud API. It relies on the device to be running the
+  Cloud Pay Display app.<br/>
+  <strong> The <a href="./cloud_index.html">main Cloud example</a> should be run, and the "Save Configuration" button
+    selected before running this example. </strong>
+  It uses saved information to connect to the device. It makes a connection to a device, and charges $123.45, and
+  passes a separate amount to base tip calculations on of $100.<br/>
+  This does NOT force a tip screen to appear.  The appearance of the tip screen is based on the merchant configuration,
+  as is the percentages that will be used to calculate suggested tip amounts.<br/>
+  The result of the transaction is displayed below.
+</p>
+
+<button onclick="clover.sendCancel(resultCallback)">Send a Cancel</button>
+
+<!-- this is a place to talk about what is happening while the example is being run -->
+<div id="uiFeedback" style="height: 400px;">
+</div>
+
+<script>
+
+  // Create the Clover object to communicate with the device.. Since no information is passed
+  // to the Clover object, it reads a cookie to get the information needed to communicate.
+  var clover = new Clover();
+
+  // Start communication
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(makeASale);
+
+  // This will be called when the device is ready
+  function makeASale(error) {
+    if (error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      var mySale = {
+        "amount": 12345, //the amount of a sale, including tax
+        "tippableAmount": 10000 // - the amount used when calculating tips
+      }
+
+      // Call the device to take payment, after the payment is complete, call the
+      // 'mySaleResult' function
+      clover.sale(mySale, resultCallback);
+    }
+  }
+
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function resultCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if (error)resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
+    resultDisplay += "<pre>" + JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+</script>
+
+</body>
+</html>

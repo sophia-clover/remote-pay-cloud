@@ -203,6 +203,184 @@
 
     
 
+    <h4 class="name" id="auth"><span class="type-signature"></span>auth<span class="signature">(saleInfo, saleRequestCallback)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Auth
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>saleInfo</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#TransactionRequest">TransactionRequest</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the information for the sale</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>saleRequestCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Clover.html#~transactionRequestCallback">Clover~transactionRequestCallback</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the callback that receives the sale completion
+ information.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line529">line 529</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    paymentId - identifier used for the payment once the transaction is completed.  This may be
+ passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="close"><span class="type-signature"></span>close<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
@@ -254,7 +432,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line111">line 111</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line120">line 120</a>
     </li></ul></dd>
     
 
@@ -464,7 +642,7 @@ the call to Clover.initDeviceConnection.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line396">line 396</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line405">line 405</a>
     </li></ul></dd>
     
 
@@ -615,7 +793,7 @@ the call to Clover.initDeviceConnection.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line152">line 152</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -845,7 +1023,7 @@ configuration from a server or even a UI.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line356">line 356</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line365">line 365</a>
     </li></ul></dd>
     
 
@@ -1041,7 +1219,7 @@ configuration from a server or even a UI.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line923">line 923</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1018">line 1018</a>
     </li></ul></dd>
     
 
@@ -1125,7 +1303,7 @@ server or some other type of cloud persistence.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line374">line 374</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line383">line 383</a>
     </li></ul></dd>
     
 
@@ -1299,7 +1477,7 @@ server or some other type of cloud persistence.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line805">line 805</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line900">line 900</a>
     </li></ul></dd>
     
 
@@ -1471,7 +1649,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line861">line 861</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line956">line 956</a>
     </li></ul></dd>
     
 
@@ -1615,7 +1793,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line830">line 830</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line925">line 925</a>
     </li></ul></dd>
     
 
@@ -1769,7 +1947,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line517">line 517</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line550">line 550</a>
     </li></ul></dd>
     
 
@@ -1923,7 +2101,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line775">line 775</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line827">line 827</a>
     </li></ul></dd>
     
 
@@ -2078,7 +2256,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line497">line 497</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line506">line 506</a>
     </li></ul></dd>
     
 
@@ -2232,7 +2410,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line885">line 885</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line980">line 980</a>
     </li></ul></dd>
     
 
@@ -2376,7 +2554,157 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line894">line 894</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line989">line 989</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="tipAdjust"><span class="type-signature"></span>tipAdjust<span class="signature">(tipAdjustRequest, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tipAdjustRequest</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#TipAdjustRequest">TipAdjustRequest</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the refund request</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#requestCallback">requestCallback</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1045">line 1045</a>
     </li></ul></dd>
     
 
@@ -2550,7 +2878,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line747">line 747</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line799">line 799</a>
     </li></ul></dd>
     
 
@@ -2730,7 +3058,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1138">line 1138</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1248">line 1248</a>
     </li></ul></dd>
     
 
@@ -2776,7 +3104,7 @@ dependant on the current state of the device.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Sun Nov 15 2015 12:42:59 GMT-0700 (MST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Dec 10 2015 09:38:29 GMT-0700 (MST)
 </footer>
 
 <script> prettyPrint(); </script>
