@@ -59,75 +59,26 @@ function WebSocketDevice() {
             // deviceSocket = new WebSocket("ws://localhost:18000");
             try {
                 console.log("contacting device");
-                this.deviceSocket = new WebSocket(
-                    //        "ws://192.168.0.56:49152"
-                    //        selectedDevice.websocket_direct
-                    ws_address
-                );
-                console.log("this.deviceSocket = " + this.deviceSocket);
-                this.deviceSocket.onopen = function (event) {
-                    console.log("deviceSocket.onopen");
-                    this.reconnecting = false;
-                    me.reconnectAttempts = 0;
-                    // Set up the ping for every X seconds
-                    me.pingIntervalId = setInterval(function () {
-                        me.checkDeadConnection();
-                        me.ping();
-                    }, me.millisecondsBetweenPings);
-                    me.onopen(event);
-                };
 
-                this.deviceSocket.onmessage = function (event) {
-                    console.log("deviceSocket.onmessage");
-                    var jsonMessage = JSON.parse(event.data);
-                    me.receiveMessage(jsonMessage);
+                // A different way to deal with the 401 error that
+                // occurs when a websocket connection is made to the
+                // server (sometimes).  Do a preliminary OPTIONS
+                // request.  Although this happens regarless of if the error
+                // happens, it is tremendously faster.
+                var wssUrl = ws_address;// me.deviceSocket.url;
+                if (wssUrl.indexOf("wss") > -1) {
+                    var httpsUrl = wssUrl.replace("wss", "https");
+                    if (!me.xmlHttpSupport) {
+                        me.xmlHttpSupport = new XmlHttpSupport();
+                    }
+                    me.xmlHttpSupport.options(httpsUrl,
+                        function () {me.startSSSS(ws_address)},
+                        function () {me.startSSSS(ws_address)}
+                        );
+                } else {
+                    me.startSSSS(ws_address);
                 }
 
-                this.deviceSocket.onerror = function (event) {
-                    console.error("deviceSocket.onerror");
-                    console.error(event);
-                    if(me.reconnect) {
-
-                        ///////////////////////////
-                        // Dealing with the very strange 401 error in secure web sockets
-                        if(!me.triedToFix401) {
-                            // Try to deal with the issue where the browser has cached
-                            // an old certificate somehow.  There is no indication of this
-                            // in the error, so just try to fix it, even if there is some
-                            // other error.
-                            console.error("Attempt to fix possible cached certificate issue.");
-                            var wssUrl = me.deviceSocket.url;
-                            if (wssUrl.indexOf("wss") > -1) {
-                                var httpsUrl = wssUrl.replace("wss", "https");
-                                if (!me.xmlHttpSupport) {
-                                    me.xmlHttpSupport = new XmlHttpSupport();
-                                }
-                                me.xmlHttpSupport.getData(httpsUrl,
-                                    me.startupReconnect.bind(me),
-                                    me.startupReconnect.bind(me));
-                                    // console.log.bind(console), console.log.bind(console));
-                                me.triedToFix401 = true;
-                            }
-                        }
-                        ///////////////////////////
-                        else {
-                            me.startupReconnect(this.timebetweenReconnectAttempts);
-                        }
-                    }
-                    else {
-                        me.onerror(event);
-                    }
-                }
-
-                this.deviceSocket.onclose = function (event) {
-                    try {
-                        console.log("Clearing ping thread");
-                        clearInterval(this.pingIntervalId);
-                    }catch(e){
-                        console.error(e);
-                    }
-                    me.onclose(event);
-                }
             } catch (error) {
                 console.log(error);
             }
@@ -136,6 +87,55 @@ function WebSocketDevice() {
             alert("Select a device first");
         }
     }
+
+    this.startSSSS = function(ws_address) {
+        var me = this;
+        this.deviceSocket = new WebSocket(
+            //        "ws://192.168.0.56:49152"
+            //        selectedDevice.websocket_direct
+            ws_address
+        );
+        console.log("this.deviceSocket = " + this.deviceSocket);
+        this.deviceSocket.onopen = function (event) {
+            console.log("deviceSocket.onopen");
+            me.reconnecting = false;
+            me.reconnectAttempts = 0;
+            // Set up the ping for every X seconds
+            me.pingIntervalId = setInterval(function () {
+                me.checkDeadConnection();
+                me.ping();
+            }, me.millisecondsBetweenPings);
+            me.onopen(event);
+        };
+
+        this.deviceSocket.onmessage = function (event) {
+            console.log("deviceSocket.onmessage");
+            var jsonMessage = JSON.parse(event.data);
+            me.receiveMessage(jsonMessage);
+        }
+
+        this.deviceSocket.onerror = function (event) {
+            console.error("deviceSocket.onerror");
+            console.error(event);
+            if(me.reconnect) {
+                me.startupReconnect(this.timebetweenReconnectAttempts);
+            }
+            else {
+                me.onerror(event);
+            }
+        }
+
+        this.deviceSocket.onclose = function (event) {
+            try {
+                console.log("Clearing ping thread");
+                clearInterval(this.pingIntervalId);
+            }catch(e){
+                console.error(e);
+            }
+            me.onclose(event);
+        }
+    }
+
 
     this.startupReconnect = function(delay) {
         if(!delay)delay=1;
