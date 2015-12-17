@@ -8,13 +8,6 @@ var exampleConfigurations =
         "merchantId" : "VKYQ0RVGMYHRR",
         "deviceSerialId" : "C030UQ53460719"
     },
-    "sandbox_booker_C030UQ53460719" : {
-        "clientId" : "1VE8EKDBFSHKA",
-        "oauthToken" : "211f96ae-2121-00e9-eb50-80995787fefa",
-        "domain" : "https://sandbox.dev.clover.com/",
-        "merchantId" : "D5PKQ077KW3CY",
-        "deviceSerialId" : "C030UQ53460719"
-    },
     "localhost_C030UQ50550081" : {
         "clientId" : "3RPTN642FHXTC",
         "oauthToken" : "be4ade2b-01aa-2603-823a-9915a30b8e59",
