@@ -131,6 +131,17 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
+     * Builds a message to show the receipt options screen for a payment
+     *
+     * @param {json} payload - the orderid and paymentid
+     * @returns {json} the constructed message
+     */
+    this.buildLastMessageRequest = function (payload) {
+        payload.method = LanMethod.LAST_MSG_REQUEST;
+        return this.buildRemoteMessage(LanMethod.LAST_MSG_REQUEST, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a terminal message (display message for device)
      *
      * @param {json} payload - the message
@@ -323,6 +334,10 @@ LanMethod.OPEN_CASH_DRAWER = "OPEN_CASH_DRAWER";
 LanMethod.TIP_ADJUST = "TIP_ADJUST";
 /** The message type for a refund print message */
 LanMethod.REFUND_PRINT_PAYMENT = "REFUND_PRINT_PAYMENT";
+/** Message returned when request for last message is sent */
+LanMethod.LAST_MSG_RESPONSE = "LAST_MSG_RESPONSE";
+/** Message type to get the last message sent/received to/from the device */
+LanMethod.LAST_MSG_REQUEST = "LAST_MSG_REQUEST";
 
 /**
  * The shutdown method type

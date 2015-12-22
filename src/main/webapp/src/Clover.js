@@ -1057,6 +1057,33 @@ function Clover(configuration) {
     }
 
 
+    /**
+     *
+     * @param {requestCallback} completionCallback
+     */
+    this.getLastMessage = function(completionCallback) {
+        var callbackPayload = {"request":{}};
+
+        var lastMessageCB = function (message) {
+            var payload = JSON.parse(message.payload);
+            callbackPayload["response"] = payload;
+
+            completionCallback(null, callbackPayload);
+        }.bind(this);
+        this.device.once(LanMethod.LAST_MSG_RESPONSE,lastMessageCB);
+
+        try {
+            this.device.sendLastMessageRequest();
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.LAST_MSG_REQUEST,
+                "Failure attempting to get last message sent", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
+    }
+
 
     //////////
 
