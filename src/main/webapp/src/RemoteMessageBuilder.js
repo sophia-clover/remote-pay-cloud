@@ -120,14 +120,25 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a message to show the receipt options screen for a payment
+     * Builds a message to open the cash drawer
      *
-     * @param {json} payload - the orderid and paymentid
+     * @param {json} payload - an empty map/object
      * @returns {json} the constructed message
      */
     this.buildOpenCashDrawer = function (payload) {
         payload.method = LanMethod.OPEN_CASH_DRAWER;
         return this.buildRemoteMessage(LanMethod.OPEN_CASH_DRAWER, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
+     * Builds a message to get the last 'transactional' message from the device.
+     *
+     * @param {json} payload - an empty map/object
+     * @returns {json} the constructed message
+     */
+    this.buildLastMessageRequest = function (payload) {
+        payload.method = LanMethod.LAST_MSG_REQUEST;
+        return this.buildRemoteMessage(LanMethod.LAST_MSG_REQUEST, RemoteMessageBuilder.COMMAND, payload);
     }
 
     /**
@@ -142,9 +153,9 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a terminal message (display message for device)
+     * Builds a message to print passed text
      *
-     * @param {json} payload - the message
+     * @param {json} payload - an object of the form {"textLines" : textLines}
      * @returns {json} the constructed message
      */
     this.buildPrintText = function (payload) {
@@ -153,9 +164,10 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a terminal message (display message for device)
+     * Builds a message to print the (small) passed image
      *
-     * @param {json} payload - the message
+     * @param {json} payload - an object that has a single attribute;
+     *  "png" : Base64 data.
      * @returns {json} the constructed message
      */
     this.buildPrintImage = function (payload) {
@@ -191,7 +203,7 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a message to send to the device to make it show the receipt screen form the last order processed
+     * Builds a message to send to the device to make it show the receipt screen from the last order processed
      *
      * @returns {json} the constructed message
      */
@@ -220,7 +232,7 @@ function RemoteMessageBuilder(defaultPackageName) {
 
     /**
      * @private
-     * @returns {json} the ping message
+     * @returns {json} a keypress message
      */
     this.buildKeyPress = function (payload) {
         payload.method = LanMethod.KEY_PRESS;
@@ -229,14 +241,14 @@ function RemoteMessageBuilder(defaultPackageName) {
 
     /**
      * @private
-     * @returns {json} the ping message
+     * @returns {json} the pong message
      */
     this.buildPong = function () {
         return this.buildRemoteMessage(null, RemoteMessageBuilder.PONG);
     }
 
     /**
-     * Builds a terminal message (display message for device)
+     * Builds a message to ask the device to shutdown
      *
      * @param {json} payload - the message
      * @returns {json} the constructed message
@@ -323,6 +335,10 @@ LanMethod.OPEN_CASH_DRAWER = "OPEN_CASH_DRAWER";
 LanMethod.TIP_ADJUST = "TIP_ADJUST";
 /** The message type for a refund print message */
 LanMethod.REFUND_PRINT_PAYMENT = "REFUND_PRINT_PAYMENT";
+/** Message returned when request for last message is sent */
+LanMethod.LAST_MSG_RESPONSE = "LAST_MSG_RESPONSE";
+/** Message type to get the last message sent/received to/from the device */
+LanMethod.LAST_MSG_REQUEST = "LAST_MSG_REQUEST";
 
 /**
  * The shutdown method type
