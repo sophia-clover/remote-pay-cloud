@@ -120,9 +120,9 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a message to show the receipt options screen for a payment
+     * Builds a message to open the cash drawer
      *
-     * @param {json} payload - the orderid and paymentid
+     * @param {json} payload - an empty map/object
      * @returns {json} the constructed message
      */
     this.buildOpenCashDrawer = function (payload) {
@@ -131,9 +131,9 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a message to show the receipt options screen for a payment
+     * Builds a message to get the last 'transactional' message from the device.
      *
-     * @param {json} payload - the orderid and paymentid
+     * @param {json} payload - an empty map/object
      * @returns {json} the constructed message
      */
     this.buildLastMessageRequest = function (payload) {
@@ -153,9 +153,9 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a terminal message (display message for device)
+     * Builds a message to print passed text
      *
-     * @param {json} payload - the message
+     * @param {json} payload - an object of the form {"textLines" : textLines}
      * @returns {json} the constructed message
      */
     this.buildPrintText = function (payload) {
@@ -164,9 +164,10 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a terminal message (display message for device)
+     * Builds a message to print the (small) passed image
      *
-     * @param {json} payload - the message
+     * @param {json} payload - an object that has a single attribute;
+     *  "png" : Base64 data.
      * @returns {json} the constructed message
      */
     this.buildPrintImage = function (payload) {
@@ -202,7 +203,7 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a message to send to the device to make it show the receipt screen form the last order processed
+     * Builds a message to send to the device to make it show the receipt screen from the last order processed
      *
      * @returns {json} the constructed message
      */
@@ -231,7 +232,7 @@ function RemoteMessageBuilder(defaultPackageName) {
 
     /**
      * @private
-     * @returns {json} the ping message
+     * @returns {json} a keypress message
      */
     this.buildKeyPress = function (payload) {
         payload.method = LanMethod.KEY_PRESS;
@@ -240,14 +241,14 @@ function RemoteMessageBuilder(defaultPackageName) {
 
     /**
      * @private
-     * @returns {json} the ping message
+     * @returns {json} the pong message
      */
     this.buildPong = function () {
         return this.buildRemoteMessage(null, RemoteMessageBuilder.PONG);
     }
 
     /**
-     * Builds a terminal message (display message for device)
+     * Builds a message to ask the device to shutdown
      *
      * @param {json} payload - the message
      * @returns {json} the constructed message
