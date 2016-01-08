@@ -95,7 +95,7 @@
               <maxIdleTime>60000</maxIdleTime>
             </connector>
             <connector implementation="org.mortbay.jetty.security.SslSocketConnector">
-              <port>8443</port>
+              <port>443</port>
               <maxIdleTime>60000</maxIdleTime>
               <keystore>${project.basedir}/jetty-ssl.keystore</keystore>
               <password>jetty6</password>
