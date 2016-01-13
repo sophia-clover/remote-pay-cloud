@@ -15,7 +15,8 @@ This produces a runnable jar that will serve a web application. There are severa
 ### Webhook Example
 If you want to use the embedded webhook example, you will need to run the example on a public facing web server.  You 
 will need to run the example before you can perform the verification of the webhook. The default address of the webhook
-in the example is ```http://<yourserver>/webhook```.  This can be changed by modifying the `web.xml` file.
+in the example is ```http://<yourserver>/webhook```.  The default server used in the webhook example is
+`https://apidev1.dev.clover.com`.  These values can be changed by modifying the `web.xml` file.  
 
 There are two servlets that are used to demonstrate the webhook functionality.  The webhook servlet echoes the 
 information sent to the hook.  It reads merchant authentication tokens from a file on the server running this example.
@@ -37,12 +38,8 @@ You must have maven and a JDK installed.
 
 Generate a certificate
 ```
-keytool -genkey -alias jetty6 -keyalg RSA -keystore jetty-ssl.keystore -storepass jetty6 -keypass jetty6 -dname "CN=localhost"
+keytool -genkey -alias jetty7 -keyalg RSA -keystore src/test/resources/jetty.keystore -storepass password -keypass password -dname "CN=localhost"
 ```
-
-__*Note*__: The following `mvn` commands require `sudo` on linux based environments.  This is because the server is 
-started on the default http and ssl ports of 80 and 443.  To avoid the `sudo` requirement, you can change the ports in 
-the root pom.xml file.
 
 Prepare the application to run:
 ```
@@ -57,7 +54,8 @@ mvn jetty:run
 You will need to configure your browser to accept the certificate you generated in order to test using the SSL 
 url (https://localhost:8443)
 
-Again, note that the ports can be changed in the maven build file (pom.xml)
+__*Note*__: The ports can be changed in the maven build file (pom.xml), however the `mvn` commands require root (`sudo`) 
+permissions on *nix* based environments if either of the ports are less than 1024.
 
 ## Make a Transaction
 
