@@ -36,24 +36,19 @@ The "Simple" examples require information that can be obtained by running the "C
     
 You must have maven and a JDK installed.
 
-Generate a certificate
-```
-keytool -genkey -alias jetty7 -keyalg RSA -keystore src/test/resources/jetty.keystore -storepass password -keypass password -dname "CN=localhost"
-```
-
-Prepare the application to run:
-```
-mvn package
-```
-
-Run the app inside a jetty container:
+Build, package and run the app inside a jetty container:
 ```
 mvn jetty:run
 ```
 
-You will need to configure your browser to accept the certificate you generated in order to test using the SSL 
-url (https://localhost:8443)
+You will need to configure your browser to accept the included self signed certificate in order to test using the SSL 
+url (https://localhost:8443).
 
+_*Note*_:  (Optional) To regenerate the certificate to use a server name other than 'localhost', a command similar to
+the following can be used:
+```
+keytool -genkey -alias jetty7 -keyalg RSA -keystore src/test/resources/jetty.keystore -storepass password -keypass password -dname "CN=localhost"
+```
 __*Note*__: The ports can be changed in the maven build file (pom.xml), however the `mvn` commands require root (`sudo`) 
 permissions on *nix* based environments if either of the ports are less than 1024.
 
