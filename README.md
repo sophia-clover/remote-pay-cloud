@@ -15,7 +15,8 @@ This produces a runnable jar that will serve a web application. There are severa
 ### Webhook Example
 If you want to use the embedded webhook example, you will need to run the example on a public facing web server.  You 
 will need to run the example before you can perform the verification of the webhook. The default address of the webhook
-in the example is ```http://<yourserver>/webhook```.  This can be changed by modifying the `web.xml` file.
+in the example is ```http://<yourserver>/webhook```.  The default server used in the webhook example is
+`https://apidev1.dev.clover.com`.  These values can be changed by modifying the `web.xml` file.  
 
 There are two servlets that are used to demonstrate the webhook functionality.  The webhook servlet echoes the 
 information sent to the hook.  It reads merchant authentication tokens from a file on the server running this example.
@@ -35,30 +36,26 @@ The "Simple" examples require information that can be obtained by running the "C
     
 You must have maven and a JDK installed.
 
-Generate a certificate
-```
-keytool -genkey -alias jetty6 -keyalg RSA -keystore jetty-ssl.keystore -storepass jetty6 -keypass jetty6 -dname "CN=localhost"
-```
-
-Prepare the application to run:
-```
-mvn package
-```
-
-Run the app inside a jetty container:
+Build, package and run the app inside a jetty container:
 ```
 mvn jetty:run
 ```
 
-You will need to configure your browser to accept the certificate you generated in order to test using the SSL 
-url (https://localhost:8443)
+You will need to configure your browser to accept the included self signed certificate in order to test using the SSL 
+url (https://localhost:8443).
 
-Note that the ports can be changed in the maven build file (pom.xml)
+_*Note*_:  (Optional) To regenerate the certificate to use a server name other than 'localhost', a command similar to
+the following can be used:
+```
+keytool -genkey -alias jetty7 -keyalg RSA -keystore src/test/resources/jetty.keystore -storepass password -keypass password -dname "CN=localhost"
+```
+__*Note*__: The ports can be changed in the maven build file (pom.xml), however the `mvn` commands require root (`sudo`) 
+permissions on *nix* based environments if either of the ports are less than 1024.
 
 ## Make a Transaction
 
 ###High Level API
-This example refers to the source files in the [webapp directory](./src/main/webapp).
+This example refers to the source files in the [webapp directory](https://github.com/clover/remote-pay-cloud/blob/master/src/main/webapp).
 
 To make a payment using the High Level Cloud API
 ####Create the Clover object.
@@ -72,9 +69,25 @@ object and how to set up your connection.
 
 Examples of creating the Clover object:
 
-1. <a href="./src/main/webapp/high_levelCLOUD_sale.html#L29" target="_blank">With a clientID, domain, merchantId, deviceSerialId</a>
-1. <a href="./src/main/webapp/high_levelCLOUD_printImage.html#L30" target="_blank">With a oauthToken, domain, merchantId, deviceSerialId</a>
-1. <a href="./src/main/webapp/high_levelCLOUD4_sale.html#L32" target="_blank">Relying on a saved configuration in a cookie</a>
+1. With a clientID, domain, merchantId, deviceSerialId
+```
+{
+  "clientId" : "3BZPZ6A6FQ8ZM",
+  "domain" : "https://sandboxdev.dev.clover.com/",
+  "merchantId" : "VKYQ0RVGMYHRR",
+  "deviceSerialId" : "C021UQ52340078"
+}
+```
+1. With a oauthToken, domain, merchantId, deviceSerialId
+```
+{
+  "oauthToken" : "6e6313e8-ff33-8662-7ff2-3a6690e0ff14",
+  "domain" : "https://sandboxdev.dev.clover.com/",
+  "merchantId" : "VKYQ0RVGMYHRR",
+  "deviceSerialId" : "C021UQ52340078"
+}
+```
+1. Relying on a saved configuration in a cookie
 
 ####Define how your program will use the Clover object
 #####In this example, this function will be passed when we start communicating with the device.  If there is an error when communication is initiated, this function will get the error as a parameter.
@@ -85,7 +98,7 @@ function makeASale(error) {
 }
 ```
 
-<a href="./src/main/webapp/high_levelCLOUD_sale.html#L42" target="_blank">Example of function to handle device initialization and invoke an operation</a>
+<a href="./src/main/webapp/sale.html#L47" target="_blank">Example of function to handle device initialization and invoke an operation</a>
 #####Here we define the error-first callback that we pass in to the Clover.sale function above.  If an error occurs, it will be the first parameter.
 ```
 function mySaleResult(error, saleResult) {
@@ -93,13 +106,13 @@ function mySaleResult(error, saleResult) {
 }
 ```
 
-<a href="./src/main/webapp/high_levelCLOUD_sale.html#L62" target="_blank">Example of function to handle result of an operation</a>
+<a href="./src/main/webapp/sale.html#L69" target="_blank">Example of function to handle result of an operation</a>
 ####Start communicating with the device and tell the device to call your program when it is ready
 ```
 clover.initDeviceConnection(makeASale);
 ```
 
-<a href="./src/main/webapp/high_levelCLOUD_sale.html#L39" target="_blank">Example of initializing the device connection</a>
+<a href="./src/main/webapp/sale.html#L44" target="_blank">Example of initializing the device connection</a>
 
 
 View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 

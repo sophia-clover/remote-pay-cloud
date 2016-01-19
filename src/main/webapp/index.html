@@ -5,6 +5,10 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
+  <script src="src/cloverCloud-min.js"></script>
+
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
 
@@ -18,7 +22,9 @@
   <ul>
     <li>a merchant may need to log in to the Clover server</li>
     <li>an oauth token may be used</li>
-    <li>a saved configuration may be loaded from a persistent store (example stores information in a cookie)</li>
+    <li>a saved configuration may be loaded from a persistent store (example stores information in a cookie)
+      <button id="save_cfg_btn" onclick="Clover.writeConfigurationToCookie(defaultConfiguration)">Save Configuration</button>
+    </li>
   </ul>
 </p>
 
@@ -76,6 +82,8 @@
     <li><a href="void.html">Void</a><br/></li>
 
     <li><a href="bad_disconnect_cloud_index.html">Test connection instability</a><br/></li>
+
+    <li><a href="showLastMessage.html">Get the last message the device processed</a><br/></li>
 
   </ul>
 </ul>

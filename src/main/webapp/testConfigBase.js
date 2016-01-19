@@ -63,18 +63,21 @@ var exampleConfigurations =
         "domain" : "https://sandboxdev.dev.clover.com/",
         "merchantId" : "VKYQ0RVGMYHRR",
         "deviceSerialId" : "C021UQ52340078"
+    },
+    "lan_1_49" : {
+        "deviceURL" : "ws://192.168.1.49:14285"
     }
 };
-var defaultConfiguration = exampleConfigurations.dev1_C031UQ52340045;
+var defaultConfiguration = exampleConfigurations.sandbox_C030UQ53460719;
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,
         "oauthToken" : defaultConfiguration.oauthToken,
         "domain" : defaultConfiguration.domain,
         "merchantId" : defaultConfiguration.merchantId,
-        "deviceSerialId" : defaultConfiguration.deviceSerialId
+        "deviceSerialId" : defaultConfiguration.deviceSerialId,
+        "deviceURL" : defaultConfiguration["deviceURL"]
     };
 }
-var defaultLANconfig = {"deviceURL" : "ws://192.168.1.41:14285"};
 
 
