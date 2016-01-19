@@ -889,6 +889,25 @@ WebSocketDevice.prototype.sendPrintImage = function(img, ackId) {
 }
 
 /**
+ * Send a message to the device to get the last message it received, along with the response
+ * returned (if any)
+ *
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendLastMessageRequest = function(ackId) {
+    var payload = {};
+    var lanMessage = this.messageBuilder.buildLastMessageRequest(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
  * @private
  * @param img
  * @returns {string}

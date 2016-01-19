@@ -825,7 +825,7 @@ function Clover(configuration) {
      * @param {requestCallback} completionCallback
      */
     this.refundPayment = function (refundRequest, completionCallback) {
-        var callbackPayload = {"request":refundRequest};
+        var callbackPayload = {"request":refundRequest, "response":{}};
         var txnName = 'refund';
 
         var me = this;
@@ -834,16 +834,14 @@ function Clover(configuration) {
         // that do not visit ALL the callback.
         var allCallBacks = [];
 
-        // TODO:  Remove in future version?
+        // TODO:  Remove in future version, CLOVER-17724
+        // This information will be in the finish_* messages returned.
         var refundResponseCB = function(message) {
             if(completionCallback) {
-                callbackPayload.response = {};
                 var payload = JSON.parse(message.payload);
-                callbackPayload.response.orderId = payload.orderId;
-                callbackPayload.response.paymentId = payload.paymentId;
-                callbackPayload.response.code = payload.code;
-                if (payload.refund) callbackPayload.response.refund = JSON.parse(payload.refund);
-                completionCallback(null, callbackPayload);
+
+                callbackPayload.response.message = payload['message'];
+                callbackPayload.response.reason = payload['reason'];
             }
         }
         this.device.once(LanMethod.REFUND_RESPONSE,refundResponseCB);
@@ -855,9 +853,8 @@ function Clover(configuration) {
             if(completionCallback) {
                 var payload = JSON.parse(message.payload);
                 var txnInfo = JSON.parse(payload[txnName]);//refund
-                callbackPayload.response = {};
                 callbackPayload.response[txnName] = txnInfo;
-                callbackPayload.response.code = txnInfo.result;
+                callbackPayload.response.code = "OK"; // finish ok
 
                 completionCallback(null, callbackPayload);
             }
@@ -870,7 +867,6 @@ function Clover(configuration) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
             if(completionCallback) {
-                callbackPayload.response = {};
                 callbackPayload.response.code = "CANCEL";
 
                 var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
@@ -1057,6 +1053,33 @@ function Clover(configuration) {
     }
 
 
+    /**
+     *
+     * @param {requestCallback} completionCallback
+     */
+    this.getLastMessage = function(completionCallback) {
+        var callbackPayload = {"request":{}};
+
+        var lastMessageCB = function (message) {
+            var payload = JSON.parse(message.payload);
+            callbackPayload["response"] = payload;
+
+            completionCallback(null, callbackPayload);
+        }.bind(this);
+        this.device.once(LanMethod.LAST_MSG_RESPONSE,lastMessageCB);
+
+        try {
+            this.device.sendLastMessageRequest();
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.LAST_MSG_REQUEST,
+                "Failure attempting to get last message sent", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
+    }
+
 
     //////////
 
@@ -1175,10 +1198,12 @@ function getCookie(cname) {
     return "";
 }
 
-Clover.writeConfigurationToCookie = function (configuration) {
+Clover.writeConfigurationToCookie = function (configuration, saveURL) {
     var cvalue = JSON.stringify(configuration);
     var jsonValue = JSON.parse(cvalue);
-    delete jsonValue.deviceURL;
+    if (!saveURL) {
+        delete jsonValue.deviceURL;
+    }
     cvalue = JSON.stringify(jsonValue);
 
     var exdays = 2;
