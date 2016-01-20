@@ -204,6 +204,96 @@
     cloverOAuth.getAccessToken();
   }
 
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  // UI Stuff - Sow the user what is going on
+  function displayUIFeedBack(infoMessage) {
+    var orig = document.getElementById("uiFeedback").innerHTML;
+
+    document.getElementById("uiFeedback").innerHTML = Date() + ": " + infoMessage + "<br/>" + orig;
+  }
+
+  /**
+   * Display a set of devices
+   * @param devicesVX
+   */
+  function displayDevices(devicesVX) {
+    var devices = null;
+    deviceBySerial = {};
+    // depending on the version of the call, the devices might be in a slightly different format.
+    // We would need to determine what devices were capable of doing what we want.  This means we
+    // need to know if the device has the websocket connection enabled.  The best way to do this is
+    // to make a different REST call, but we could filter the devices here.
+    if (devicesVX.hasOwnProperty('devices')) {
+      devices = devicesVX.devices;
+    }
+    else if (devicesVX.hasOwnProperty('elements')) {
+      devices = devicesVX.elements;
+    }
+    var out = "";
+    var i;
+    for (i = 0; i < devices.length; i++) {
+      var style = 'device_enabled';
+      if (devices[i].model != "Clover_C100") {
+        out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
+            '<input type="radio" name="device" value="' +
+            devices[i].serial + '"  ' +
+            ' onclick="deviceClicked(this)"/>' +
+            devices[i].model + " " + devices[i].serial +
+            '</div><br>';
+      }
+      deviceBySerial[devices[i].serial] = devices[i];
+    }
+    document.getElementById("id01").innerHTML = out;
+  }
+
+  // Show a signature so the user can ask for a credit card and verify it.
+  function displaySignature(signature) {
+    if(signature) {
+      var canvas = document.getElementById("myCanvas");
+      // reset the canvas
+      canvas.width = canvas.width;
+      var ctx = canvas.getContext("2d");
+
+      for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
+        var stroke = signature.strokes[strokeIndex];
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
+          ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
+          ctx.stroke();
+        }
+      }
+    }
+    enable("signaturePane");
+    displayUIFeedBack("Verify or reject the signature");
+  }
+
+
+
+  //*********************************************
+  // Dump a message to the message pane
+  //*********************************************
+  function displayRawMessage(message) {
+    var messageText = "<table>";
+    messageText += "<tr><td>type:</td><td>" + message.type + "</td></tr>";
+    messageText += "<tr><td>method:</td><td>" + message.method + "</td></tr>";
+    messageText += "<tr><td>payload:</td><td>" + message.payload + "</td></tr>";
+    messageText += "</table>";
+
+    document.getElementById("message_display").innerHTML = messageText;
+
+    console.log(JSON.stringify(message));
+  }
+
+
   if (!cloverOAuth.hasToken()) {
     // Get user to enter clientId and domain
   }
@@ -488,38 +578,6 @@
       );
     }
 
-    // UI Stuff
-    function enable(id) {
-      document.getElementById(id).style.display = 'block';
-    }
-
-    // UI Stuff
-    function disable(id) {
-      document.getElementById(id).style.display = 'none';
-    }
-
-    // UI Stuff - Sow the user what is going on
-    function displayUIFeedBack(infoMessage) {
-      var orig = document.getElementById("uiFeedback").innerHTML;
-
-      document.getElementById("uiFeedback").innerHTML = Date() + ": " + infoMessage + "<br/>" + orig;
-    }
-
-    //*********************************************
-    // Dump a message to the message pane
-    //*********************************************
-    function displayRawMessage(message) {
-      var messageText = "<table>";
-      messageText += "<tr><td>type:</td><td>" + message.type + "</td></tr>";
-      messageText += "<tr><td>method:</td><td>" + message.method + "</td></tr>";
-      messageText += "<tr><td>payload:</td><td>" + message.payload + "</td></tr>";
-      messageText += "</table>";
-
-      document.getElementById("message_display").innerHTML = messageText;
-
-      console.log(JSON.stringify(message));
-    }
-
     // Show the payment details
     function displayPaymentDetails(payment) {
       var messageText = "<table>";
@@ -532,61 +590,6 @@
       messageText += "</table>";
 
       document.getElementById("message_display").innerHTML = messageText;
-    }
-
-    /**
-     * Display a set of devices
-     * @param devicesVX
-     */
-    function displayDevices(devicesVX) {
-      var devices = null;
-      deviceBySerial = {};
-      // depending on the version of the call, the devices might be in a slightly different format.
-      // We would need to determine what devices were capable of doing what we want.  This means we
-      // need to know if the device has the websocket connection enabled.  The best way to do this is
-      // to make a different REST call, but we could filter the devices here.
-      if (devicesVX.hasOwnProperty('devices')) {
-        devices = devicesVX.devices;
-      }
-      else if (devicesVX.hasOwnProperty('elements')) {
-        devices = devicesVX.elements;
-      }
-      var out = "";
-      var i;
-      for (i = 0; i < devices.length; i++) {
-        var style = 'device_enabled';
-        if (devices[i].model != "Clover_C100") {
-          out += "<div id='" + devices[i].serial + "_status' class='" + style + "'>" +
-              '<input type="radio" name="device" value="' +
-              devices[i].serial + '"  ' +
-              ' onclick="deviceClicked(this)"/>' +
-              devices[i].model + " " + devices[i].serial +
-              '</div><br>';
-        }
-        deviceBySerial[devices[i].serial] = devices[i];
-      }
-      document.getElementById("id01").innerHTML = out;
-    }
-
-    // Show a signature so the user can ask for a credit card and verify it.
-    function displaySignature(signature) {
-      if(signature) {
-        var canvas = document.getElementById("myCanvas");
-        // reset the canvas
-        canvas.width = canvas.width;
-        var ctx = canvas.getContext("2d");
-
-        for (var strokeIndex = 0; strokeIndex < signature.strokes.length; strokeIndex++) {
-          var stroke = signature.strokes[strokeIndex];
-          ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-          for (var pointIndex = 1; pointIndex < stroke.points.length; pointIndex++) {
-            ctx.lineTo(stroke.points[pointIndex].x, stroke.points[pointIndex].y);
-            ctx.stroke();
-          }
-        }
-      }
-      enable("signaturePane");
-      displayUIFeedBack("Verify or reject the signature");
     }
 
     function deviceClicked(element) {
