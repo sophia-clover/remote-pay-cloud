@@ -44,6 +44,12 @@ function XmlHttpSupport() {
         this.setXmlHttpCallback(this.xmlhttp, onDataLoaded, onError);
 
         this.xmlhttp.open(method, endpoint, true);
+        // Firefox bug
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=433859#c4
+        // ugh.  About time to go ahead and include a library
+        if (navigator.userAgent.search("Firefox")) {
+            this.xmlhttp.setRequestHeader("Accept", "*/*");
+        }
         this.xmlhttp.send();
     }
 
