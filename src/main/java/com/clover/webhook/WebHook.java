@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Simple example of receiving web hook messages from Clover.
@@ -156,16 +157,19 @@ public class WebHook extends javax.servlet.http.HttpServlet {
     public void handleEvent(WebHookMessage webHookEvent) {
       // Print out some info from the static type.
       System.out.println("The application that sent the event was: '" + webHookEvent.getAppId() + "'");
-      Iterator<String> keys = webHookEvent.getMerchants().keySet().iterator();
-      while (keys.hasNext()) {
-        String merchantId = keys.next();
-        List<WebHookMessage.Update> updates = webHookEvent.getMerchants().get(merchantId);
-        System.out.println("  updates for merchant: '" + merchantId + "'");
-        for (int updateIndex = 0; updateIndex < updates.size(); updateIndex++) {
-          WebHookMessage.Update update = updates.get(updateIndex);
-          System.out.println("    update[" + updateIndex + "].objectId: '" + update.getObjectId() + "'");
-          System.out.println("    update[" + updateIndex + "].type: '" + update.getType() + "'");
-          System.out.println("    update[" + updateIndex + "].ts: '" + update.getTs() + "'");
+      Map<String, List<WebHookMessage.Update>> merchants = webHookEvent.getMerchants();
+      if (merchants != null) {
+        Iterator<String> keys = merchants.keySet().iterator();
+        while (keys.hasNext()) {
+          String merchantId = keys.next();
+          List<WebHookMessage.Update> updates = webHookEvent.getMerchants().get(merchantId);
+          System.out.println("  updates for merchant: '" + merchantId + "'");
+          for (int updateIndex = 0; updateIndex < updates.size(); updateIndex++) {
+            WebHookMessage.Update update = updates.get(updateIndex);
+            System.out.println("    update[" + updateIndex + "].objectId: '" + update.getObjectId() + "'");
+            System.out.println("    update[" + updateIndex + "].type: '" + update.getType() + "'");
+            System.out.println("    update[" + updateIndex + "].ts: '" + update.getTs() + "'");
+          }
         }
       }
     }
