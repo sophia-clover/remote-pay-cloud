@@ -36,6 +36,7 @@ public class WebHook extends javax.servlet.http.HttpServlet {
    */
   public WebHook() {
     addListener(new DefaultWebHookMessageHandler());
+    addListener(new VerificationCodeWebHookMessageHandler());
   }
 
   /**
