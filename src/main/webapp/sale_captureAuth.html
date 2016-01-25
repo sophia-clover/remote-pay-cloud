@@ -65,7 +65,6 @@
   function doCapture() {
     if(saleResult && saleResult.code == "AUTH") {
       var capturePreAuthRequest = {
-        "orderId" : saleResult.payment.order.id,
         "paymentId" : saleResult.payment.id,
         "amount" : 11000,
         "tipAmount" : 1100

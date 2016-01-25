@@ -82,7 +82,7 @@ var exampleConfigurations =
         "deviceURL" : "ws://192.168.1.49:14285"
     }
 };
-var defaultConfiguration = exampleConfigurations.dev1_C021UQ52340078;
+var defaultConfiguration = exampleConfigurations.localhost_C030UQ50550081;
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,

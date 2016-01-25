@@ -1089,9 +1089,6 @@ function Clover(configuration) {
         var callbackPayload = {"request":request};
 
         // Validate request has contents
-        if(!request.hasOwnProperty("orderId")) {
-            completionCallback(new CloverError(CloverError.INVALID_DATA, "missing orderId"), null);
-        }
         if(!request.hasOwnProperty("paymentId")) {
             completionCallback(new CloverError(CloverError.INVALID_DATA, "missing paymentId"), null);
         }
@@ -1326,7 +1323,6 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
 
 /**
  * @typedef {Object} CapturePreAuthRequest
- * @property {string} orderId - the id of the order with the payment to capture
  * @property {string} paymentId - the id of the payment to capture
  * @property {number} amount - the final amount ofthe payment less any included tip
  * @property {number} [tipAmount] - the amount of the tip.
