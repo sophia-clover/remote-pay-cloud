@@ -1,0 +1,109 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
+  <script src="src/cloverCloud-min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body onbeforeunload="clover.close()">
+
+<p>
+  This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
+  Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
+  previously obtained.  It makes a connection to a device, and authorizes a $100.00 charge.<br/>
+
+  Once the authorization is complete, it captures the authorization by adjusting the amount to $110.00
+  with a $11.00 tip.
+
+  The result of the transaction is displayed below.
+  <br/>
+</p>
+
+<button onclick="clover.sendCancel(resultCallback)">Send a Cancel</button>
+<button onclick="doCapture()" id="capturePreAuthID" style="display:none">Adjust the auth with a $1 tip</button>
+
+<!-- this is a place to talk about what is happening while the example is being run -->
+<div id="uiFeedback" style="height: 400px;">
+</div>
+
+<script>
+
+  // Create the Clover object to communicate with the device
+  var clover = new Clover();
+
+  // Start communication
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(doAuth);
+
+  // A place to hold on to the sale result
+  var saleResult=null;
+
+  // This will be called when the device is ready
+  function doAuth(error) {
+    if(error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      var mySale = {
+        "amount": 10000 // null tipAmount makes auth - right?
+      }
+
+      // Call the device to take payment, after the payment is complete, call the
+      // 'mySaleResult' function
+      clover.auth(mySale, resultCallback);
+    }
+  }
+
+  function doCapture() {
+    if(saleResult && saleResult.code == "AUTH") {
+      var capturePreAuthRequest = {
+        "orderId" : saleResult.payment.order.id,
+        "paymentId" : saleResult.payment.id,
+        "amount" : 11000,
+        "tipAmount" : 1100
+      }
+      clover.capturePreAuth(capturePreAuthRequest, resultCallback);
+      disable("capturePreAuthID");
+    }
+  }
+
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function resultCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error) {
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    } else if (resultData.code == "AUTH"){
+      saleResult = resultData;
+      enable("capturePreAuthID");
+    }
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+
+  /////////////////////////////////////////////////////
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

@@ -1080,6 +1080,43 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     *
+     * @param {CapturePreAuthRequest} request
+     * @param completionCallback
+     */
+    this.capturePreAuth = function(request, completionCallback) {
+        var callbackPayload = {"request":request};
+
+        // Validate request has contents
+        if(!request.hasOwnProperty("orderId")) {
+            completionCallback(new CloverError(CloverError.INVALID_DATA, "missing orderId"), null);
+        }
+        if(!request.hasOwnProperty("paymentId")) {
+            completionCallback(new CloverError(CloverError.INVALID_DATA, "missing paymentId"), null);
+        }
+        if(!request.hasOwnProperty("amount")) {
+            completionCallback(new CloverError(CloverError.INVALID_DATA, "missing amount"), null);
+        }
+
+        var capturePreAuthCB = function (message) {
+            var payload = JSON.parse(message.payload);
+            callbackPayload["response"] = payload;
+            completionCallback(null, callbackPayload);
+        }.bind(this);
+        this.device.once(LanMethod.CAPTURE_PREAUTH_RESPONSE,capturePreAuthCB);
+
+        try {
+            this.device.sendCapturePreAuth(request.orderId,request.paymentId,request.amount,request["tipAmount"]);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.LAST_MSG_REQUEST,
+                "Failure attempting to get last message sent", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
+    }
 
     //////////
 
@@ -1285,6 +1322,14 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {number} [amount] - the amount to refund.  If not included, the full payment is refunded.  The amount
  *  cannot exceed the original payment, and additional constraints apply to this (EX: if a partial refund
  *  has already been performed then the amount canot exceed the remaining payment amount).
+ */
+
+/**
+ * @typedef {Object} CapturePreAuthRequest
+ * @property {string} orderId - the id of the order with the payment to capture
+ * @property {string} paymentId - the id of the payment to capture
+ * @property {number} amount - the final amount ofthe payment less any included tip
+ * @property {number} [tipAmount] - the amount of the tip.
  */
 
 /**
