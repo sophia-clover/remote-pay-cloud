@@ -633,6 +633,27 @@ WebSocketDevice.prototype.sendVoidPayment = function(payment, voidReason, ackId)
 }
 
 /**
+ * Vault a card
+ *
+ * @param {int} cardEntryMethods - card entry methods, bitwise OR of {@link CardEntryMethods} constants
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendVaultCard = function(cardEntryMethods, ackId) {
+    var payload = {};
+    payload.cardEntryMethods = cardEntryMethods;
+
+    var lanMessage = this.messageBuilder.buildVaultCard(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
  * Refund a payment, partial or complete
  *
  * @param {string} orderId - the id for the order the refund is against
