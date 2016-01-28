@@ -601,6 +601,9 @@ function Clover(configuration) {
         if (txnInfo.hasOwnProperty("employeeId")) {
             payIntent.employeeId = txnInfo.employeeId;
         }
+        if (txnInfo.hasOwnProperty("vaultedCard")) {
+            payIntent.vaultedCard = txnInfo.vaultedCard;
+        }
         if (txnInfo.hasOwnProperty("externalPaymentId")) {
             if(txnInfo.externalPaymentId.length > 32) {
                 var error = new CloverError(CloverError.INVALID_DATA, "id is invalid - '" + txnInfo.externalPaymentId + "'");
@@ -704,7 +707,11 @@ function Clover(configuration) {
             callbackPayload.signature = signature;
             callbackPayload.code = txnInfo.result;
 
-            txnRequestCallback(null, callbackPayload);
+            try {
+                txnRequestCallback(null, callbackPayload);
+            } catch (err) {
+                console.log(err);
+            }
             me.device.sendShowWelcomeScreen();
         };
         this.device.once(LanMethod.FINISH_OK,finishOKCB);
@@ -720,7 +727,11 @@ function Clover(configuration) {
             callbackPayload.code = "CANCEL";
 
             var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
-            txnRequestCallback(error, callbackPayload);
+            try {
+                txnRequestCallback(error, callbackPayload);
+            } catch (err) {
+                console.log(err);
+            }
             me.device.sendShowWelcomeScreen();
         };
         this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
@@ -775,9 +786,13 @@ function Clover(configuration) {
                     "messageReceived": true
                 };
                 // Call the callback with the data
+                try {
                 if(completionCallback) completionCallback(null, callbackPayload);
                 // Show the welcome screen after the acknowledgement.
                 // This might be removed later
+                } catch (err) {
+                    console.log(err);
+                }
                 me.device.sendShowWelcomeScreen();
             }
         };
@@ -851,13 +866,17 @@ function Clover(configuration) {
         var finishOKCB = function (message) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
-            if(completionCallback) {
-                var payload = JSON.parse(message.payload);
-                var txnInfo = JSON.parse(payload[txnName]);//refund
-                callbackPayload.response[txnName] = txnInfo;
-                callbackPayload.response.code = "OK"; // finish ok
+            try {
+                if (completionCallback) {
+                    var payload = JSON.parse(message.payload);
+                    var txnInfo = JSON.parse(payload[txnName]);//refund
+                    callbackPayload.response[txnName] = txnInfo;
+                    callbackPayload.response.code = "OK"; // finish ok
 
-                completionCallback(null, callbackPayload);
+                    completionCallback(null, callbackPayload);
+                }
+            } catch (err) {
+                console.log(err);
             }
             me.device.sendShowWelcomeScreen();
         };
@@ -867,11 +886,15 @@ function Clover(configuration) {
         var finishCancelCB = function (message) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
-            if(completionCallback) {
-                callbackPayload.response.code = "CANCEL";
+            try {
+                if (completionCallback) {
+                    callbackPayload.response.code = "CANCEL";
 
-                var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
-                completionCallback(error, callbackPayload);
+                    var error = new CloverError(CloverError.CANCELED, "Transaction canceled");
+                    completionCallback(error, callbackPayload);
+                }
+            } catch (err) {
+                console.log(err);
             }
             me.device.sendShowWelcomeScreen();
         };
@@ -923,7 +946,11 @@ function Clover(configuration) {
         var callbackPayload = {"request":printRequest};
 
         var finishCancelCB = function (message) {
-            completionCallback(null, callbackPayload);
+            try {
+                completionCallback(null, callbackPayload);
+            } catch (err) {
+                console.log(err);
+            }
             // We could let them do this
             this.device.sendShowWelcomeScreen();
         }.bind(this);
@@ -1074,6 +1101,34 @@ function Clover(configuration) {
         } catch (error) {
             var cloverError = new CloverError(LanMethod.LAST_MSG_REQUEST,
                 "Failure attempting to get last message sent", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
+    }
+
+    /**
+     * Capture a card for future usage in a sale or auth request.
+     *
+     * @param {requestCallback} completionCallback
+     */
+    this.vaultCard = function (cardEntryMethods, completionCallback) {
+        var callbackPayload = {"request": {"cardEntryMethods": cardEntryMethods}};
+
+        var vaultCardCB = function (message) {
+            var payload = JSON.parse(message.payload);
+            callbackPayload["response"] = payload;
+
+            completionCallback(null, callbackPayload);
+        }.bind(this);
+        this.device.once(LanMethod.VAULT_CARD_RESPONSE, vaultCardCB);
+
+        try {
+            this.device.sendVaultCard(cardEntryMethods);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.VAULT_CARD,
+                "Failure attempting to capture card", error);
             completionCallback(cloverError, {
                 "code": "ERROR",
                 "request": callbackPayload

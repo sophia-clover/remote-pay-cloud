@@ -87,6 +87,17 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
+     * Builds a vault card message
+     *
+     * @param {json} payload - card entry types allowed
+     * @returns {json} the constructed message
+     */
+    this.buildVaultCard = function (payload) {
+        payload.method = LanMethod.VAULT_CARD;
+        return this.buildRemoteMessage(LanMethod.VAULT_CARD, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a refund payment message
      *
      * @param {json} payload - the orderid and paymentid with optional amount
@@ -339,6 +350,10 @@ LanMethod.REFUND_PRINT_PAYMENT = "REFUND_PRINT_PAYMENT";
 LanMethod.LAST_MSG_RESPONSE = "LAST_MSG_RESPONSE";
 /** Message type to get the last message sent/received to/from the device */
 LanMethod.LAST_MSG_REQUEST = "LAST_MSG_REQUEST";
+/** Message type to Request to capture card info */
+LanMethod.VAULT_CARD = "VAULT_CARD";
+/** Message type to respond to capture card info request */
+LanMethod.VAULT_CARD_RESPONSE = "VAULT_CARD_RESPONSE";
 
 /**
  * The shutdown method type
