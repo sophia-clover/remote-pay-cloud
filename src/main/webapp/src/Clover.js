@@ -1464,7 +1464,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * <p>
  *     Possible configurations:<br/>
  *     <ol>
- *          <li>deviceURL (Only valid when device is in Local Pay Display app configuration)</li>
+ *          <li>deviceURL</li>
  *          <li>oauthToken, domain, merchantId, deviceSerialId</li>
  *          <li>clientId, domain, merchantId, deviceId (Requires log in to Clover server)</li>
  *          <li>clientId, domain, merchantId, deviceSerialId (Requires log in to Clover server)</li>
