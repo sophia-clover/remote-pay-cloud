@@ -7,7 +7,7 @@
  *
  * @constructor
  */
-function WebSocketDevice() {
+function WebSocketDevice(allowOvertakeConnection) {
     // This is the websocket connection
     this.deviceSocket = null;
     // The id for the ping interval timer so we can stop it
@@ -26,6 +26,7 @@ function WebSocketDevice() {
     this.deadConnectionErrorThreshold = this.deadConnectionWarnThreshold * 2;
     // How long should it be before we shut down on a dead connection
     this.deadConnectionShutdownThreshold = this.deadConnectionErrorThreshold * 2;
+    this.allowOvertakeConnection = allowOvertakeConnection;
 
     // Flag to indicate if we attempt reconnects
     this.reconnect = true;
@@ -44,6 +45,19 @@ function WebSocketDevice() {
      * @param {url} ws_address - the web service url to connect to to communicate with the clover device
      */
     this.contactDevice = function(ws_address) {
+        if(allowOvertakeConnection) {
+            ws_address = ws_address + "&forceConnect=true";
+        } else {
+            ws_address = ws_address + "&forceConnect=false";
+        }
+        this.reContactDevice(ws_address)
+    }
+    /**
+     * Initiates contact with the device.
+     *
+     * @param {url} ws_address - the web service url to connect to to communicate with the clover device
+     */
+    this.reContactDevice = function(ws_address) {
         var me = this;
         // Reset the timestamp values
         this.pongReceivedMillis = new Date().getTime();
@@ -290,7 +304,7 @@ function WebSocketDevice() {
         }
         this.reconnecting = true;
         console.log("attempting reconnect...");
-        this.contactDevice(this.deviceSocket.url);
+        this.reContactDevice(this.deviceSocket.url);
     }
 
     /**
