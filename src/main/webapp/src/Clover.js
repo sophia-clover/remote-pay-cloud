@@ -5,8 +5,14 @@
  * @constructor
  */
 function Clover(configuration) {
+    this.configuration = configuration;
+    if(!this.configuration) {
+        this.configuration = {};
+    }
+    this.configuration.allowOvertakeConnection =
+        Boolean(this.configuration["allowOvertakeConnection"]);
 
-    this.device = new WebSocketDevice();
+    this.device = new WebSocketDevice(this.configuration.allowOvertakeConnection);
     this.device.messageBuilder = new RemoteMessageBuilder("com.clover.remote.protocol.lan");
     // Echo all messages sent and received.
     this.device.echoAllMessages = false;
@@ -14,11 +20,6 @@ function Clover(configuration) {
     this.numberOfDiscoveryMessagesToSend = 10;
     // This is used to augment the 'isOpen' functionality.
     this.discoveryResponseReceived = false;
-
-    this.configuration = configuration;
-    if(!this.configuration) {
-        this.configuration = {};
-    }
 
     /*
     Set up a value to help the user of the Clover object know when it is available.

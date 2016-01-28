@@ -129,53 +129,56 @@ public class DetailedWebHookMessageHandler implements WebHookMessageHandler {
    */
   public void handleEvent(WebHookMessage webHookEvent) {
     // Iterate across merchants
-    Iterator<String> merchantIds = webHookEvent.getMerchants().keySet().iterator();
+    Map<String, List<WebHookMessage.Update>> merchants = webHookEvent.getMerchants();
+    if (merchants != null) {
+      Iterator<String> merchantIds = merchants.keySet().iterator();
 
-    while (merchantIds.hasNext()) {
-      // Make a copy of the template variable map so we can add to it without mucking with the template.
-      Map<String, String> variableMap = new HashMap<String, String>(templateVariableMap);
-      // Grab the merchantId
-      String merchantId = merchantIds.next();
+      while (merchantIds.hasNext()) {
+        // Make a copy of the template variable map so we can add to it without mucking with the template.
+        Map<String, String> variableMap = new HashMap<String, String>(templateVariableMap);
+        // Grab the merchantId
+        String merchantId = merchantIds.next();
 
-      // Try to get a access token for this merchant.  If we cannot get it, then we will not be able to make
-      // rest calls
-      String accessToken = accessTokenService.getAccessToken(merchantId);
-      if (null != accessToken) {
-        // Put the Access Token into the map for later replacement
-        variableMap.put(ACCESS_TKN_KEY, accessToken);
+        // Try to get a access token for this merchant.  If we cannot get it, then we will not be able to make
+        // rest calls
+        String accessToken = accessTokenService.getAccessToken(merchantId);
+        if (null != accessToken) {
+          // Put the Access Token into the map for later replacement
+          variableMap.put(ACCESS_TKN_KEY, accessToken);
 
-        variableMap.put(MERCHANT_KEY, merchantId);
-        // Get the merchant collection of updates
-        List<WebHookMessage.Update> updates = webHookEvent.getMerchants().get(merchantId);
-        for (int updateIndex = 0; updateIndex < updates.size(); updateIndex++) {
-          WebHookMessage.Update update = updates.get(updateIndex);
-          // Split the object spec int othe object type and the object id
-          String[] objectSpec = update.getObjectId().split(":");
-          // Get the type of the object
-          WebHookMessage.ObjectType objectType = WebHookMessage.ObjectType.valueOf(objectSpec[OBJECT_TYPE]);
-          // Get the object id
-          String objectId = objectSpec[OBJECT_ID];
-          // Get the replacement key for the object type and put it into the map
-          String objectTypeKey = objectTypeKeys.get(objectType);
-          // Put the object id int othe replacement map
-          variableMap.put(objectTypeKey, objectId);
-          // Grab the correct rest url based on the object type
-          String urlTemplate = urlTemplates.get(objectType);
-          if (null != urlTemplate) {
-            // If we have the replacement url (we should), use the replacement map to set the values on it
-            // and generate a concrete populated url.
-            String restUrl = setVariables(urlTemplate, variableMap);
-            // Call the rest service.
-            try {
-              String detailedData = callRest(restUrl);
-              handleDetailedData(  detailedData );
-            } catch (IOException e) {
-              e.printStackTrace();
+          variableMap.put(MERCHANT_KEY, merchantId);
+          // Get the merchant collection of updates
+          List<WebHookMessage.Update> updates = webHookEvent.getMerchants().get(merchantId);
+          for (int updateIndex = 0; updateIndex < updates.size(); updateIndex++) {
+            WebHookMessage.Update update = updates.get(updateIndex);
+            // Split the object spec int othe object type and the object id
+            String[] objectSpec = update.getObjectId().split(":");
+            // Get the type of the object
+            WebHookMessage.ObjectType objectType = WebHookMessage.ObjectType.valueOf(objectSpec[OBJECT_TYPE]);
+            // Get the object id
+            String objectId = objectSpec[OBJECT_ID];
+            // Get the replacement key for the object type and put it into the map
+            String objectTypeKey = objectTypeKeys.get(objectType);
+            // Put the object id int othe replacement map
+            variableMap.put(objectTypeKey, objectId);
+            // Grab the correct rest url based on the object type
+            String urlTemplate = urlTemplates.get(objectType);
+            if (null != urlTemplate) {
+              // If we have the replacement url (we should), use the replacement map to set the values on it
+              // and generate a concrete populated url.
+              String restUrl = setVariables(urlTemplate, variableMap);
+              // Call the rest service.
+              try {
+                String detailedData = callRest(restUrl);
+                handleDetailedData(detailedData);
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
             }
           }
+        } else {
+          System.out.println("No access token found for merchant id = " + merchantId);
         }
-      } else {
-        System.out.println("No access token found for merchant id = " + merchantId);
       }
     }
   }
