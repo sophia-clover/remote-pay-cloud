@@ -23,7 +23,7 @@ var exampleConfigurations =
         "deviceSerialId" : "C030UQ50550081"
     },
     "localhost_C031UQ52340065" : {
-        "clientId" : "930REZDGX0N8T",
+        "clientId" : "3RPTN642FHXTC",
         "oauthToken" : "98b9d13f-4339-86d3-7dae-9a16d540ee81",
         "domain" : "http://192.168.1.123:9001/",
         "merchantId" : "BBFF8NBCXEMDT",
@@ -75,7 +75,7 @@ var exampleConfigurations =
         "deviceURL" : "ws://192.168.1.49:14285"
     }
 };
-var defaultConfiguration = exampleConfigurations.sandbox_C030UQ53460719;
+var defaultConfiguration = exampleConfigurations.localhost_C031UQ52340065;
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,
