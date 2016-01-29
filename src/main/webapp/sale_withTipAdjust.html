@@ -60,12 +60,12 @@
 
       // Call the device to take payment, after the payment is complete, call the
       // 'mySaleResult' function
-      clover.sale(mySale, resultCallback);
+      clover.auth(mySale, resultCallback);
     }
   }
 
   function doTipAdjust() {
-    if(saleResult && saleResult.code == "AUTH") {
+    if(saleResult.code = "SUCCESS" && canTipAdjust(saleResult.payment) ) {
       var tipAdjustment = {
         "orderId" : saleResult.payment.order.id,
         "paymentId" : saleResult.payment.id,
@@ -74,6 +74,10 @@
       clover.tipAdjust(tipAdjustment, resultCallback);
       disable("adjustTipID");
     }
+  }
+
+  function canTipAdjust(payment) {
+    return (payment.result == "SUCCESS" && payment.cardTransaction.type == "PREAUTH");
   }
 
   /**
@@ -86,7 +90,7 @@
     var resultDisplay = "";
     if(error) {
       resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
-    } else if (resultData.code == "AUTH"){
+    } else if(resultData.code = "SUCCESS" && canTipAdjust(resultData.payment)) {
       saleResult = resultData;
       enable("adjustTipID");
     }

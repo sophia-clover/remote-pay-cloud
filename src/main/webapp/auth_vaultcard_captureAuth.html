@@ -17,17 +17,19 @@
 <p>
   This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
   Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
-  previously obtained.  It makes a connection to a device, and preauthorizes a $100.00 charge.<br/>
+  previously obtained.  It makes a connection to a device and vaults a card.
 
-  Once the preauthorization is complete, it captures the preauthorization by adjusting the amount to $110.00
+  Once the card is vaulted, you select a button to authorize a $100.00 charge.<br/>
+
+  Once the authorization is complete, you select a button to capture the authorization by adjusting the amount to $110.00
   with a $11.00 tip.
 
-  The result of the transaction is displayed below.
+  The results of the transactions are displayed below.
   <br/>
 </p>
 
-<button onclick="clover.sendCancel(resultCallback)">Send a Cancel</button>
-<button onclick="doCapture()" id="capturePreAuthID" style="display:none">Adjust to $110 with $11 tip</button>
+<button onclick="doAuth(vaultedCard)" id="doAuthID" style="display:none">Do a auth with the vaulted card</button>
+<button onclick="doCapture()" id="capturePreAuthID" style="display:none">Adjust the auth to $110.00 with a $11.00 tip</button>
 
 <!-- this is a place to talk about what is happening while the example is being run -->
 <div id="uiFeedback" style="height: 400px;">
@@ -40,29 +42,65 @@
 
   // Start communication
   // Pass the function that should be called when the device is ready.
-  clover.initDeviceConnection(doPreAuth);
+  clover.initDeviceConnection(vaultACard);
 
   // A place to hold on to the sale result
   var saleResult=null;
+  var vaultedCard = null;
 
   // This will be called when the device is ready
-  function doPreAuth(error) {
+  function vaultACard(error) {
     if(error) {
       var resultDisplay = "";
       resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
-      var mySale = {
-        "amount": 10000,
-        "isPreAuth": true
-      }
-      // Do the pre authorization
-      clover.auth(mySale, resultCallback);
+      // Call the device to take payment, after the payment is complete, call the
+      // 'mySaleResult' function
+      clover.vaultCard(CardEntryMethods.ALL, vaultCardCallback);
     }
+  }
+  function vaultCardCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error) {
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    } else {
+
+      vaultedCard = JSON.parse(resultData.response.card);
+      enable("doAuthID");
+    }
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+
+  function doAuth(vaultedCard) {
+    var mySale = {
+      "amount": 12345, //the amount of a sale, including tax
+      "vaultedCard": vaultedCard,
+      "tipAmount": 123 // - the amount of a tip.  Added to the amount for the total.
+    }
+
+    // Call the device to take payment, after the payment is complete, call the
+    // 'mySaleResult' function
+    clover.sale(mySale, authCallback);
+    disable("doAuthID");
+  }
+  function authCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error) {
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    } //else if (resultData.code == "AUTH"){
+      saleResult = resultData;
+      enable("capturePreAuthID");
+    // }
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
   }
 
   function doCapture() {
-    if(saleResult && saleResult.code == "AUTH") {
+    if(saleResult /*&& saleResult.code == "AUTH"*/) {
       var capturePreAuthRequest = {
         "paymentId" : saleResult.payment.id,
         "amount" : 11000,
