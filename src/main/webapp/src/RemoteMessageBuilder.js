@@ -109,6 +109,17 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
+     * Builds a capture preauth message
+     *
+     * @param {json} payload - the orderid, paymentid, amount, with optional tipAmount
+     * @returns {json} the constructed message
+     */
+    this.buildCapturePreAuth = function (payload) {
+        payload.method = LanMethod.CAPTURE_PREAUTH;
+        return this.buildRemoteMessage(LanMethod.CAPTURE_PREAUTH, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a tip adjust payment message
      *
      * @param {json} payload - the orderid and paymentid with amount
@@ -350,6 +361,10 @@ LanMethod.REFUND_PRINT_PAYMENT = "REFUND_PRINT_PAYMENT";
 LanMethod.LAST_MSG_RESPONSE = "LAST_MSG_RESPONSE";
 /** Message type to get the last message sent/received to/from the device */
 LanMethod.LAST_MSG_REQUEST = "LAST_MSG_REQUEST";
+/** Message type to capture a pre auth payment */
+LanMethod.CAPTURE_PREAUTH = "CAPTURE_PREAUTH";
+/** Message type returned to capture a pre auth payment */
+LanMethod.CAPTURE_PREAUTH_RESPONSE = "CAPTURE_PREAUTH_RESPONSE";
 /** Message type to Request to capture card info */
 LanMethod.VAULT_CARD = "VAULT_CARD";
 /** Message type to respond to capture card info request */

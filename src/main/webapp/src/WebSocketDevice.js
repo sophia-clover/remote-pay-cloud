@@ -694,6 +694,33 @@ WebSocketDevice.prototype.sendRefund = function(orderId, paymentId, amount, ackI
 }
 
 /**
+ * Capture a preauthorization
+ *
+ * @param {string} orderId - the id for the order the payment was against
+ * @param {string} paymentId - the id for the payment on the order the preauth is against
+ * @param {number} amount - the final amount for the payment, not including the tip
+ * @param {number} [tipAmount] - the tip for the order
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendCapturePreAuth = function(orderId, paymentId, amount, tipAmount, ackId) {
+    var payload = {};
+    payload.orderId = orderId;
+    payload.paymentId = paymentId;
+    if(amount)payload.amount = amount;
+    if(tipAmount)payload.tipAmount = tipAmount;
+
+    var lanMessage = this.messageBuilder.buildCapturePreAuth(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
  * Adjust a payment
  *
  * @param {string} orderId - the id for the order the adjust is against
@@ -941,6 +968,7 @@ WebSocketDevice.prototype.sendLastMessageRequest = function(ackId) {
 
     this.sendMessage(lanMessage);
 }
+
 
 /**
  * @private

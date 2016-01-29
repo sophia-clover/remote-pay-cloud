@@ -69,7 +69,7 @@ function Clover(configuration) {
     this.configuration.remotePrint =
         Boolean(this.configuration.remotePrint);
 
-    this.sale_payIntentTemplate = {
+    this.saleOrAuth_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "PAYMENT",
         "taxAmount": 0, // tax amount is included in the amount
@@ -78,7 +78,7 @@ function Clover(configuration) {
         "remotePrint":  this.configuration.remotePrint
     };
 
-    this.auth_payIntentTemplate = {
+    this.preAuth_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "AUTH",
         "taxAmount": 0, // tax amount is included in the amount
@@ -511,9 +511,13 @@ function Clover(configuration) {
         } else {
             externalPaymentId = CloverID.getNewId();
         }
+        // For a sale, force the tip to be set
+        if (!saleInfo.hasOwnProperty("tipAmount")) {
+            saleInfo["tipAmount"] = 0;
+        }
         saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
-            this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
+            this.internalTx(saleInfo, saleRequestCallback, this.saleOrAuth_payIntentTemplate, "payment");
         }
         return externalPaymentId;
     }
@@ -534,13 +538,20 @@ function Clover(configuration) {
         } else {
             externalPaymentId = CloverID.getNewId();
         }
+        // For a auth, force the tip to null
+        if(saleInfo["tipAmount"]) delete saleInfo.tipAmount;
+        // Default the template to sale/auth
+        var template = this.saleOrAuth_payIntentTemplate;
+        // For a preauth use the correct template
+        if (saleInfo["isPreAuth"]) {
+            template = this.preAuth_payIntentTemplate;
+        }
         saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
-            this.internalTx(saleInfo, saleRequestCallback, this.auth_payIntentTemplate, "payment");
+            this.internalTx(saleInfo, saleRequestCallback, template, "payment");
         }
         return externalPaymentId;
     }
-
 
     /**
      * Refund AKA credit
@@ -581,10 +592,7 @@ function Clover(configuration) {
     this.internalTx = function (txnInfo, txnRequestCallback, template, txnName) {
         // Use a template to start with
         var payIntent = template;
-        // Do verification of parameters
-        if (!txnInfo.hasOwnProperty("tipAmount")) {
-            txnInfo["tipAmount"] = 0;
-        } else if (!isInt(txnInfo.tipAmount)) {
+        if (txnInfo.hasOwnProperty("tipAmount") && !isInt(txnInfo.tipAmount)) {
             txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
                 "if paymentInfo has 'tipAmount', the value must be an integer"));
             return;
@@ -627,7 +635,7 @@ function Clover(configuration) {
             }
         }
         payIntent.amount = txnInfo.amount;
-        payIntent.tipAmount = txnInfo.tipAmount;
+        payIntent.tipAmount = txnInfo["tipAmount"];
 
         // Reserve a reference to this object
         var me = this;
@@ -1071,7 +1079,7 @@ function Clover(configuration) {
 
         var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         try {
-            this.device.sendTipAdjust(tipAdjustRequest.orderId, tipAdjustRequest.paymentId, tipAdjustRequest.tipAmount, uuid);
+            this.device.sendTipAdjust(tipAdjustRequest.orderId, tipAdjustRequest.paymentId, tipAdjustRequest["tipAmount"], uuid);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.TIP_ADJUST,
                 "Failure attempting to send tip adjust", error);
@@ -1136,6 +1144,40 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     *
+     * @param {CapturePreAuthRequest} request
+     * @param completionCallback
+     */
+    this.capturePreAuth = function(request, completionCallback) {
+        var callbackPayload = {"request":request};
+
+        // Validate request has contents
+        if(!request.hasOwnProperty("paymentId")) {
+            completionCallback(new CloverError(CloverError.INVALID_DATA, "missing paymentId"), null);
+        }
+        if(!request.hasOwnProperty("amount")) {
+            completionCallback(new CloverError(CloverError.INVALID_DATA, "missing amount"), null);
+        }
+
+        var capturePreAuthCB = function (message) {
+            var payload = JSON.parse(message.payload);
+            callbackPayload["response"] = payload;
+            completionCallback(null, callbackPayload);
+        }.bind(this);
+        this.device.once(LanMethod.CAPTURE_PREAUTH_RESPONSE,capturePreAuthCB);
+
+        try {
+            this.device.sendCapturePreAuth(request.orderId,request.paymentId,request.amount,request["tipAmount"]);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.LAST_MSG_REQUEST,
+                "Failure attempting to get last message sent", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
+    }
 
     //////////
 
@@ -1313,6 +1355,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  *  This will override the internal object flag autoVerifySignature.
  * @property {string} [requestId] - optional CloverID compatible identifier used for the payment once the transaction
  *  is completed.  See @CloverID
+ * @property {boolean} [isPreAuth] - valid for auth calls.  If set, the payment will be made as a pre authorization.
  */
 
 /**
@@ -1341,6 +1384,13 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {number} [amount] - the amount to refund.  If not included, the full payment is refunded.  The amount
  *  cannot exceed the original payment, and additional constraints apply to this (EX: if a partial refund
  *  has already been performed then the amount canot exceed the remaining payment amount).
+ */
+
+/**
+ * @typedef {Object} CapturePreAuthRequest
+ * @property {string} paymentId - the id of the payment to capture
+ * @property {number} amount - the final amount ofthe payment less any included tip
+ * @property {number} [tipAmount] - the amount of the tip.
  */
 
 /**
@@ -1423,7 +1473,7 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * <p>
  *     Possible configurations:<br/>
  *     <ol>
- *          <li>deviceURL (Only valid when device is in Local Pay Display app configuration)</li>
+ *          <li>deviceURL</li>
  *          <li>oauthToken, domain, merchantId, deviceSerialId</li>
  *          <li>clientId, domain, merchantId, deviceId (Requires log in to Clover server)</li>
  *          <li>clientId, domain, merchantId, deviceSerialId (Requires log in to Clover server)</li>
