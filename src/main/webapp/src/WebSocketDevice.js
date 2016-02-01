@@ -45,10 +45,14 @@ function WebSocketDevice(allowOvertakeConnection) {
      * @param {url} ws_address - the web service url to connect to to communicate with the clover device
      */
     this.contactDevice = function(ws_address) {
+        var connect = "?";
+        if(ws_address.indexOf("?") > -1){
+            connect = "&";
+        }
         if(allowOvertakeConnection) {
-            ws_address = ws_address + "?forceConnect=true";
+            ws_address = ws_address + connect + "forceConnect=true";
         } else {
-            ws_address = ws_address + "?forceConnect=false";
+            ws_address = ws_address + connect + "forceConnect=false";
         }
         this.reContactDevice(ws_address)
     }
