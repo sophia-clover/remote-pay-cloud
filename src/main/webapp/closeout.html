@@ -1,0 +1,75 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+    <!-- following for testing only -->
+   <script src="testConfigBase.js"></script>
+
+  <script src="src/xmlHttpSupport.js"></script>
+  <script src="src/CardEntryMethods.js"></script>
+  <script src="src/CloverOAuth.js"></script>
+  <script src="src/CloverError.js"></script>
+  <script src="src/Clover.js"></script>
+  <script src="src/WebSocketDevice.js"></script>
+  <script src="src/Endpoints.js"></script>
+  <script src="src/CloverID.js"></script>
+  <script src="src/eventemitter3_v1_1_1.js"></script>
+  <script src="src/RemoteMessageBuilder.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body onbeforeunload="clover.close()">
+
+<p>
+  This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
+  Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
+  previously obtained.  It makes a connection to a device, and requests a closeout.
+</p>
+
+<button onclick="clover.close()">Close Clover</button>
+
+<!-- this is a place to talk about what is happening while the example is being run -->
+<div id="uiFeedback" style="height: 400px;">
+</div>
+
+<script>
+
+  // Create the Clover object to communicate with the device
+  var clover = new Clover();
+
+  // Start communication
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(sendCloseout);
+
+  // This will be called when the device is ready
+  function sendCloseout(error) {
+    if(error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      clover.closeout({}, resultCallback);
+    }
+  }
+
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function resultCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+</script>
+
+</body>
+</html>

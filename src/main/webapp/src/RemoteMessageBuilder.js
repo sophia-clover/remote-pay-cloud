@@ -120,6 +120,17 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
+     * Builds a closeout message
+     *
+     * @param {json} payload - optional allowOpenTabs and batchid
+     * @returns {json} the constructed message
+     */
+    this.buildCloseout = function (payload) {
+        payload.method = LanMethod.CLOSEOUT_REQUEST;
+        return this.buildRemoteMessage(LanMethod.CLOSEOUT_REQUEST, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a tip adjust payment message
      *
      * @param {json} payload - the orderid and paymentid with amount
@@ -369,6 +380,10 @@ LanMethod.CAPTURE_PREAUTH_RESPONSE = "CAPTURE_PREAUTH_RESPONSE";
 LanMethod.VAULT_CARD = "VAULT_CARD";
 /** Message type to respond to capture card info request */
 LanMethod.VAULT_CARD_RESPONSE = "VAULT_CARD_RESPONSE";
+/** Message type to request closeout*/
+LanMethod.CLOSEOUT_REQUEST = "CLOSEOUT_REQUEST"
+/** Message type to respond to closeout request */
+LanMethod.CLOSEOUT_RESPONSE = "CLOSEOUT_RESPONSE";
 
 /**
  * The shutdown method type
