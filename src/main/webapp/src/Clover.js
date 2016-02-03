@@ -1179,6 +1179,42 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     *
+     * @param {CloseoutRequest} request
+     * @param completionCallback
+     */
+    this.closeout = function(request, completionCallback) {
+        if (!request)request={};
+        var callbackPayload = {"request":request};
+
+        // Validate request has contents
+        if(request.hasOwnProperty("allowOpenTabs")) {
+            if( !typeof(request.allowOpenTabs) === "boolean")
+            completionCallback(new CloverError(CloverError.INVALID_DATA, "allowOpenTabs must be true or false"), null);
+        }
+
+        var closeoutCB = function (message) {
+            var payload = JSON.parse(message.payload);
+            callbackPayload["response"] = payload;
+            completionCallback(null, callbackPayload);
+        }.bind(this);
+        this.device.once(LanMethod.CLOSEOUT_RESPONSE, closeoutCB);
+
+        try {
+            // 'batchId' is left undocumented for now, and not supported.  Only
+            // Current open batches will be closed out.
+            this.device.sendCloseout(request["allowOpenTabs"], request["batchId"]);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.CLOSEOUT_RESPONSE,
+                "Failure attempting to send closeout request", error);
+            completionCallback(cloverError, {
+                "code": "ERROR",
+                "request": callbackPayload
+            });
+        }
+    }
+
     //////////
 
     //
@@ -1375,6 +1411,12 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @callback Clover~transactionRequestCallback
  * @param {Error} [error] - null iff there was no error, else an object that contains a code and a message text
  * @param {TransactionResponse} result - data that results from the function.
+ */
+
+/**
+ * @typedef {Object} CloseoutRequest
+ * @property {boolean} [allowOpenTabs] - if true, indicates that a closeout can proceed, even if open tabs are
+ *  present.  Defaults to false.
  */
 
 /**
