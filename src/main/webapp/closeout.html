@@ -5,20 +5,10 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 
-    <!-- following for testing only -->
-   <script src="testConfigBase.js"></script>
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
 
-  <script src="src/xmlHttpSupport.js"></script>
-  <script src="src/CardEntryMethods.js"></script>
-  <script src="src/CloverOAuth.js"></script>
-  <script src="src/CloverError.js"></script>
-  <script src="src/Clover.js"></script>
-  <script src="src/WebSocketDevice.js"></script>
-  <script src="src/Endpoints.js"></script>
-  <script src="src/CloverID.js"></script>
-  <script src="src/eventemitter3_v1_1_1.js"></script>
-  <script src="src/RemoteMessageBuilder.js"></script>
-
+  <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -26,9 +16,9 @@
 <body onbeforeunload="clover.close()">
 
 <p>
-  This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
-  Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
-  previously obtained.  It makes a connection to a device, and requests a closeout.
+  This is an example of the Clover High Level Cloud API. It relies on the device to be running the
+  Cloud Pay Display app. It uses the device id to identify the device, and a authorization token that was
+  previously obtained. It makes a connection to a device, and requests a closeout.
 </p>
 
 <button onclick="clover.close()">Close Clover</button>
@@ -48,9 +38,9 @@
 
   // This will be called when the device is ready
   function sendCloseout(error) {
-    if(error) {
+    if (error) {
       var resultDisplay = "";
-      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
       clover.closeout({}, resultCallback);
@@ -65,8 +55,8 @@
   function resultCallback(error, resultData) {
     // do something with this.
     var resultDisplay = "";
-    if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
-    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    if (error)resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
+    resultDisplay += "<pre>" + JSON.stringify(resultData, null, 4) + "</pre>";
     document.getElementById("uiFeedback").innerHTML = resultDisplay;
   }
 </script>
