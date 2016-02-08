@@ -1,0 +1,64 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+    <!-- following for testing only -->
+   <script src="testConfigBase.js"></script>
+    <script src="src/cloverCloud-min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body onbeforeunload="clover.close()">
+
+<p>
+  This is an example of the Clover High Level Cloud API. It assumes that the Clover device is running the
+  Cloud Pay Display app. It uses the Clover device ID to identify the device and an authorization token that was
+  previously obtained. It makes a connection to a device and prints the image you see below.
+</p>
+
+<div id="message_config">
+  Message: <textarea id="messageText"></textarea>
+  <button id="sendMessageBtn" style="display:none" onclick="showMessage()">Show Message</button>
+</div>
+
+<script>
+
+  // Create the Clover object to communicate with the device
+  var clover = new Clover();
+
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(deviceReady);
+
+  function deviceReady(error) {
+    if(error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      enable("sendMessageBtn");
+    }
+  }
+
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  // This will be called when the device is ready
+  function showMessage() {
+    var str = document.getElementById("messageText").value;
+    clover.showMessage(str);
+  }
+</script>
+
+</body>
+</html>
