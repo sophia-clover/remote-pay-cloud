@@ -79,7 +79,6 @@ function Clover(configuration) {
         return {
             "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
             "transactionType": "PAYMENT",
-            "transactionSubType": "SALE",
             "taxAmount": 0, // tax amount is included in the amount
             "cardEntryMethods": CardEntryMethods.ALL,
             "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
@@ -95,7 +94,6 @@ function Clover(configuration) {
         return {
             "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
             "transactionType": "PAYMENT",
-            "transactionSubType": "AUTH",
             "taxAmount": 0, // tax amount is included in the amount
             "cardEntryMethods": CardEntryMethods.ALL,
             "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
@@ -591,7 +589,7 @@ function Clover(configuration) {
             delete saleInfo.tipAmount;
         }
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
-            this.internalTx(saleInfo, saleRequestCallback, this.auth_payIntentTemplate(), "payment");
+            this.internalTx(saleInfo, saleRequestCallback, this.auth_payIntentTemplate(), "payment", true);
         }
         return saleInfo.externalPaymentId;
     }
@@ -650,7 +648,7 @@ function Clover(configuration) {
      * @param {Clover~transactionRequestCallback} txnRequestCallback
      * @param template
      */
-    this.internalTx = function (txnInfo, txnRequestCallback, template, txnName) {
+    this.internalTx = function (txnInfo, txnRequestCallback, template, txnName, suppressOnScreenTips) {
         // Use a template to start with
         var payIntent = template;
         if (txnInfo.hasOwnProperty("tipAmount") && !Clover.isInt(txnInfo.tipAmount)) {
@@ -805,7 +803,7 @@ function Clover(configuration) {
         allCallBacks.push({"event": LanMethod.FINISH_CANCEL, "callback": finishCancelCB});
 
         try {
-            this.device.sendTXStart(payIntent);
+            this.device.sendTXStart(payIntent, suppressOnScreenTips);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.TX_START,
                 "Failure attempting to send start transaction", error);
