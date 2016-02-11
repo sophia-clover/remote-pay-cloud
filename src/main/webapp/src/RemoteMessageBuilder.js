@@ -366,6 +366,8 @@ LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS = "SHOW_PAYMENT_RECEIPT_OPTIONS";
 LanMethod.OPEN_CASH_DRAWER = "OPEN_CASH_DRAWER";
 /** The tip adjust request method type */
 LanMethod.TIP_ADJUST = "TIP_ADJUST";
+/** The tip adjust request method type */
+LanMethod.TIP_ADJUST_RESPONSE = "TIP_ADJUST_RESPONSE";
 /** The message type for a refund print message */
 LanMethod.REFUND_PRINT_PAYMENT = "REFUND_PRINT_PAYMENT";
 /** Message returned when request for last message is sent */

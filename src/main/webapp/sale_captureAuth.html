@@ -53,11 +53,11 @@
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
       var mySale = {
-        "amount": 10000,
+        "amount": 15000,
         "isPreAuth": true
       }
       // Do the pre authorization
-      clover.auth(mySale, resultCallback);
+      clover.preAuth(mySale, resultCallback);
     }
   }
 

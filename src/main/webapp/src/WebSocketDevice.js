@@ -568,11 +568,12 @@ WebSocketDevice.prototype.sendKeyPress = function(keyCode, ackId) {
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendTXStart = function(payIntent, ackId) {
+WebSocketDevice.prototype.sendTXStart = function(payIntent, suppressOnScreenTips, ackId) {
 
     // This is how they are doing the payload...
     var payload = {
-        "payIntent": payIntent
+        "payIntent": payIntent,
+        "suppressOnScreenTips": suppressOnScreenTips
     };
 
     var lanMessage = this.messageBuilder.buildTxStart(payload);

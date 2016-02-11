@@ -6,7 +6,7 @@
  */
 function Clover(configuration) {
     this.configuration = configuration;
-    if(!this.configuration) {
+    if (!this.configuration) {
         this.configuration = {};
     }
     this.configuration.allowOvertakeConnection =
@@ -22,29 +22,31 @@ function Clover(configuration) {
     this.discoveryResponseReceived = false;
 
     /*
-    Set up a value to help the user of the Clover object know when it is available.
+     Set up a value to help the user of the Clover object know when it is available.
      */
     this._isOpen = false;
-    this.device.on(WebSocketDevice.DEVICE_OPEN,  function(){this._isOpen = true; }.bind(this) );
-    this.device.on(WebSocketDevice.DEVICE_CLOSE, function(){
+    this.device.on(WebSocketDevice.DEVICE_OPEN, function () {
+        this._isOpen = true;
+    }.bind(this));
+    this.device.on(WebSocketDevice.DEVICE_CLOSE, function () {
         this._isOpen = false;
         this.configuration.deviceURL = null;
         this.discoveryResponseReceived = false;
-    }.bind(this) );
-    this.device.on(WebSocketDevice.DEVICE_ERROR, function(){
+    }.bind(this));
+    this.device.on(WebSocketDevice.DEVICE_ERROR, function () {
         this._isOpen = false;
         this.device.forceClose();
-    }.bind(this) );
-    this.device.on(WebSocketDevice.CONNECTION_ERROR, function(){
+    }.bind(this));
+    this.device.on(WebSocketDevice.CONNECTION_ERROR, function () {
         this._isOpen = false;
         this.device.forceClose();
-    }.bind(this) );
+    }.bind(this));
 
     /**
      * @returns {boolean} true if the device is open and ready for communications,
      *  false if the device is closed, or has an error.
      */
-    this.isOpen = function(){
+    this.isOpen = function () {
         // The device must not only be opened, it must have responded with a discovery response
         // to indicate that not only is the socket communication channel open, but the device
         // has bootstrapped the functionality to actually respond to messages.
@@ -52,12 +54,12 @@ function Clover(configuration) {
     }
 
     /*
-    The following is a bit elaborate, but I want it to be clear that the default of
-    this value is 'true', and that it is only false if explicitly set.
+     The following is a bit elaborate, but I want it to be clear that the default of
+     this value is 'true', and that it is only false if explicitly set.
      */
-    if( this.configuration.hasOwnProperty("autoVerifySignature") &&
+    if (this.configuration.hasOwnProperty("autoVerifySignature") &&
         this.configuration.autoVerifySignature != null &&
-        this.configuration.autoVerifySignature === false ) {
+        this.configuration.autoVerifySignature === false) {
         this.configuration.autoVerifySignature = false;
     } else {
         this.configuration.autoVerifySignature = true;
@@ -69,31 +71,62 @@ function Clover(configuration) {
     this.configuration.remotePrint =
         Boolean(this.configuration.remotePrint);
 
-    this.saleOrAuth_payIntentTemplate = {
-        "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
-        "transactionType": "PAYMENT",
-        "taxAmount": 0, // tax amount is included in the amount
-        "cardEntryMethods": CardEntryMethods.ALL,
-        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
-        "remotePrint":  this.configuration.remotePrint
+    /**
+     * @private
+     * @returns {{action: string, transactionType: string, transactionSubType: string, taxAmount: number, cardEntryMethods: *, disableRestartTransactionWhenFailed: boolean, remotePrint: boolean}}
+     */
+    this.sale_payIntentTemplate = function () {
+        return {
+            "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+            "transactionType": "PAYMENT",
+            "taxAmount": 0, // tax amount is included in the amount
+            "cardEntryMethods": CardEntryMethods.ALL,
+            "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+            "remotePrint": this.configuration.remotePrint
+        };
     };
 
-    this.preAuth_payIntentTemplate = {
-        "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
-        "transactionType": "AUTH",
-        "taxAmount": 0, // tax amount is included in the amount
-        "cardEntryMethods": CardEntryMethods.ALL,
-        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
-        "remotePrint":  this.configuration.remotePrint
+    /**
+     * @private
+     * @returns {{action: string, transactionType: string, transactionSubType: string, taxAmount: number, cardEntryMethods: *, disableRestartTransactionWhenFailed: boolean, remotePrint: boolean}}
+     */
+    this.auth_payIntentTemplate = function () {
+        return {
+            "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+            "transactionType": "PAYMENT",
+            "taxAmount": 0, // tax amount is included in the amount
+            "cardEntryMethods": CardEntryMethods.ALL,
+            "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+            "remotePrint": this.configuration.remotePrint
+        };
     };
 
+    /**
+     * @private
+     * @returns {{action: string, transactionType: string, taxAmount: number, cardEntryMethods: *, disableRestartTransactionWhenFailed: boolean, remotePrint: boolean}}
+     */
+    this.preAuth_payIntentTemplate = function () {
+        return {
+            "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+            "transactionType": "AUTH",
+            "taxAmount": 0, // tax amount is included in the amount
+            "cardEntryMethods": CardEntryMethods.ALL,
+            "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+            "remotePrint": this.configuration.remotePrint
+        };
+    };
+
+    /**
+     * @private
+     * @type {{action: string, transactionType: string, taxAmount: number, cardEntryMethods: *, disableRestartTransactionWhenFailed: boolean, remotePrint: boolean}}
+     */
     this.refund_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "CREDIT",
         "taxAmount": 0, // tax amount is included in the amount
         "cardEntryMethods": CardEntryMethods.ALL,
         "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
-        "remotePrint":  this.configuration.remotePrint
+        "remotePrint": this.configuration.remotePrint
     };
 
     //****************************************
@@ -107,12 +140,18 @@ function Clover(configuration) {
         }
     );
 
-    this.getAutoVerifySignature = function() {
-        if( this.configuration.hasOwnProperty("autoVerifySignature") &&
+    /**
+     * Returns true if the signature should be automatically verified
+     * @private
+     * @returns {boolean}
+     */
+    this.getAutoVerifySignature = function () {
+        if (this.configuration.hasOwnProperty("autoVerifySignature") &&
             this.configuration.autoVerifySignature != null &&
-            this.configuration.autoVerifySignature === false ) {
+            this.configuration.autoVerifySignature === false) {
             return false;
-        } return true;
+        }
+        return true;
     }
 
     /**
@@ -120,7 +159,7 @@ function Clover(configuration) {
      */
     this.close = function () {
         if (this.device) {
-            if(this.device.discoveryTimerId){
+            if (this.device.discoveryTimerId) {
                 clearInterval(this.device.discoveryTimerId);
             }
             this.sendCancel();
@@ -160,7 +199,7 @@ function Clover(configuration) {
      *  Adheres to error first paradigm.
      */
     this.initDeviceConnection = function (callBackOnDeviceReady) {
-        if(!this.isOpen()) {
+        if (!this.isOpen()) {
             if (callBackOnDeviceReady) {
                 this.device.once(LanMethod.DISCOVERY_RESPONSE, function (message) {
                     callBackOnDeviceReady(null, message)
@@ -217,7 +256,7 @@ function Clover(configuration) {
                     if (this.configuration.deviceId) {
                         var noDashesDeviceId = this.configuration.deviceId.replace(/-/g, "");
                         // this is the uuid for the device
-                        var xmlHttpSupport = new XmlHttpSupport();
+                        xmlHttpSupport = new XmlHttpSupport();
                         // This is the data posted to tell the server we want to create a connection
                         // to the device
                         var deviceContactInfo = {
@@ -289,7 +328,7 @@ function Clover(configuration) {
                                 // Stations do not support the kiosk/pay display.
                                 // If the user has selected one, then print out a (loud) warning
                                 var myDevice = me.deviceBySerial[me.configuration.deviceSerialId];
-                                if(null == myDevice) {
+                                if (null == myDevice) {
                                     callBackOnDeviceReady(new CloverError(CloverError.DEVICE_NOT_FOUND,
                                         "Device " + deviceSerialId + " not in set returned."));
                                 }
@@ -464,7 +503,7 @@ function Clover(configuration) {
             // The connection to the device is open, but we do not yet know if there is anyone at the other end.
             // Send discovery request messages until we get a discovery response.
             me.device.dicoveryMessagesSent = 0;
-            if(!me.device.discoveryTimerId) {
+            if (!me.device.discoveryTimerId) {
                 me.device.discoveryTimerId =
                     setInterval(
                         function () {
@@ -490,9 +529,27 @@ function Clover(configuration) {
                     );
             }
             console.log('device opened');
-        } );
+        });
         console.log("Contacting device at " + this.configuration.deviceURL);
         this.device.contactDevice(this.configuration.deviceURL);
+    }
+
+    /**
+     * Utility function to ensure that the external payment id is set.
+     *
+     * @private
+     * @param txInfo
+     * @returns {*}
+     */
+    this.ensureExternalPaymentId = function (txInfo) {
+        var externalPaymentId = null;
+        if (txInfo.hasOwnProperty('requestId') && txInfo.requestId != null) {
+            externalPaymentId = txInfo.requestId;
+        } else {
+            externalPaymentId = CloverID.getNewId();
+        }
+        txInfo.externalPaymentId = externalPaymentId;
+        return txInfo;
     }
 
     /**
@@ -505,21 +562,15 @@ function Clover(configuration) {
      *  passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
      */
     this.sale = function (saleInfo, saleRequestCallback) {
-        var externalPaymentId = null;
-        if(saleInfo.hasOwnProperty('requestId') && saleInfo.requestId != null) {
-            externalPaymentId = saleInfo.requestId;
-        } else {
-            externalPaymentId = CloverID.getNewId();
-        }
+        this.ensureExternalPaymentId(saleInfo);
         // For a sale, force the tip to be set
         if (!saleInfo.hasOwnProperty("tipAmount")) {
             saleInfo["tipAmount"] = 0;
         }
-        saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
-            this.internalTx(saleInfo, saleRequestCallback, this.saleOrAuth_payIntentTemplate, "payment");
+            this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate(), "payment");
         }
-        return externalPaymentId;
+        return saleInfo.externalPaymentId;
     }
 
     /**
@@ -532,25 +583,33 @@ function Clover(configuration) {
      *  passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
      */
     this.auth = function (saleInfo, saleRequestCallback) {
-        var externalPaymentId = null;
-        if(saleInfo.hasOwnProperty('requestId') && saleInfo.requestId != null) {
-            externalPaymentId = saleInfo.requestId;
-        } else {
-            externalPaymentId = CloverID.getNewId();
+        this.ensureExternalPaymentId(saleInfo);
+        // For a auth, force the tip to be set to null
+        if (saleInfo.hasOwnProperty("tipAmount")) {
+            delete saleInfo.tipAmount;
         }
-        // For a auth, force the tip to null
-        if(saleInfo["tipAmount"]) delete saleInfo.tipAmount;
-        // Default the template to sale/auth
-        var template = this.saleOrAuth_payIntentTemplate;
-        // For a preauth use the correct template
-        if (saleInfo["isPreAuth"]) {
-            template = this.preAuth_payIntentTemplate;
-        }
-        saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
-            this.internalTx(saleInfo, saleRequestCallback, template, "payment");
+            this.internalTx(saleInfo, saleRequestCallback, this.auth_payIntentTemplate(), "payment", true);
         }
-        return externalPaymentId;
+        return saleInfo.externalPaymentId;
+    }
+
+    /**
+     * Pre Auth
+     *
+     * @param {TransactionRequest} saleInfo - the information for the sale
+     * @param {Clover~transactionRequestCallback} saleRequestCallback - the callback that receives the sale completion
+     *  information.
+     * @return {string} paymentId - identifier used for the payment once the transaction is completed.  This may be
+     *  passed in as part of the saleInfo.  If it is not passed in then this will be a new generated value.
+     */
+    this.preAuth = function (saleInfo, saleRequestCallback) {
+        this.ensureExternalPaymentId(saleInfo);
+        delete saleInfo.tipAmount;
+        if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
+            this.internalTx(saleInfo, saleRequestCallback, this.preAuth_payIntentTemplate(), "payment");
+        }
+        return saleInfo.externalPaymentId;
     }
 
     /**
@@ -562,7 +621,7 @@ function Clover(configuration) {
     this.refund = function (refundInfo, refundRequestCallback) {
         if (this.verifyValidAmount(refundInfo, refundRequestCallback)) {
             refundInfo.amount = Math.abs(refundInfo.amount) * -1;
-            this.internalTx(refundInfo, refundRequestCallback, this.refund_payIntentTemplate, "credit");
+            this.internalTx(refundInfo, refundRequestCallback, this.refund_payIntentTemplate(), "credit");
         }
     }
 
@@ -574,7 +633,7 @@ function Clover(configuration) {
      * @returns {boolean}
      */
     this.verifyValidAmount = function (txnInfo, errorFirstCallback) {
-        if (!txnInfo.hasOwnProperty("amount") || !isInt(txnInfo.amount) || (txnInfo.amount < 0)) {
+        if (!txnInfo.hasOwnProperty("amount") || !Clover.isInt(txnInfo.amount) || (txnInfo.amount < 0)) {
             errorFirstCallback(CloverError.INVALID_DATA,
                 new CloverError("paymentInfo must include 'amount',and  the value must be an integer with " +
                     "a value greater than 0"));
@@ -589,16 +648,16 @@ function Clover(configuration) {
      * @param {Clover~transactionRequestCallback} txnRequestCallback
      * @param template
      */
-    this.internalTx = function (txnInfo, txnRequestCallback, template, txnName) {
+    this.internalTx = function (txnInfo, txnRequestCallback, template, txnName, suppressOnScreenTips) {
         // Use a template to start with
         var payIntent = template;
-        if (txnInfo.hasOwnProperty("tipAmount") && !isInt(txnInfo.tipAmount)) {
+        if (txnInfo.hasOwnProperty("tipAmount") && !Clover.isInt(txnInfo.tipAmount)) {
             txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
                 "if paymentInfo has 'tipAmount', the value must be an integer"));
             return;
         }
         if (txnInfo.hasOwnProperty("tippableAmount")) {
-            if (!isInt(txnInfo.tippableAmount)) {
+            if (!Clover.isInt(txnInfo.tippableAmount)) {
                 txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
                     "if paymentInfo has 'tippableAmount', the value must be an integer"));
                 return;
@@ -613,7 +672,7 @@ function Clover(configuration) {
             payIntent.vaultedCard = txnInfo.vaultedCard;
         }
         if (txnInfo.hasOwnProperty("externalPaymentId")) {
-            if(txnInfo.externalPaymentId.length > 32) {
+            if (txnInfo.externalPaymentId.length > 32) {
                 var error = new CloverError(CloverError.INVALID_DATA, "id is invalid - '" + txnInfo.externalPaymentId + "'");
                 txnRequestCallback(error, null);
                 return;
@@ -621,16 +680,14 @@ function Clover(configuration) {
             payIntent.externalPaymentId = txnInfo.externalPaymentId;
         }
         /*
-        The order id cannot be specified at this time.
-        if (txnInfo.hasOwnProperty("orderId")) {
-            payIntent.orderId = txnInfo.orderId;
-        }
-        */
+         The order id cannot be specified at this time.
+         if (txnInfo.hasOwnProperty("orderId")) {
+         payIntent.orderId = txnInfo.orderId;
+         }
+         */
         var autoVerifySignature = this.getAutoVerifySignature();
-        if( txnInfo.hasOwnProperty("autoVerifySignature") )
-        {
-            if( txnInfo.autoVerifySignature === true )
-            {
+        if (txnInfo.hasOwnProperty("autoVerifySignature")) {
+            if (txnInfo.autoVerifySignature === true) {
                 autoVerifySignature = true;
             }
         }
@@ -647,32 +704,32 @@ function Clover(configuration) {
         // that do not visit ALL the callback.
         var allCallBacks = [];
 
-        var deviceErrorCB = function(event) {
+        var deviceErrorCB = function (event) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
             var error = new CloverError(CloverError.DEVICE_ERROR, event);
             txnRequestCallback(error, null);
         };
         this.device.on(WebSocketDevice.DEVICE_ERROR, deviceErrorCB);
-        allCallBacks.push({"event":WebSocketDevice.DEVICE_ERROR, "callback":deviceErrorCB});
+        allCallBacks.push({"event": WebSocketDevice.DEVICE_ERROR, "callback": deviceErrorCB});
 
-        var generalErrorCB = function(message) {
+        var generalErrorCB = function (message) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
             var error = new CloverError(CloverError.ERROR, message);
             txnRequestCallback(error, null);
         };
         this.device.on(LanMethod.ERROR, generalErrorCB);
-        allCallBacks.push({"event":LanMethod.ERROR, "callback":generalErrorCB});
+        allCallBacks.push({"event": LanMethod.ERROR, "callback": generalErrorCB});
 
-        var connectionErrorCB = function(message) {
+        var connectionErrorCB = function (message) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
             var error = new CloverError(CloverError.COMMUNICATION_ERROR, message);
             txnRequestCallback(error, null);
         };
         this.device.on(WebSocketDevice.CONNECTION_ERROR, connectionErrorCB);
-        allCallBacks.push({"event":WebSocketDevice.CONNECTION_ERROR, "callback":connectionErrorCB});
+        allCallBacks.push({"event": WebSocketDevice.CONNECTION_ERROR, "callback": connectionErrorCB});
 
         //Wire in the handler for completion to be called once.
         /**
@@ -687,7 +744,7 @@ function Clover(configuration) {
                 // This has the potential to 'stall out' the
                 // sale processing if the user of the API does not register
                 // a callback for this message, and verify the signature themselves.
-                if(autoVerifySignature) {
+                if (autoVerifySignature) {
                     me.device.sendSignatureVerified(payment);
                 }
             } catch (error) {
@@ -700,8 +757,8 @@ function Clover(configuration) {
                 });
             }
         };
-        this.device.once(LanMethod.VERIFY_SIGNATURE,verifySignatureCB);
-        allCallBacks.push({"event":LanMethod.VERIFY_SIGNATURE, "callback":verifySignatureCB});
+        this.device.once(LanMethod.VERIFY_SIGNATURE, verifySignatureCB);
+        allCallBacks.push({"event": LanMethod.VERIFY_SIGNATURE, "callback": verifySignatureCB});
 
         var finishOKCB = function (message) {
             // Remove obsolete listeners.  This is an end state
@@ -722,8 +779,8 @@ function Clover(configuration) {
             }
             me.device.sendShowWelcomeScreen();
         };
-        this.device.once(LanMethod.FINISH_OK,finishOKCB);
-        allCallBacks.push({"event":LanMethod.FINISH_OK, "callback":finishOKCB});
+        this.device.once(LanMethod.FINISH_OK, finishOKCB);
+        allCallBacks.push({"event": LanMethod.FINISH_OK, "callback": finishOKCB});
 
         var finishCancelCB = function (message) {
             // Remove obsolete listeners.  This is an end state
@@ -742,11 +799,11 @@ function Clover(configuration) {
             }
             me.device.sendShowWelcomeScreen();
         };
-        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
-        allCallBacks.push({"event":LanMethod.FINISH_CANCEL, "callback":finishCancelCB});
+        this.device.once(LanMethod.FINISH_CANCEL, finishCancelCB);
+        allCallBacks.push({"event": LanMethod.FINISH_CANCEL, "callback": finishCancelCB});
 
         try {
-            this.device.sendTXStart(payIntent);
+            this.device.sendTXStart(payIntent, suppressOnScreenTips);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.TX_START,
                 "Failure attempting to send start transaction", error);
@@ -785,7 +842,7 @@ function Clover(configuration) {
                 // called once.
                 me.device.removeListener(LanMethod.ACK, genericAckCallback);
                 // Build up a callback data object
-                if ((typeof callbackPayload == 'undefined')||(callbackPayload == null)) {
+                if ((typeof callbackPayload == 'undefined') || (callbackPayload == null)) {
                     callbackPayload = {};
                 }
                 // Add in the value for successfully sent.
@@ -795,9 +852,9 @@ function Clover(configuration) {
                 };
                 // Call the callback with the data
                 try {
-                if(completionCallback) completionCallback(null, callbackPayload);
-                // Show the welcome screen after the acknowledgement.
-                // This might be removed later
+                    if (completionCallback) completionCallback(null, callbackPayload);
+                    // Show the welcome screen after the acknowledgement.
+                    // This might be removed later
                 } catch (err) {
                     console.log(err);
                 }
@@ -821,10 +878,10 @@ function Clover(configuration) {
      * @param {requestCallback} completionCallback
      */
     this.voidTransaction = function (payment, voidReason, completionCallback) {
-        var callbackPayload = {"request":{"payment":payment, "voidReason":voidReason}};
+        var callbackPayload = {"request": {"payment": payment, "voidReason": voidReason}};
 
         // Temporary - Will be replaced by employee on backend
-        if(!payment.hasOwnProperty("employee")){
+        if (!payment.hasOwnProperty("employee")) {
             payment["employee"] = {
                 "id": "DFLTEMPLOYEE"
             }
@@ -849,7 +906,7 @@ function Clover(configuration) {
      * @param {requestCallback} completionCallback
      */
     this.refundPayment = function (refundRequest, completionCallback) {
-        var callbackPayload = {"request":refundRequest, "response":{}};
+        var callbackPayload = {"request": refundRequest, "response": {}};
         var txnName = 'refund';
 
         var me = this;
@@ -860,16 +917,16 @@ function Clover(configuration) {
 
         // TODO:  Remove in future version, CLOVER-17724
         // This information will be in the finish_* messages returned.
-        var refundResponseCB = function(message) {
-            if(completionCallback) {
+        var refundResponseCB = function (message) {
+            if (completionCallback) {
                 var payload = JSON.parse(message.payload);
 
                 callbackPayload.response.message = payload['message'];
                 callbackPayload.response.reason = payload['reason'];
             }
         }
-        this.device.once(LanMethod.REFUND_RESPONSE,refundResponseCB);
-        allCallBacks.push({"event":LanMethod.REFUND_RESPONSE, "callback":refundResponseCB});
+        this.device.once(LanMethod.REFUND_RESPONSE, refundResponseCB);
+        allCallBacks.push({"event": LanMethod.REFUND_RESPONSE, "callback": refundResponseCB});
 
         var finishOKCB = function (message) {
             // Remove obsolete listeners.  This is an end state
@@ -888,8 +945,8 @@ function Clover(configuration) {
             }
             me.device.sendShowWelcomeScreen();
         };
-        this.device.once(LanMethod.FINISH_OK,finishOKCB);
-        allCallBacks.push({"event":LanMethod.FINISH_OK, "callback":finishOKCB});
+        this.device.once(LanMethod.FINISH_OK, finishOKCB);
+        allCallBacks.push({"event": LanMethod.FINISH_OK, "callback": finishOKCB});
 
         var finishCancelCB = function (message) {
             // Remove obsolete listeners.  This is an end state
@@ -906,15 +963,15 @@ function Clover(configuration) {
             }
             me.device.sendShowWelcomeScreen();
         };
-        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
-        allCallBacks.push({"event":LanMethod.FINISH_CANCEL, "callback":finishCancelCB});
+        this.device.once(LanMethod.FINISH_CANCEL, finishCancelCB);
+        allCallBacks.push({"event": LanMethod.FINISH_CANCEL, "callback": finishCancelCB});
 
         try {
             this.device.sendRefund(refundRequest.orderId, refundRequest.paymentId, refundRequest["amount"]);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.REFUND_REQUEST,
                 "Failure attempting to send refund request", error);
-            callbackPayload["code"] =  "ERROR";
+            callbackPayload["code"] = "ERROR";
             completionCallback(cloverError, callbackPayload);
         }
     }
@@ -926,9 +983,9 @@ function Clover(configuration) {
      * @param {requestCallback} [completionCallback]
      */
     this.print = function (textLines, completionCallback) {
-        var callbackPayload = {"request":textLines};
+        var callbackPayload = {"request": textLines};
         var uuid = null;
-        if(completionCallback) {
+        if (completionCallback) {
             uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         }
         try {
@@ -936,7 +993,7 @@ function Clover(configuration) {
         } catch (error) {
             var cloverError = new CloverError(LanMethod.PRINT_TEXT,
                 "Failure attempting to print text", error);
-            if(completionCallback) {
+            if (completionCallback) {
                 completionCallback(cloverError, {
                     "code": "ERROR",
                     "request": callbackPayload
@@ -951,7 +1008,7 @@ function Clover(configuration) {
      * @param completionCallback
      */
     this.printReceipt = function (printRequest, completionCallback) {
-        var callbackPayload = {"request":printRequest};
+        var callbackPayload = {"request": printRequest};
 
         var finishCancelCB = function (message) {
             try {
@@ -962,7 +1019,7 @@ function Clover(configuration) {
             // We could let them do this
             this.device.sendShowWelcomeScreen();
         }.bind(this);
-        this.device.once(LanMethod.FINISH_CANCEL,finishCancelCB);
+        this.device.once(LanMethod.FINISH_CANCEL, finishCancelCB);
 
         try {
             this.device.sendShowPaymentReceiptOptions(printRequest.orderId, printRequest.paymentId);
@@ -986,9 +1043,9 @@ function Clover(configuration) {
      * @param {requestCallback} [completionCallback]
      */
     this.printImage = function (img, completionCallback) {
-        var callbackPayload = {"request":{"img":{"src": img.src }}};
+        var callbackPayload = {"request": {"img": {"src": img.src}}};
         var uuid = null;
-        if(completionCallback) {
+        if (completionCallback) {
             uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         }
         try {
@@ -996,7 +1053,7 @@ function Clover(configuration) {
         } catch (error) {
             var cloverError = new CloverError(LanMethod.PRINT_IMAGE,
                 "Failure attempting to print image", error);
-            if(completionCallback) {
+            if (completionCallback) {
                 completionCallback(cloverError, {
                     "code": "ERROR",
                     "request": callbackPayload
@@ -1021,9 +1078,9 @@ function Clover(configuration) {
     this.sendCancel = function (completionCallback) {
         // Note - this is a pattern for sending keystrokes ot the device.
         // Available keystrokes can be found in KeyPress.
-        var callbackPayload = {"request":"cancel"};
+        var callbackPayload = {"request": "cancel"};
         var uuid = null;
-        if(completionCallback) {
+        if (completionCallback) {
             uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         }
         try {
@@ -1031,7 +1088,7 @@ function Clover(configuration) {
         } catch (error) {
             var cloverError = new CloverError(LanMethod.KEY_PRESS,
                 "Failure attempting to cancel", error);
-            if(completionCallback) {
+            if (completionCallback) {
                 completionCallback(cloverError, {
                     "code": "ERROR",
                     "request": callbackPayload
@@ -1050,9 +1107,9 @@ function Clover(configuration) {
     this.openCashDrawer = function (reason, completionCallback) {
         // Note - this is a pattern for sending keystrokes ot the device.
         // Available keystrokes can be found in KeyPress.
-        var callbackPayload = {"request":{"reason":reason}};
+        var callbackPayload = {"request": {"reason": reason}};
         var uuid = null;
-        if(completionCallback) {
+        if (completionCallback) {
             uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
         }
         try {
@@ -1060,7 +1117,7 @@ function Clover(configuration) {
         } catch (error) {
             var cloverError = new CloverError(LanMethod.OPEN_CASH_DRAWER,
                 "Failure attempting to open the cash drawer", error);
-            if(completionCallback) {
+            if (completionCallback) {
                 completionCallback(cloverError, {
                     "code": "ERROR",
                     "request": callbackPayload
@@ -1074,27 +1131,34 @@ function Clover(configuration) {
      * @param {TipAdjustRequest} tipAdjustRequest - the refund request
      * @param {requestCallback} completionCallback
      */
-    this.tipAdjust = function(tipAdjustRequest, completionCallback) {
-        var callbackPayload = {"request":tipAdjustRequest};
+    this.tipAdjust = function (tipAdjustRequest, completionCallback) {
+        var callbackPayload = {"request": tipAdjustRequest};
 
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var tipAdjustCB = function (message) {
+            var payload = JSON.parse(message.payload);
+            callbackPayload["response"] = payload;
+            callbackPayload["code"] = "SUCCESS";
+
+            completionCallback(null, callbackPayload);
+        }.bind(this);
+        this.device.once(LanMethod.TIP_ADJUST_RESPONSE, tipAdjustCB);
+
         try {
-            this.device.sendTipAdjust(tipAdjustRequest.orderId, tipAdjustRequest.paymentId, tipAdjustRequest["tipAmount"], uuid);
+            this.device.sendTipAdjust(tipAdjustRequest.orderId, tipAdjustRequest.paymentId, tipAdjustRequest["tipAmount"]);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.TIP_ADJUST,
                 "Failure attempting to send tip adjust", error);
-            callbackPayload["code"] =  "ERROR";
+            callbackPayload["code"] = "ERROR";
             completionCallback(cloverError, callbackPayload);
         }
     }
-
 
     /**
      *
      * @param {requestCallback} completionCallback
      */
-    this.getLastMessage = function(completionCallback) {
-        var callbackPayload = {"request":{}};
+    this.getLastMessage = function (completionCallback) {
+        var callbackPayload = {"request": {}};
 
         var lastMessageCB = function (message) {
             var payload = JSON.parse(message.payload);
@@ -1102,7 +1166,7 @@ function Clover(configuration) {
 
             completionCallback(null, callbackPayload);
         }.bind(this);
-        this.device.once(LanMethod.LAST_MSG_RESPONSE,lastMessageCB);
+        this.device.once(LanMethod.LAST_MSG_RESPONSE, lastMessageCB);
 
         try {
             this.device.sendLastMessageRequest();
@@ -1149,14 +1213,14 @@ function Clover(configuration) {
      * @param {CapturePreAuthRequest} request
      * @param completionCallback
      */
-    this.capturePreAuth = function(request, completionCallback) {
-        var callbackPayload = {"request":request};
+    this.capturePreAuth = function (request, completionCallback) {
+        var callbackPayload = {"request": request};
 
         // Validate request has contents
-        if(!request.hasOwnProperty("paymentId")) {
+        if (!request.hasOwnProperty("paymentId")) {
             completionCallback(new CloverError(CloverError.INVALID_DATA, "missing paymentId"), null);
         }
-        if(!request.hasOwnProperty("amount")) {
+        if (!request.hasOwnProperty("amount")) {
             completionCallback(new CloverError(CloverError.INVALID_DATA, "missing amount"), null);
         }
 
@@ -1165,10 +1229,10 @@ function Clover(configuration) {
             callbackPayload["response"] = payload;
             completionCallback(null, callbackPayload);
         }.bind(this);
-        this.device.once(LanMethod.CAPTURE_PREAUTH_RESPONSE,capturePreAuthCB);
+        this.device.once(LanMethod.CAPTURE_PREAUTH_RESPONSE, capturePreAuthCB);
 
         try {
-            this.device.sendCapturePreAuth(request.orderId,request.paymentId,request.amount,request["tipAmount"]);
+            this.device.sendCapturePreAuth(request.orderId, request.paymentId, request.amount, request["tipAmount"]);
         } catch (error) {
             var cloverError = new CloverError(LanMethod.LAST_MSG_REQUEST,
                 "Failure attempting to get last message sent", error);
@@ -1184,14 +1248,14 @@ function Clover(configuration) {
      * @param {CloseoutRequest} request
      * @param completionCallback
      */
-    this.closeout = function(request, completionCallback) {
-        if (!request)request={};
-        var callbackPayload = {"request":request};
+    this.closeout = function (request, completionCallback) {
+        if (!request)request = {};
+        var callbackPayload = {"request": request};
 
         // Validate request has contents
-        if(request.hasOwnProperty("allowOpenTabs")) {
-            if( !typeof(request.allowOpenTabs) === "boolean")
-            completionCallback(new CloverError(CloverError.INVALID_DATA, "allowOpenTabs must be true or false"), null);
+        if (request.hasOwnProperty("allowOpenTabs")) {
+            if (!typeof(request.allowOpenTabs) === "boolean")
+                completionCallback(new CloverError(CloverError.INVALID_DATA, "allowOpenTabs must be true or false"), null);
         }
 
         var closeoutCB = function (message) {
@@ -1215,41 +1279,93 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     * Puts a message on the device screen
+     *
+     * @param {string} message - the message to put on the device screen.
+     * @param {requestCallback} [completionCallback]
+     */
+    this.showMessage = function (message, completionCallback) {
+        // Note - this is a pattern for sending keystrokes ot the device.
+        // Available keystrokes can be found in KeyPress.
+        var callbackPayload = {"request": {"message": message}};
+        var uuid = null;
+        if (completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendTerminalMessage(message, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.TERMINAL_MESSAGE,
+                "Failure attempting to put message on device", error);
+            if (completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
+    /**
+     * Puts the device in the welcome screen
+     *
+     * @param {requestCallback} [completionCallback]
+     */
+    this.showWelcomeScreen = function (completionCallback) {
+        // Note - this is a pattern for sending keystrokes ot the device.
+        // Available keystrokes can be found in KeyPress.
+        var callbackPayload = {"request": {}};
+        var uuid = null;
+        if (completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendShowWelcomeScreen(uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SHOW_WELCOME_SCREEN,
+                "Failure attempting to put message on device", error);
+            if (completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
+    /**
+     * Puts the device in the 'thank you' screen
+     *
+     * @param {requestCallback} [completionCallback]
+     */
+    this.showThankYouScreen = function (completionCallback) {
+        // Note - this is a pattern for sending keystrokes ot the device.
+        // Available keystrokes can be found in KeyPress.
+        var callbackPayload = {"request": {}};
+        var uuid = null;
+        if (completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendShowThankYouScreen(uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SHOW_THANK_YOU_SCREEN,
+                "Failure attempting to put message on device", error);
+            if (completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
     //////////
 
-    //
-    //
-    ///**
-    // * Not yet implemented
-    // */
-    //this.preAuth = function() {
-    //    throw new Error("Not yet implemented");
-    //};
-    ///**
-    // * Not yet implemented
-    // */
-    //this.authorize = this.preAuth
-    //
-    ///**
-    // * Not yet implemented
-    // */
-    //this.adjustAuth = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    //
-    ///**
-    // * Not yet implemented
-    // */
-    //this.manualRefund = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    ///**
-    // * Not yet implemented
-    // */
-    //this.closeout = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    //
     ///**
     // * Not yet implemented
     // */
@@ -1260,28 +1376,7 @@ function Clover(configuration) {
     ///**
     // * Not yet implemented
     // */
-    //this.displayMessage = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    //
-    ///**
-    // * Not yet implemented
-    // */
-    //this.cancelTxn = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    //
-    ///**
-    // * Not yet implemented
-    // */
     //this.rebootDevice = function() {
-    //    throw new Error("Not yet implemented");
-    //}
-    //
-    ///**
-    // * Not yet implemented
-    // */
-    //this.echo = function() {
     //    throw new Error("Not yet implemented");
     //}
     //
@@ -1300,12 +1395,14 @@ function Clover(configuration) {
     //}
 }
 
+// Below are utility methods that can be located anywhere.
+// Want to make sure we have the namespace, so putting in Clover.
 /**
  * @private
  * @param value
  * @returns {boolean}
  */
-function isInt(value) {
+Clover.isInt = function(value) {
     var x;
     if (isNaN(value)) {
         return false;
@@ -1314,14 +1411,14 @@ function isInt(value) {
     return (x | 0) === x;
 }
 
-function setCookie(cname, cvalue, exdays) {
+Clover.setCookie = function(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + "; " + expires;
 }
 
-function getCookie(cname) {
+Clover.getCookie = function(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
@@ -1342,13 +1439,13 @@ Clover.writeConfigurationToCookie = function (configuration, saveURL) {
 
     var exdays = 2;
     if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
-    setCookie(this.configurationName, cvalue, exdays);
+    Clover.setCookie(this.configurationName, cvalue, exdays);
 }
 
 Clover.loadConfigurationFromCookie = function (configurationName) {
     // We have no configuration at all.  Try to get it from a cookie
     var configuration = null;
-    var cvalue = getCookie(configurationName);
+    var cvalue = Clover.getCookie(configurationName);
     if (cvalue) {
         configuration = JSON.parse(cvalue);
     }
