@@ -37,6 +37,10 @@ function XmlHttpSupport() {
         }
     }
 
+    this.getResponseHeader = function(headerName) {
+        return this.xmlhttp.getResponseHeader(headerName);
+    }
+
     /**
      * Make the REST call to get the data
      */

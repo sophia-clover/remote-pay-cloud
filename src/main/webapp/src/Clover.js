@@ -12,7 +12,7 @@ function Clover(configuration) {
     this.configuration.allowOvertakeConnection =
         Boolean(this.configuration["allowOvertakeConnection"]);
 
-    this.device = new WebSocketDevice(this.configuration.allowOvertakeConnection);
+    this.device = new WebSocketDevice(this.configuration.allowOvertakeConnection, this.configuration["friendlyId"]);
     this.device.messageBuilder = new RemoteMessageBuilder("com.clover.remote.protocol.lan");
     // Echo all messages sent and received.
     this.device.echoAllMessages = false;
@@ -38,6 +38,10 @@ function Clover(configuration) {
         this.device.forceClose();
     }.bind(this));
     this.device.on(WebSocketDevice.CONNECTION_ERROR, function () {
+        this._isOpen = false;
+        this.device.forceClose();
+    }.bind(this));
+    this.device.on(WebSocketDevice.CONNECTION_STOLEN, function () {
         this._isOpen = false;
         this.device.forceClose();
     }.bind(this));
@@ -211,6 +215,7 @@ function Clover(configuration) {
             callBackOnDeviceReady();
         }
     }
+
     /**
      * Called to initialize the device for communications.
      *
@@ -266,6 +271,11 @@ function Clover(configuration) {
 
                         xmlHttpSupport.postData(endpoints.getAlertDeviceEndpoint(this.configuration.merchantId),
                             function (data) {
+
+                                me.device.bootStrapReconnect = function(callback) {
+                                    xmlHttpSupport.postData(endpoints.getAlertDeviceEndpoint(me.configuration.merchantId),
+                                        callback, callback, deviceContactInfo);
+                                }
                                 // The format of the data received is:
                                 //{
                                 //    'sent': true | false,
@@ -488,18 +498,24 @@ function Clover(configuration) {
         var me = this;
         this.discoveryResponseReceived = false;
 
-        this.device.once(LanMethod.DISCOVERY_RESPONSE,
-            function (message) {
-                // This id is set when the discovery request is sent when the device 'onopen' is called.
-                clearInterval(me.device.discoveryTimerId);
-                me.device.discoveryTimerId = null;
-                me.discoveryResponseReceived = true;
-                console.log("Device has responded to discovery message.");
-                console.log(message);
-            }
-        );
+        // Holds all the callbacks so that they can be removed later, if
+        // They need to be.  Callbacks need to be removed in the 'end states'
+        // that do not visit ALL the callback.
+        var allCallBacks = [];
 
-        this.device.once(WebSocketDevice.DEVICE_OPEN, function () {
+        var discoveryResponseCallback = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+            // This id is set when the discovery request is sent when the device 'onopen' is called.
+            clearInterval(me.device.discoveryTimerId);
+            me.device.discoveryTimerId = null;
+            me.discoveryResponseReceived = true;
+            console.log("Device has responded to discovery message.");
+        }
+        this.device.once(LanMethod.DISCOVERY_RESPONSE, discoveryResponseCallback);
+        allCallBacks.push({"event": LanMethod.DISCOVERY_RESPONSE, "callback": discoveryResponseCallback});
+
+        var onopenCallback = function () {
             // The connection to the device is open, but we do not yet know if there is anyone at the other end.
             // Send discovery request messages until we get a discovery response.
             me.device.dicoveryMessagesSent = 0;
@@ -508,11 +524,17 @@ function Clover(configuration) {
                     setInterval(
                         function () {
                             console.log("Sending 'discovery' message to device.");
-                            me.device.sendMessage(me.device.messageBuilder.buildDiscoveryRequest());
+                            try {
+                                me.device.sendMessage(me.device.messageBuilder.buildDiscoveryRequest());
+                            } catch (e) {
+                                console.log(e);
+                            }
                             me.device.dicoveryMessagesSent++;
 
                             // Arbitrary decision that 10 messages is long enough to wait.
                             if (me.device.dicoveryMessagesSent > me.numberOfDiscoveryMessagesToSend) {
+                                // Remove obsolete listeners.  This is an end state
+                                me.device.removeListeners(allCallBacks);
                                 var seconds = (me.numberOfDiscoveryMessagesToSend * me.pauseBetweenDiscovery) / 1000;
                                 var message = "No discovery response after " + seconds + " seconds";
                                 console.log(message +
@@ -529,7 +551,17 @@ function Clover(configuration) {
                     );
             }
             console.log('device opened');
-        });
+        }
+        this.device.once(WebSocketDevice.DEVICE_OPEN, onopenCallback);
+        allCallBacks.push({"event": WebSocketDevice.DEVICE_OPEN, "callback": onopenCallback});
+
+        var connctionDeniedCallback = function (message) {
+            // Remove obsolete listeners.  This is an end state
+            me.device.removeListeners(allCallBacks);
+        }
+        this.device.once(WebSocketDevice.CONNECTION_DENIED, connctionDeniedCallback);
+        allCallBacks.push({"event": WebSocketDevice.CONNECTION_DENIED, "callback": connctionDeniedCallback});
+
         console.log("Contacting device at " + this.configuration.deviceURL);
         this.device.contactDevice(this.configuration.deviceURL);
     }

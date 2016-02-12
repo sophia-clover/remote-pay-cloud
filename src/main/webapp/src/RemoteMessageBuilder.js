@@ -295,6 +295,8 @@ RemoteMessageBuilder.QUERY = "QUERY";
 RemoteMessageBuilder.EVENT = "EVENT";
 RemoteMessageBuilder.PING = "PING";
 RemoteMessageBuilder.PONG = "PONG";
+RemoteMessageBuilder.FORCE = "forceConnect";
+
 
 /**
  * The set of messages understood by the clover device
