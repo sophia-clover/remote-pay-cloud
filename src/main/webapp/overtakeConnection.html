@@ -71,11 +71,6 @@
       var resultDisplay = message.friendlyId + " stole the connection";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     });
-
-    clover.device.on(WebSocketDevice.CONNECTION_DENIED,  function (pairedToInfo) {
-      var resultDisplay = "Already paired to " + pairedToInfo;
-      document.getElementById("uiFeedback").innerHTML = resultDisplay;
-    });
   }
 
   function forceConnect() {
@@ -97,6 +92,9 @@
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
       clover.showMessage("Terminal " + document.getElementById("terminalId").value + " connected.");
+      var resultDisplay = "";
+      resultDisplay += "<pre>" + document.getElementById("terminalId").value + " connected." + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
     }
   }
 

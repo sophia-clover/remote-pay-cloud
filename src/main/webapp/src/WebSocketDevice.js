@@ -123,54 +123,61 @@ function WebSocketDevice(allowOvertakeConnection, friendlyId) {
         var connectedId = me.xmlHttpSupport.getResponseHeader("X-CLOVER-CONNECTED-ID");
 
         if (connectedId && !this.allowOvertakeConnection) {
-            this.connectionDenied(connectedId);
+            if (this.friendlyId == connectedId) {
+                // Do anything here?  This is already connected.
+                console.log("Trying to connect, but already connected.");
+            } else {
+                this.connectionDenied(connectedId);
+            }
             return;
         }
 
-        this.deviceSocket = new WebSocket(
-            //        "ws://192.168.0.56:49152"
-            //        selectedDevice.websocket_direct
-            ws_address
-        );
-        console.log("this.deviceSocket = " + this.deviceSocket);
-        this.deviceSocket.onopen = function (event) {
-            console.log("deviceSocket.onopen");
-            me.reconnecting = false;
-            me.reconnectAttempts = 0;
-            // Set up the ping for every X seconds
-            clearInterval(this.pingIntervalId);
-            me.pingIntervalId = setInterval(function () {
-                me.checkDeadConnection();
-                me.ping();
-            }, me.millisecondsBetweenPings);
-            me.onopen(event);
-        };
-
-        this.deviceSocket.onmessage = function (event) {
-            console.log("deviceSocket.onmessage");
-            var jsonMessage = JSON.parse(event.data);
-            me.receiveMessage(jsonMessage);
-        }
-
-        this.deviceSocket.onerror = function (event) {
-            console.error("deviceSocket.onerror");
-            console.error(event);
-            if(me.reconnect) {
-                me.startupReconnect(this.timebetweenReconnectAttempts);
-            }
-            else {
-                me.onerror(event);
-            }
-        }
-
-        this.deviceSocket.onclose = function (event) {
-            try {
-                console.log("Clearing ping thread");
+        if (!this.deviceSocket || this.deviceSocket.readyState != WebSocket.OPEN) {
+            this.deviceSocket = new WebSocket(
+                //        "ws://192.168.0.56:49152"
+                //        selectedDevice.websocket_direct
+                ws_address
+            );
+            console.log("this.deviceSocket = " + this.deviceSocket);
+            this.deviceSocket.onopen = function (event) {
+                console.log("deviceSocket.onopen");
+                me.reconnecting = false;
+                me.reconnectAttempts = 0;
+                // Set up the ping for every X seconds
                 clearInterval(this.pingIntervalId);
-            }catch(e){
-                console.error(e);
+                me.pingIntervalId = setInterval(function () {
+                    me.checkDeadConnection();
+                    me.ping();
+                }, me.millisecondsBetweenPings);
+                me.onopen(event);
+            };
+
+            this.deviceSocket.onmessage = function (event) {
+                // console.log("deviceSocket.onmessage");
+                var jsonMessage = JSON.parse(event.data);
+                me.receiveMessage(jsonMessage);
             }
-            me.onclose(event);
+
+            this.deviceSocket.onerror = function (event) {
+                // console.error("deviceSocket.onerror");
+                console.error(event);
+                if (me.reconnect) {
+                    me.startupReconnect(this.timebetweenReconnectAttempts);
+                }
+                else {
+                    me.onerror(event);
+                }
+            }
+
+            this.deviceSocket.onclose = function (event) {
+                try {
+                    console.log("Clearing ping thread");
+                    clearInterval(this.pingIntervalId);
+                } catch (e) {
+                    console.error(e);
+                }
+                me.onclose(event);
+            }
         }
     }
 

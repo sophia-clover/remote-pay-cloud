@@ -17,8 +17,10 @@ function XmlHttpSupport() {
                 if (xmlhttp.status == 200) {
                         try {
                         if(onDataLoaded) {
-                            var data = JSON.parse(xmlhttp.responseText);
-                            // displayDevices(devices);
+                            var data = null;
+                            if(xmlhttp.responseText && xmlhttp.responseText != "") {
+                                data = JSON.parse(xmlhttp.responseText);
+                            }
                             onDataLoaded(data);
                         }
                     } catch(e) {

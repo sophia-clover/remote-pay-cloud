@@ -5,6 +5,7 @@
  * @constructor
  */
 function Clover(configuration) {
+    this.debugConfiguration = {};
     this.configuration = configuration;
     if (!this.configuration) {
         this.configuration = {};
@@ -136,13 +137,15 @@ function Clover(configuration) {
     //****************************************
     // Very useful for debugging
     //****************************************
-    this.device.on(WebSocketDevice.ALL_MESSAGES,
-        function (message) {
-            if ((message['type'] != 'PONG') && (message['type'] != 'PING')) {
-                console.log(message);
+    if (this.debugConfiguration[WebSocketDevice.ALL_MESSAGES]) {
+        this.device.on(WebSocketDevice.ALL_MESSAGES,
+            function (message) {
+                if ((message['type'] != 'PONG') && (message['type'] != 'PING')) {
+                    console.log(message);
+                }
             }
-        }
-    );
+        );
+    }
 
     /**
      * Returns true if the signature should be automatically verified
@@ -558,6 +561,10 @@ function Clover(configuration) {
         var connctionDeniedCallback = function (message) {
             // Remove obsolete listeners.  This is an end state
             me.device.removeListeners(allCallBacks);
+            if (callBackOnDeviceReady) {
+                callBackOnDeviceReady(new CloverError(CloverError.CONNECTION_DENIED,
+                    message), message);
+            }
         }
         this.device.once(WebSocketDevice.CONNECTION_DENIED, connctionDeniedCallback);
         allCallBacks.push({"event": WebSocketDevice.CONNECTION_DENIED, "callback": connctionDeniedCallback});
