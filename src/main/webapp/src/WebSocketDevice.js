@@ -961,7 +961,7 @@ WebSocketDevice.prototype.sendShutdown = function() {
 }
 
 /**
- * Send a message to ask the device if it is there.
+ * Send a message with an image for the device to print.
  *
  * @param img - an image.  Can be obtained in a manner similar to :
  *  <pre>var img = document.getElementById("img_id");</pre>
@@ -973,6 +973,26 @@ WebSocketDevice.prototype.sendShutdown = function() {
  */
 WebSocketDevice.prototype.sendPrintImage = function(img, ackId) {
     var payload = {"png" : this.getBase64Image(img) };
+    var lanMessage = this.messageBuilder.buildPrintImage(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+
+/**
+ * Send a message with an image url for the device to print.
+ *
+ * @param img - a url to an image that is reachable from the device
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendPrintImageFromURL = function(urlString, ackId) {
+    var payload = {"urlString" : urlString };
     var lanMessage = this.messageBuilder.buildPrintImage(payload);
     // If an id is included, then an "ACK" message will be sent for this message
     if(ackId) lanMessage.id = ackId;
