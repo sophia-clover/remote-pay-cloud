@@ -1095,6 +1095,35 @@ function Clover(configuration) {
     }
 
     /**
+     * Prints an image on the receipt printer of the device.
+     *
+     * The size of the image should be limited, and the optimal
+     * width of the image is 384 pixals.
+     *
+     * @param img an HTML DOM IMG object.
+     * @param {requestCallback} [completionCallback]
+     */
+    this.printImageFromURL = function (img, completionCallback) {
+        var callbackPayload = {"request":{"img":{"url": img }}};
+        var uuid = null;
+        if(completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendPrintImageFromURL(img, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.PRINT_IMAGE,
+                "Failure attempting to print image", error);
+            if(completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+        }
+    }
+
+    /**
      * Not yet implemented
      * @param {requestCallback} completionCallback
      */
