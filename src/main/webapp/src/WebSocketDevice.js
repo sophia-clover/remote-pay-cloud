@@ -7,7 +7,7 @@
  *
  * @constructor
  */
-function WebSocketDevice(allowOvertakeConnection) {
+function WebSocketDevice(allowOvertakeConnection, friendlyId) {
     // This is the websocket connection
     this.deviceSocket = null;
     // The id for the ping interval timer so we can stop it
@@ -27,7 +27,10 @@ function WebSocketDevice(allowOvertakeConnection) {
     // How long should it be before we shut down on a dead connection
     this.deadConnectionShutdownThreshold = this.deadConnectionErrorThreshold * 2;
     this.allowOvertakeConnection = allowOvertakeConnection;
-
+    this.friendlyId = CloverID.getNewId();
+    if(friendlyId) {
+        this.friendlyId = friendlyId;
+    }
     // Flag to indicate if we attempt reconnects
     this.reconnect = true;
     this.reconnectAttempts = 0;
@@ -45,16 +48,22 @@ function WebSocketDevice(allowOvertakeConnection) {
      * @param {url} ws_address - the web service url to connect to to communicate with the clover device
      */
     this.contactDevice = function(ws_address) {
+        this.baseAddress = ws_address;
+        this.reContactDevice(this.generateAddress(this.baseAddress));
+    }
+
+    this.generateAddress = function(baseAddress) {
         var connect = "?";
-        if(ws_address.indexOf("?") > -1){
+        if(baseAddress.indexOf("?") > -1){
             connect = "&";
         }
-        if(allowOvertakeConnection) {
-            ws_address = ws_address + connect + "forceConnect=true";
+        var generatedAddress = baseAddress + connect + "friendlyId=" + this.friendlyId;
+        if(this.allowOvertakeConnection) {
+            generatedAddress = generatedAddress + connect + "forceConnect=true";
         } else {
-            ws_address = ws_address + connect + "forceConnect=false";
+            generatedAddress = generatedAddress + connect + "forceConnect=false";
         }
-        this.reContactDevice(ws_address)
+        return generatedAddress;
     }
     /**
      * Initiates contact with the device.
@@ -84,19 +93,21 @@ function WebSocketDevice(allowOvertakeConnection) {
                 // request.  Although this happens regarless of if the error
                 // happens, it is tremendously faster.
                 var wssUrl = ws_address;// me.deviceSocket.url;
+
+                var httpUrl = null;
                 if (wssUrl.indexOf("wss") > -1) {
-                    var httpsUrl = wssUrl.replace("wss", "https");
-                    if (!me.xmlHttpSupport) {
-                        me.xmlHttpSupport = new XmlHttpSupport();
-                    }
-                    me.xmlHttpSupport.options(httpsUrl,
-                        function () {me.startSSSS(ws_address)},
-                        function () {me.startSSSS(ws_address)}
-                        );
+                    httpUrl = wssUrl.replace("wss", "https");
                 } else {
-                    me.startSSSS(ws_address);
+                    httpUrl = ws_address.replace("ws", "http");
                 }
 
+                if (!me.xmlHttpSupport) {
+                    me.xmlHttpSupport = new XmlHttpSupport();
+                }
+                me.xmlHttpSupport.options(httpUrl,
+                    function () {me.startSSSS(ws_address)},
+                    function () {me.startSSSS(ws_address)}
+                    );
             } catch (error) {
                 console.log(error);
             }
@@ -108,49 +119,65 @@ function WebSocketDevice(allowOvertakeConnection) {
 
     this.startSSSS = function(ws_address) {
         var me = this;
-        this.deviceSocket = new WebSocket(
-            //        "ws://192.168.0.56:49152"
-            //        selectedDevice.websocket_direct
-            ws_address
-        );
-        console.log("this.deviceSocket = " + this.deviceSocket);
-        this.deviceSocket.onopen = function (event) {
-            console.log("deviceSocket.onopen");
-            me.reconnecting = false;
-            me.reconnectAttempts = 0;
-            // Set up the ping for every X seconds
-            me.pingIntervalId = setInterval(function () {
-                me.checkDeadConnection();
-                me.ping();
-            }, me.millisecondsBetweenPings);
-            me.onopen(event);
-        };
+        // See com.clover.support.handler.remote_pay.RemotePayConnectionControlHandler#X_CLOVER_CONNECTED_ID
+        var connectedId = me.xmlHttpSupport.getResponseHeader("X-CLOVER-CONNECTED-ID");
 
-        this.deviceSocket.onmessage = function (event) {
-            console.log("deviceSocket.onmessage");
-            var jsonMessage = JSON.parse(event.data);
-            me.receiveMessage(jsonMessage);
+        if (connectedId && !this.allowOvertakeConnection) {
+            if (this.friendlyId == connectedId) {
+                // Do anything here?  This is already connected.
+                console.log("Trying to connect, but already connected.");
+            } else {
+                this.connectionDenied(connectedId);
+            }
+            return;
         }
 
-        this.deviceSocket.onerror = function (event) {
-            console.error("deviceSocket.onerror");
-            console.error(event);
-            if(me.reconnect) {
-                me.startupReconnect(this.timebetweenReconnectAttempts);
-            }
-            else {
-                me.onerror(event);
-            }
-        }
-
-        this.deviceSocket.onclose = function (event) {
-            try {
-                console.log("Clearing ping thread");
+        if (!this.deviceSocket || this.deviceSocket.readyState != WebSocket.OPEN) {
+            this.deviceSocket = new WebSocket(
+                //        "ws://192.168.0.56:49152"
+                //        selectedDevice.websocket_direct
+                ws_address
+            );
+            console.log("this.deviceSocket = " + this.deviceSocket);
+            this.deviceSocket.onopen = function (event) {
+                console.log("deviceSocket.onopen");
+                me.reconnecting = false;
+                me.reconnectAttempts = 0;
+                // Set up the ping for every X seconds
                 clearInterval(this.pingIntervalId);
-            }catch(e){
-                console.error(e);
+                me.pingIntervalId = setInterval(function () {
+                    me.checkDeadConnection();
+                    me.ping();
+                }, me.millisecondsBetweenPings);
+                me.onopen(event);
+            };
+
+            this.deviceSocket.onmessage = function (event) {
+                // console.log("deviceSocket.onmessage");
+                var jsonMessage = JSON.parse(event.data);
+                me.receiveMessage(jsonMessage);
             }
-            me.onclose(event);
+
+            this.deviceSocket.onerror = function (event) {
+                // console.error("deviceSocket.onerror");
+                console.error(event);
+                if (me.reconnect) {
+                    me.startupReconnect(this.timebetweenReconnectAttempts);
+                }
+                else {
+                    me.onerror(event);
+                }
+            }
+
+            this.deviceSocket.onclose = function (event) {
+                try {
+                    console.log("Clearing ping thread");
+                    clearInterval(this.pingIntervalId);
+                } catch (e) {
+                    console.error(e);
+                }
+                me.onclose(event);
+            }
         }
     }
 
@@ -197,6 +224,17 @@ function WebSocketDevice(allowOvertakeConnection) {
     }
 
     /**
+     * Called when an initial connection is actively denied, typically because the
+     * device is already paired to another terminal.
+     *
+     * @param terminalIdPairedTo
+     */
+    this.connectionDenied = function(terminalIdPairedTo) {
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_DENIED, terminalIdPairedTo);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, terminalIdPairedTo);
+    }
+
+    /**
      * Called when the connection is OK.
      * Emits the
      *  WebSocketDevice.CONNECTION_OK message to registered listeners.
@@ -205,6 +243,17 @@ function WebSocketDevice(allowOvertakeConnection) {
         var message = "Connection Ok";
         this.eventEmitter.emit(WebSocketDevice.CONNECTION_OK, message);
         this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
+    }
+
+    /**
+     * The connection was taken away from us.  Do NOT try to reconnect!
+     *
+     * @param message
+     */
+    this.connectionStolen = function(message) {
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_STOLEN, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
+        this.forceClose(true);
     }
 
     /**
@@ -285,11 +334,30 @@ function WebSocketDevice(allowOvertakeConnection) {
      * is how this should be closed.  That sends a message to the device
      * to tell it that we are closing.  But this may be needed if the
      * device is not responsive.
+     *
+     * @param skipSendShutdown - if true, then the shutdown message is NOT
+     *  sent to the device.
      */
-    this.forceClose = function() {
-        clearInterval(this.pingIntervalId);
-        this.sendShutdown();
-        this.deviceSocket.close();
+    this.forceClose = function (skipSendShutdown) {
+        try {
+            clearInterval(this.pingIntervalId);
+        } catch (e) {
+        }
+        if(!skipSendShutdown) {
+            var oldReconnect = this.reconnect;
+            this.reconnect = false;
+            try {
+                this.sendShutdown();
+            } catch (e) {
+            }
+            this.reconnect = oldReconnect;
+        }
+        if (this.deviceSocket) {
+            try {
+                this.deviceSocket.close();
+            } catch (e) {
+            }
+        }
     }
 
     /**
@@ -308,7 +376,16 @@ function WebSocketDevice(allowOvertakeConnection) {
         }
         this.reconnecting = true;
         console.log("attempting reconnect...");
-        this.reContactDevice(this.deviceSocket.url);
+        var me = this;
+        if (this.bootStrapReconnect) {
+            this.bootStrapReconnect(
+                function() {
+                    me.reContactDevice(me.generateAddress(me.baseAddress));
+                }
+            );
+        } else {
+            this.reContactDevice(this.generateAddress(this.baseAddress));
+        }
     }
 
     /**
@@ -381,6 +458,9 @@ function WebSocketDevice(allowOvertakeConnection) {
             }
             if(message["type"] == RemoteMessageBuilder.PING) {
                 this.pingReceived(message);
+            }
+            if(message["type"] == RemoteMessageBuilder.FORCE) {
+                this.connectionStolen(message);
             }
         }
         this.eventEmitter.emit(message.method, message);
@@ -480,6 +560,16 @@ WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
  */
 WebSocketDevice.LOCAL_EVENT = "LOCAL_EVENT";
 
+/**
+ * Event emitter key for connection stolen messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_STOLEN = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_STOLEN";
+/**
+ * Event emitter key for connection denied messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_DENIED = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_DENIED";
 /**
  * Event emitter key for connection ok messages
  * @type {string}

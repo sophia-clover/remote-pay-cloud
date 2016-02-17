@@ -31,9 +31,14 @@
   <br/>
 </p>
 
-<button onclick="clover.close()">Close Clover</button>
-<button onclick="clover.device.deviceSocket.close()">Simulate network problem</button>
-<button onclick="clover.initDeviceConnection(putAMessageOnDevice)">Init connection and put a message on device</button>
+<div id="identityBlock">
+<button onclick="startTest()">Accept Identity</button><input type="text" id="terminalId"/><br/>
+</div>
+
+<button onclick="forceConnect()">Force Connect</button>
+<button onclick="askForConnect()">Ask for connection</button>
+<button onclick="getLastMessage()">Get Last Message</button>
+
 
 <!-- this is a place to talk about what is happening while the example is being run -->
 <div id="uiFeedback" style="height: 400px;">
@@ -41,16 +46,43 @@
 
 <script>
 
-  // Create the Clover object to communicate with the device
-  var configuration = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
-  configuration.allowOvertakeConnection = true;
-  var clover = new Clover(configuration);
+  document.getElementById("terminalId").value = CloverID.getNewId();
+  var clover = null;
 
-  var count = 0;
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
 
-  // Start communication
-  // Pass the function that should be called when the device is ready.
-  clover.initDeviceConnection(putAMessageOnDevice);
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function startTest(){
+    disable("identityBlock");
+    // Create the Clover object to communicate with the device
+    var configuration = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
+    // configuration.allowOvertakeConnection = true;
+    configuration.friendlyId = document.getElementById("terminalId").value;
+    clover = new Clover(configuration);
+
+    clover.device.on(WebSocketDevice.CONNECTION_STOLEN, function (message) {
+      var resultDisplay = message.friendlyId + " stole the connection";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    });
+  }
+
+  function forceConnect() {
+    clover.device.allowOvertakeConnection = true;
+    clover.initDeviceConnection(putAMessageOnDevice)
+  }
+
+  function askForConnect() {
+    clover.device.allowOvertakeConnection = false;
+    clover.initDeviceConnection(putAMessageOnDevice)
+  }
+
 
   // This will be called when the device is ready
   function putAMessageOnDevice(error) {
@@ -58,10 +90,33 @@
       var resultDisplay = "";
       resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      clover.showMessage("Terminal " + document.getElementById("terminalId").value + " connected.");
+      var resultDisplay = "";
+      resultDisplay += "<pre>" + document.getElementById("terminalId").value + " connected." + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
     }
-    clover.device.sendTerminalMessage("Message number " + count);
-    count+=1;
   }
+
+
+  // This will be called when the device is ready
+  function getLastMessage() {
+    clover.getLastMessage(resultCallback);
+  }
+
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function resultCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+
 </script>
 
 </body>
