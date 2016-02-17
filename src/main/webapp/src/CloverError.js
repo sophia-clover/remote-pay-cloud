@@ -25,6 +25,8 @@ CloverError.DEVICE_OFFLINE = "device offline";
 CloverError.INCOMPLETE_CONFIGURATION = "incomplete configuration";
 /** DISCOVERY_TIMEOUT */
 CloverError.DISCOVERY_TIMEOUT = "discovery timeout";
+/** DISCOVERY_TIMEOUT */
+CloverError.CONNECTION_DENIED = "connection denied";
 /** COMMUNICATION_ERROR */
 CloverError.COMMUNICATION_ERROR = "communication error";
 /** DEVICE_ERROR */

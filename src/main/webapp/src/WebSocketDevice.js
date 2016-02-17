@@ -7,7 +7,7 @@
  *
  * @constructor
  */
-function WebSocketDevice(allowOvertakeConnection) {
+function WebSocketDevice(allowOvertakeConnection, friendlyId) {
     // This is the websocket connection
     this.deviceSocket = null;
     // The id for the ping interval timer so we can stop it
@@ -27,7 +27,10 @@ function WebSocketDevice(allowOvertakeConnection) {
     // How long should it be before we shut down on a dead connection
     this.deadConnectionShutdownThreshold = this.deadConnectionErrorThreshold * 2;
     this.allowOvertakeConnection = allowOvertakeConnection;
-
+    this.friendlyId = CloverID.getNewId();
+    if(friendlyId) {
+        this.friendlyId = friendlyId;
+    }
     // Flag to indicate if we attempt reconnects
     this.reconnect = true;
     this.reconnectAttempts = 0;
@@ -45,12 +48,22 @@ function WebSocketDevice(allowOvertakeConnection) {
      * @param {url} ws_address - the web service url to connect to to communicate with the clover device
      */
     this.contactDevice = function(ws_address) {
-        if(allowOvertakeConnection) {
-            ws_address = ws_address + "&forceConnect=true";
-        } else {
-            ws_address = ws_address + "&forceConnect=false";
+        this.baseAddress = ws_address;
+        this.reContactDevice(this.generateAddress(this.baseAddress));
+    }
+
+    this.generateAddress = function(baseAddress) {
+        var connect = "?";
+        if(baseAddress.indexOf("?") > -1){
+            connect = "&";
         }
-        this.reContactDevice(ws_address)
+        var generatedAddress = baseAddress + connect + "friendlyId=" + this.friendlyId;
+        if(this.allowOvertakeConnection) {
+            generatedAddress = generatedAddress + connect + "forceConnect=true";
+        } else {
+            generatedAddress = generatedAddress + connect + "forceConnect=false";
+        }
+        return generatedAddress;
     }
     /**
      * Initiates contact with the device.
@@ -80,19 +93,21 @@ function WebSocketDevice(allowOvertakeConnection) {
                 // request.  Although this happens regarless of if the error
                 // happens, it is tremendously faster.
                 var wssUrl = ws_address;// me.deviceSocket.url;
+
+                var httpUrl = null;
                 if (wssUrl.indexOf("wss") > -1) {
-                    var httpsUrl = wssUrl.replace("wss", "https");
-                    if (!me.xmlHttpSupport) {
-                        me.xmlHttpSupport = new XmlHttpSupport();
-                    }
-                    me.xmlHttpSupport.options(httpsUrl,
-                        function () {me.startSSSS(ws_address)},
-                        function () {me.startSSSS(ws_address)}
-                        );
+                    httpUrl = wssUrl.replace("wss", "https");
                 } else {
-                    me.startSSSS(ws_address);
+                    httpUrl = ws_address.replace("ws", "http");
                 }
 
+                if (!me.xmlHttpSupport) {
+                    me.xmlHttpSupport = new XmlHttpSupport();
+                }
+                me.xmlHttpSupport.options(httpUrl,
+                    function () {me.startSSSS(ws_address)},
+                    function () {me.startSSSS(ws_address)}
+                    );
             } catch (error) {
                 console.log(error);
             }
@@ -104,49 +119,65 @@ function WebSocketDevice(allowOvertakeConnection) {
 
     this.startSSSS = function(ws_address) {
         var me = this;
-        this.deviceSocket = new WebSocket(
-            //        "ws://192.168.0.56:49152"
-            //        selectedDevice.websocket_direct
-            ws_address
-        );
-        console.log("this.deviceSocket = " + this.deviceSocket);
-        this.deviceSocket.onopen = function (event) {
-            console.log("deviceSocket.onopen");
-            me.reconnecting = false;
-            me.reconnectAttempts = 0;
-            // Set up the ping for every X seconds
-            me.pingIntervalId = setInterval(function () {
-                me.checkDeadConnection();
-                me.ping();
-            }, me.millisecondsBetweenPings);
-            me.onopen(event);
-        };
+        // See com.clover.support.handler.remote_pay.RemotePayConnectionControlHandler#X_CLOVER_CONNECTED_ID
+        var connectedId = me.xmlHttpSupport.getResponseHeader("X-CLOVER-CONNECTED-ID");
 
-        this.deviceSocket.onmessage = function (event) {
-            console.log("deviceSocket.onmessage");
-            var jsonMessage = JSON.parse(event.data);
-            me.receiveMessage(jsonMessage);
+        if (connectedId && !this.allowOvertakeConnection) {
+            if (this.friendlyId == connectedId) {
+                // Do anything here?  This is already connected.
+                console.log("Trying to connect, but already connected.");
+            } else {
+                this.connectionDenied(connectedId);
+            }
+            return;
         }
 
-        this.deviceSocket.onerror = function (event) {
-            console.error("deviceSocket.onerror");
-            console.error(event);
-            if(me.reconnect) {
-                me.startupReconnect(this.timebetweenReconnectAttempts);
-            }
-            else {
-                me.onerror(event);
-            }
-        }
-
-        this.deviceSocket.onclose = function (event) {
-            try {
-                console.log("Clearing ping thread");
+        if (!this.deviceSocket || this.deviceSocket.readyState != WebSocket.OPEN) {
+            this.deviceSocket = new WebSocket(
+                //        "ws://192.168.0.56:49152"
+                //        selectedDevice.websocket_direct
+                ws_address
+            );
+            console.log("this.deviceSocket = " + this.deviceSocket);
+            this.deviceSocket.onopen = function (event) {
+                console.log("deviceSocket.onopen");
+                me.reconnecting = false;
+                me.reconnectAttempts = 0;
+                // Set up the ping for every X seconds
                 clearInterval(this.pingIntervalId);
-            }catch(e){
-                console.error(e);
+                me.pingIntervalId = setInterval(function () {
+                    me.checkDeadConnection();
+                    me.ping();
+                }, me.millisecondsBetweenPings);
+                me.onopen(event);
+            };
+
+            this.deviceSocket.onmessage = function (event) {
+                // console.log("deviceSocket.onmessage");
+                var jsonMessage = JSON.parse(event.data);
+                me.receiveMessage(jsonMessage);
             }
-            me.onclose(event);
+
+            this.deviceSocket.onerror = function (event) {
+                // console.error("deviceSocket.onerror");
+                console.error(event);
+                if (me.reconnect) {
+                    me.startupReconnect(this.timebetweenReconnectAttempts);
+                }
+                else {
+                    me.onerror(event);
+                }
+            }
+
+            this.deviceSocket.onclose = function (event) {
+                try {
+                    console.log("Clearing ping thread");
+                    clearInterval(this.pingIntervalId);
+                } catch (e) {
+                    console.error(e);
+                }
+                me.onclose(event);
+            }
         }
     }
 
@@ -193,6 +224,17 @@ function WebSocketDevice(allowOvertakeConnection) {
     }
 
     /**
+     * Called when an initial connection is actively denied, typically because the
+     * device is already paired to another terminal.
+     *
+     * @param terminalIdPairedTo
+     */
+    this.connectionDenied = function(terminalIdPairedTo) {
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_DENIED, terminalIdPairedTo);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, terminalIdPairedTo);
+    }
+
+    /**
      * Called when the connection is OK.
      * Emits the
      *  WebSocketDevice.CONNECTION_OK message to registered listeners.
@@ -201,6 +243,17 @@ function WebSocketDevice(allowOvertakeConnection) {
         var message = "Connection Ok";
         this.eventEmitter.emit(WebSocketDevice.CONNECTION_OK, message);
         this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
+    }
+
+    /**
+     * The connection was taken away from us.  Do NOT try to reconnect!
+     *
+     * @param message
+     */
+    this.connectionStolen = function(message) {
+        this.eventEmitter.emit(WebSocketDevice.CONNECTION_STOLEN, message);
+        this.eventEmitter.emit(WebSocketDevice.ALL_MESSAGES, message);
+        this.forceClose(true);
     }
 
     /**
@@ -281,11 +334,30 @@ function WebSocketDevice(allowOvertakeConnection) {
      * is how this should be closed.  That sends a message to the device
      * to tell it that we are closing.  But this may be needed if the
      * device is not responsive.
+     *
+     * @param skipSendShutdown - if true, then the shutdown message is NOT
+     *  sent to the device.
      */
-    this.forceClose = function() {
-        clearInterval(this.pingIntervalId);
-        this.sendShutdown();
-        this.deviceSocket.close();
+    this.forceClose = function (skipSendShutdown) {
+        try {
+            clearInterval(this.pingIntervalId);
+        } catch (e) {
+        }
+        if(!skipSendShutdown) {
+            var oldReconnect = this.reconnect;
+            this.reconnect = false;
+            try {
+                this.sendShutdown();
+            } catch (e) {
+            }
+            this.reconnect = oldReconnect;
+        }
+        if (this.deviceSocket) {
+            try {
+                this.deviceSocket.close();
+            } catch (e) {
+            }
+        }
     }
 
     /**
@@ -304,7 +376,16 @@ function WebSocketDevice(allowOvertakeConnection) {
         }
         this.reconnecting = true;
         console.log("attempting reconnect...");
-        this.reContactDevice(this.deviceSocket.url);
+        var me = this;
+        if (this.bootStrapReconnect) {
+            this.bootStrapReconnect(
+                function() {
+                    me.reContactDevice(me.generateAddress(me.baseAddress));
+                }
+            );
+        } else {
+            this.reContactDevice(this.generateAddress(this.baseAddress));
+        }
     }
 
     /**
@@ -377,6 +458,9 @@ function WebSocketDevice(allowOvertakeConnection) {
             }
             if(message["type"] == RemoteMessageBuilder.PING) {
                 this.pingReceived(message);
+            }
+            if(message["type"] == RemoteMessageBuilder.FORCE) {
+                this.connectionStolen(message);
             }
         }
         this.eventEmitter.emit(message.method, message);
@@ -477,6 +561,16 @@ WebSocketDevice.ALL_MESSAGES = "ALL_MESSAGES";
 WebSocketDevice.LOCAL_EVENT = "LOCAL_EVENT";
 
 /**
+ * Event emitter key for connection stolen messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_STOLEN = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_STOLEN";
+/**
+ * Event emitter key for connection denied messages
+ * @type {string}
+ */
+WebSocketDevice.CONNECTION_DENIED = WebSocketDevice.LOCAL_EVENT + "_CONNECTION_DENIED";
+/**
  * Event emitter key for connection ok messages
  * @type {string}
  */
@@ -564,11 +658,12 @@ WebSocketDevice.prototype.sendKeyPress = function(keyCode, ackId) {
  *  parameter is included.  This "ACK" message will be in addition to any other message
  *  that may be generated as a result of this message being sent.
  */
-WebSocketDevice.prototype.sendTXStart = function(payIntent, ackId) {
+WebSocketDevice.prototype.sendTXStart = function(payIntent, suppressOnScreenTips, ackId) {
 
     // This is how they are doing the payload...
     var payload = {
-        "payIntent": payIntent
+        "payIntent": payIntent,
+        "suppressOnScreenTips": suppressOnScreenTips
     };
 
     var lanMessage = this.messageBuilder.buildTxStart(payload);
@@ -647,6 +742,27 @@ WebSocketDevice.prototype.sendVoidPayment = function(payment, voidReason, ackId)
 }
 
 /**
+ * Vault a card
+ *
+ * @param {int} cardEntryMethods - card entry methods, bitwise OR of {@link CardEntryMethods} constants
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendVaultCard = function(cardEntryMethods, ackId) {
+    var payload = {};
+    payload.cardEntryMethods = cardEntryMethods;
+
+    var lanMessage = this.messageBuilder.buildVaultCard(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
  * Refund a payment, partial or complete
  *
  * @param {string} orderId - the id for the order the refund is against
@@ -671,6 +787,58 @@ WebSocketDevice.prototype.sendRefund = function(orderId, paymentId, amount, ackI
 
     this.sendMessage(lanMessage);
 }
+
+/**
+ * Capture a preauthorization
+ *
+ * @param {string} orderId - the id for the order the payment was against
+ * @param {string} paymentId - the id for the payment on the order the preauth is against
+ * @param {number} amount - the final amount for the payment, not including the tip
+ * @param {number} [tipAmount] - the tip for the order
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendCapturePreAuth = function(orderId, paymentId, amount, tipAmount, ackId) {
+    var payload = {};
+    payload.orderId = orderId;
+    payload.paymentId = paymentId;
+    if(amount)payload.amount = amount;
+    if(tipAmount)payload.tipAmount = tipAmount;
+
+    var lanMessage = this.messageBuilder.buildCapturePreAuth(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+
+
+/**
+ * Capture a preauthorization
+ *
+ * @param {string} sendCloseout - the request for closeout.
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendCloseout = function(allowOpenTabs, batchId, ackId) {
+    var payload = {};
+    payload.allowOpenTabs = allowOpenTabs;
+    payload.batchId = batchId;
+
+    var lanMessage = this.messageBuilder.buildCloseout(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
 
 /**
  * Adjust a payment
@@ -883,7 +1051,7 @@ WebSocketDevice.prototype.sendShutdown = function() {
 }
 
 /**
- * Send a message to ask the device if it is there.
+ * Send a message with an image for the device to print.
  *
  * @param img - an image.  Can be obtained in a manner similar to :
  *  <pre>var img = document.getElementById("img_id");</pre>
@@ -895,6 +1063,26 @@ WebSocketDevice.prototype.sendShutdown = function() {
  */
 WebSocketDevice.prototype.sendPrintImage = function(img, ackId) {
     var payload = {"png" : this.getBase64Image(img) };
+    var lanMessage = this.messageBuilder.buildPrintImage(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+
+/**
+ * Send a message with an image url for the device to print.
+ *
+ * @param img - a url to an image that is reachable from the device
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendPrintImageFromURL = function(urlString, ackId) {
+    var payload = {"urlString" : urlString };
     var lanMessage = this.messageBuilder.buildPrintImage(payload);
     // If an id is included, then an "ACK" message will be sent for this message
     if(ackId) lanMessage.id = ackId;
@@ -920,6 +1108,7 @@ WebSocketDevice.prototype.sendLastMessageRequest = function(ackId) {
 
     this.sendMessage(lanMessage);
 }
+
 
 /**
  * @private

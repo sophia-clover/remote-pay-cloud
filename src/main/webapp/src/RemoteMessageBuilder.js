@@ -87,6 +87,17 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
+     * Builds a vault card message
+     *
+     * @param {json} payload - card entry types allowed
+     * @returns {json} the constructed message
+     */
+    this.buildVaultCard = function (payload) {
+        payload.method = LanMethod.VAULT_CARD;
+        return this.buildRemoteMessage(LanMethod.VAULT_CARD, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
      * Builds a refund payment message
      *
      * @param {json} payload - the orderid and paymentid with optional amount
@@ -95,6 +106,28 @@ function RemoteMessageBuilder(defaultPackageName) {
     this.buildRefund = function (payload) {
         payload.method = LanMethod.REFUND_REQUEST;
         return this.buildRemoteMessage(LanMethod.REFUND_REQUEST, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
+     * Builds a capture preauth message
+     *
+     * @param {json} payload - the orderid, paymentid, amount, with optional tipAmount
+     * @returns {json} the constructed message
+     */
+    this.buildCapturePreAuth = function (payload) {
+        payload.method = LanMethod.CAPTURE_PREAUTH;
+        return this.buildRemoteMessage(LanMethod.CAPTURE_PREAUTH, RemoteMessageBuilder.COMMAND, payload);
+    }
+
+    /**
+     * Builds a closeout message
+     *
+     * @param {json} payload - optional allowOpenTabs and batchid
+     * @returns {json} the constructed message
+     */
+    this.buildCloseout = function (payload) {
+        payload.method = LanMethod.CLOSEOUT_REQUEST;
+        return this.buildRemoteMessage(LanMethod.CLOSEOUT_REQUEST, RemoteMessageBuilder.COMMAND, payload);
     }
 
     /**
@@ -262,6 +295,8 @@ RemoteMessageBuilder.QUERY = "QUERY";
 RemoteMessageBuilder.EVENT = "EVENT";
 RemoteMessageBuilder.PING = "PING";
 RemoteMessageBuilder.PONG = "PONG";
+RemoteMessageBuilder.FORCE = "forceConnect";
+
 
 /**
  * The set of messages understood by the clover device
@@ -333,12 +368,26 @@ LanMethod.SHOW_PAYMENT_RECEIPT_OPTIONS = "SHOW_PAYMENT_RECEIPT_OPTIONS";
 LanMethod.OPEN_CASH_DRAWER = "OPEN_CASH_DRAWER";
 /** The tip adjust request method type */
 LanMethod.TIP_ADJUST = "TIP_ADJUST";
+/** The tip adjust request method type */
+LanMethod.TIP_ADJUST_RESPONSE = "TIP_ADJUST_RESPONSE";
 /** The message type for a refund print message */
 LanMethod.REFUND_PRINT_PAYMENT = "REFUND_PRINT_PAYMENT";
 /** Message returned when request for last message is sent */
 LanMethod.LAST_MSG_RESPONSE = "LAST_MSG_RESPONSE";
 /** Message type to get the last message sent/received to/from the device */
 LanMethod.LAST_MSG_REQUEST = "LAST_MSG_REQUEST";
+/** Message type to capture a pre auth payment */
+LanMethod.CAPTURE_PREAUTH = "CAPTURE_PREAUTH";
+/** Message type returned to capture a pre auth payment */
+LanMethod.CAPTURE_PREAUTH_RESPONSE = "CAPTURE_PREAUTH_RESPONSE";
+/** Message type to Request to capture card info */
+LanMethod.VAULT_CARD = "VAULT_CARD";
+/** Message type to respond to capture card info request */
+LanMethod.VAULT_CARD_RESPONSE = "VAULT_CARD_RESPONSE";
+/** Message type to request closeout*/
+LanMethod.CLOSEOUT_REQUEST = "CLOSEOUT_REQUEST"
+/** Message type to respond to closeout request */
+LanMethod.CLOSEOUT_RESPONSE = "CLOSEOUT_RESPONSE";
 
 /**
  * The shutdown method type
