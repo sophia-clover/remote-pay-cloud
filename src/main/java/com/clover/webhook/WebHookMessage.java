@@ -12,6 +12,15 @@ public class WebHookMessage {
   private String appId;   //The app ID that the webhook was set up for
   private Map<String, List<Update>> merchants; // Map of [“merchantId” -> List of updates]
 
+  public String getVerificationCode() {
+    return verificationCode;
+  }
+
+  public void setVerificationCode(String verificationCode) {
+    this.verificationCode = verificationCode;
+  }
+
+  private String verificationCode;
 
   public String getAppId() {
     return appId;

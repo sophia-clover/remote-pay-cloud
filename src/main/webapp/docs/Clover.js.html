@@ -96,7 +96,7 @@ function Clover(configuration) {
     this.configuration.remotePrint =
         Boolean(this.configuration.remotePrint);
 
-    this.sale_payIntentTemplate = {
+    this.saleOrAuth_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "PAYMENT",
         "taxAmount": 0, // tax amount is included in the amount
@@ -105,7 +105,7 @@ function Clover(configuration) {
         "remotePrint":  this.configuration.remotePrint
     };
 
-    this.auth_payIntentTemplate = {
+    this.preAuth_payIntentTemplate = {
         "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
         "transactionType": "AUTH",
         "taxAmount": 0, // tax amount is included in the amount
@@ -540,7 +540,7 @@ function Clover(configuration) {
         }
         saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
-            this.internalTx(saleInfo, saleRequestCallback, this.sale_payIntentTemplate, "payment");
+            this.internalTx(saleInfo, saleRequestCallback, this.saleOrAuth_payIntentTemplate, "payment");
         }
         return externalPaymentId;
     }
@@ -563,7 +563,7 @@ function Clover(configuration) {
         }
         saleInfo.externalPaymentId = externalPaymentId;
         if (this.verifyValidAmount(saleInfo, saleRequestCallback)) {
-            this.internalTx(saleInfo, saleRequestCallback, this.auth_payIntentTemplate, "payment");
+            this.internalTx(saleInfo, saleRequestCallback, this.preAuth_payIntentTemplate, "payment");
         }
         return externalPaymentId;
     }

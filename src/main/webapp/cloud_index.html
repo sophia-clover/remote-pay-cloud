@@ -427,7 +427,15 @@
         }
     );
 
-    // There is a problem with the connection.  A long time has gone by without expected communication
+    device.on(WebSocketDevice.CONNECTION_DENIED,  function (pairedToInfo) {
+      displayUIFeedBack("There is a problem with the connection.  The device is already paired to " +
+          pairedToInfo
+      );
+      device.disconnectFromDevice();
+      clearInterval(device.discoveryTimerId);
+    });
+
+      // There is a problem with the connection.  A long time has gone by without expected communication
     // with the device.
     device.on(WebSocketDevice.CONNECTION_ERROR,  function (lag) {
       document.getElementById(getSelectedDevice().serial + "_status").style.backgroundColor = 'red';

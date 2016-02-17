@@ -1,4 +1,6 @@
-// The base clover configuration.
+/*
+This file contains configuration examples for the Clover object.
+ */
 var exampleConfigurations =
 {
     "sandbox_C030UQ53460719": {
@@ -6,6 +8,13 @@ var exampleConfigurations =
         "oauthToken" : "73d0c70d-1dc2-21ef-66b3-220b2efdc4eb",
         "domain" : "https://sandbox.dev.clover.com/",
         "merchantId" : "VKYQ0RVGMYHRR",
+        "deviceSerialId" : "C030UQ53460719"
+    },
+    "sandbox_booker_C030UQ53460719" : {
+        "clientId" : "1VE8EKDBFSHKA",
+        "oauthToken" : "211f96ae-2121-00e9-eb50-80995787fefa",
+        "domain" : "https://sandbox.dev.clover.com/",
+        "merchantId" : "D5PKQ077KW3CY",
         "deviceSerialId" : "C030UQ53460719"
     },
     "localhost_C030UQ50550081" : {
@@ -59,7 +68,7 @@ var exampleConfigurations =
     },
     "sandboxdev_C021UQ52340078" : {
         "clientId" : "3BZPZ6A6FQ8ZM",
-        "oauthToken" : "6e6313e8-ff33-8662-7ff2-3a6690e0ff14",
+        "oauthToken" : "f41035d0-ff33-8662-7ff2-3a6690e0ff14",
         "domain" : "https://sandboxdev.dev.clover.com/",
         "merchantId" : "VKYQ0RVGMYHRR",
         "deviceSerialId" : "C021UQ52340078"
@@ -68,7 +77,7 @@ var exampleConfigurations =
         "deviceURL" : "ws://192.168.1.49:14285"
     }
 };
-var defaultConfiguration = exampleConfigurations.sandbox_C030UQ53460719;
+var defaultConfiguration = exampleConfigurations.sandboxdev_C021UQ52340078;
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,
