@@ -687,7 +687,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line370">line 370</a>
+        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line435">line 435</a>
     </li></ul></dd>
     
 
@@ -972,7 +972,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line352">line 352</a>
+        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line417">line 417</a>
     </li></ul></dd>
     
 
@@ -997,6 +997,194 @@
         <h3 class="subsection-title">Type Definitions</h3>
 
         
+                
+<h4 class="name" id="CapturePreAuthRequest">CapturePreAuthRequest</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>paymentId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the id of the payment to capture</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>amount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the final amount ofthe payment less any included tip</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tipAmount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the amount of the tip.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1600">line 1600</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
                 
 <h4 class="name" id="CardTransaction">CardTransaction</h4>
 
@@ -1288,7 +1476,138 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1299">line 1299</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1641">line 1641</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="CloseoutRequest">CloseoutRequest</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>allowOpenTabs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">if true, indicates that a closeout can proceed, even if open tabs are
+ present.  Defaults to false.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1585">line 1585</a>
     </li></ul></dd>
     
 
@@ -1318,7 +1637,7 @@ be configured for proper access to the device.
 <p>
     Possible configurations:<br/>
     <ol>
-         <li>deviceURL (Only valid when device is in Local Pay Display app configuration)</li>
+         <li>deviceURL</li>
          <li>oauthToken, domain, merchantId, deviceSerialId</li>
          <li>clientId, domain, merchantId, deviceId (Requires log in to Clover server)</li>
          <li>clientId, domain, merchantId, deviceSerialId (Requires log in to Clover server)</li>
@@ -1688,7 +2007,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1338">line 1338</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1680">line 1680</a>
     </li></ul></dd>
     
 
@@ -1973,7 +2292,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1283">line 1283</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1625">line 1625</a>
     </li></ul></dd>
     
 
@@ -2287,7 +2606,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1272">line 1272</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1614">line 1614</a>
     </li></ul></dd>
     
 
@@ -2430,7 +2749,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1331">line 1331</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1673">line 1673</a>
     </li></ul></dd>
     
 
@@ -2620,7 +2939,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1256">line 1256</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1591">line 1591</a>
     </li></ul></dd>
     
 
@@ -2797,7 +3116,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1200">line 1200</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1528">line 1528</a>
     </li></ul></dd>
     
 
@@ -2981,7 +3300,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1317">line 1317</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1659">line 1659</a>
     </li></ul></dd>
     
 
@@ -3105,7 +3424,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1326">line 1326</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1668">line 1668</a>
     </li></ul></dd>
     
 
@@ -3248,7 +3567,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1293">line 1293</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1635">line 1635</a>
     </li></ul></dd>
     
 
@@ -3414,7 +3733,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1265">line 1265</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1607">line 1607</a>
     </li></ul></dd>
     
 
@@ -3671,6 +3990,37 @@ can still be returned in the other arguments as well, but generally the error is
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>isPreAuth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">valid for auth calls.  If set, the payment will be made as a pre authorization.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -3706,7 +4056,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1220">line 1220</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1548">line 1548</a>
     </li></ul></dd>
     
 
@@ -3958,7 +4308,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1237">line 1237</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1566">line 1566</a>
     </li></ul></dd>
     
 
@@ -3994,7 +4344,7 @@ can still be returned in the other arguments as well, but generally the error is
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Dec 10 2015 09:38:29 GMT-0700 (MST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Feb 18 2016 13:25:24 GMT-0700 (MST)
 </footer>
 
 <script> prettyPrint(); </script>

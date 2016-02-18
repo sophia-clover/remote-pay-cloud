@@ -1,20 +1,29 @@
-/*
-This file contains configuration examples for the Clover object.
- */
+// The base clover configuration.
 var exampleConfigurations =
 {
-    "sandboxdev_C021UQ52340078" : {
-        "clientId" : "3BZPZ6A6FQ8ZM",
-        "oauthToken" : "f41035d0-ff33-8662-7ff2-3a6690e0ff14",
-        "domain" : "https://sandboxdev.dev.clover.com/",
-        "merchantId" : "VKYQ0RVGMYHRR",
-        "deviceSerialId" : "C021UQ52340078"
+    "production" : {
+        "clientId" : "VYM6CYQ9GZRST",
+        "domain" : "https://www.clover.com/",
+        "configName" : "production"
     },
-    "lan_1_49" : {
-        "deviceURL" : "ws://192.168.1.49:14285"
+    "sandbox": {
+        "clientId" : "TQCACCW9EDGX2",
+        "domain" : "https://sandbox.dev.clover.com/",
+        "configName" : "sandbox"
+    },
+    "dev1" : {
+        "clientId" : "5FTA0E29EM826",
+        "domain" : "https://dev1.dev.clover.com/",
+        "configName" : "dev1"
+    },
+    "sandboxdev" : {
+        "clientId" : "TQCACCW9EDGX2",
+        "domain" : "https://sandboxdev.dev.clover.com/",
+        "configName" : "sandboxdev"
     }
 };
-var defaultConfiguration = exampleConfigurations.sandboxdev_C021UQ52340078;
+var defaultConfigurationName = "sandboxdev"
+var defaultConfiguration = exampleConfigurations[defaultConfigurationName];
 function copyConfig() {
     return {
         "clientId" : defaultConfiguration.clientId,
@@ -22,7 +31,8 @@ function copyConfig() {
         "domain" : defaultConfiguration.domain,
         "merchantId" : defaultConfiguration.merchantId,
         "deviceSerialId" : defaultConfiguration.deviceSerialId,
-        "deviceURL" : defaultConfiguration["deviceURL"]
+        "deviceURL" : defaultConfiguration["deviceURL"],
+        "configName" : defaultConfiguration["configName"]
     };
 }
 

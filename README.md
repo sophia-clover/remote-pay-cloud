@@ -49,8 +49,11 @@ the following can be used:
 ```
 keytool -genkey -alias jetty7 -keyalg RSA -keystore src/test/resources/jetty.keystore -storepass password -keypass password -dname "CN=localhost"
 ```
-__*Note*__: The ports can be changed in the maven build file (pom.xml), however the `mvn` commands require root (`sudo`) 
-permissions on *nix* based environments if either of the ports are less than 1024.
+__*Note*__: The ports can be changed in the maven build file (pom.xml), or can be specified on the command line, for example:
+```
+sudo mvn -Djetty.port=80 -Dhttps.port=443 clean package jetty:run
+```
+however the `mvn` commands require root (`sudo`) permissions on *nix* based environments if either of the ports are less than 1024.
 
 ## Make a Transaction
 

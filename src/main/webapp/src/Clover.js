@@ -1222,6 +1222,7 @@ function Clover(configuration) {
     }
 
     /**
+     * Retreive the last transactional message made to the device.
      *
      * @param {requestCallback} completionCallback
      */
@@ -1277,6 +1278,7 @@ function Clover(configuration) {
     }
 
     /**
+     * Capture a previously made preauthorization.
      *
      * @param {CapturePreAuthRequest} request
      * @param completionCallback
@@ -1312,6 +1314,8 @@ function Clover(configuration) {
     }
 
     /**
+     *
+     * Send a closeout request to the device.
      *
      * @param {CloseoutRequest} request
      * @param completionCallback

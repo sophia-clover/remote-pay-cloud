@@ -20,18 +20,79 @@
   <script src="src/RemoteMessageBuilder.js"></script>
 
   <script>
-    function initStuff(config) {
-      var domain = document.getElementById("cloverUrl_oauth");
-      domain.value = config.domain;
+    function initStuff() {
+
+      var config = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
+
+      var clientIds = {};
+      var domains = {};
+
       var clientId = document.getElementById("clientId_oauth");
-      clientId.value = config.clientId;
+      clientId.options.length = 0;
+      var domain = document.getElementById("cloverUrl_oauth");
+      domain.options.length = 0;
+      var completeConfig = document.getElementById("complete_config");
+      completeConfig.options.length = 0;
+
+      for(var key in exampleConfigurations)
+      {
+        if(exampleConfigurations.hasOwnProperty(key))
+        {
+          var oneConfig = exampleConfigurations[key];
+
+          if(oneConfig.clientId && (!clientIds[oneConfig.clientId])) {
+            clientIds[oneConfig.clientId]=1;
+
+            var opt = document.createElement("option");
+            opt.value = oneConfig.clientId;
+            opt.innerHTML = oneConfig.clientId; // whatever property it has
+            // then append it to the select element
+            clientId.appendChild(opt);
+          }
+
+          if(oneConfig.domain && (!domains[oneConfig.domain])) {
+            domains[oneConfig.domain]=1;
+
+            var opt2 = document.createElement("option");
+            opt2.value = oneConfig.domain;
+            opt2.innerHTML = oneConfig.domain; // whatever property it has
+            // then append it to the select element
+            domain.appendChild(opt2);
+          }
+
+          var opt3 = document.createElement("option");
+          opt3.value = key;
+          opt3.innerHTML = key; // whatever property it has
+          // then append it to the select element
+          completeConfig.appendChild(opt3);
+        }
+      }
+      if (config) {
+        if(config["configName"]) {
+          completeConfig.value = config["configName"];
+          configChange(config["configName"]);
+        } else {
+          domain.value = config.domain;
+          clientId.value = config.clientId;
+        }
+      } else {
+        completeConfig.value = defaultConfigurationName;
+        configChange(completeConfig.value);
+      }
+    }
+
+    function configChange(key) {
+      var clientId = document.getElementById("clientId_oauth");
+      var domain = document.getElementById("cloverUrl_oauth");
+      domain.value = exampleConfigurations[key].domain;
+      clientId.value = exampleConfigurations[key].clientId;
     }
   </script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
 
-<body onbeforeunload="shutdown()" onload="initStuff(defaultConfiguration)">
+<body onbeforeunload="shutdown()" onload="initStuff()">
 <h1>Web Socket Cloud Remote API Example</h1>
 
 <a href="./docs">Developer documents</a><br/>
@@ -59,9 +120,17 @@
 
 <!-- Let the user enter their app id and the clover server (it might be a dev server, or their own) -->
 <div id="ouauth_config">
-  Client ID: <input type="text" id="clientId_oauth" value=""/><br/>
-  Clover Server URL: <input disabled="true" type="text" id="cloverUrl_oauth"
-                            onload="this.value=defaultConfiguration.domain"/>
+  Complete Config:
+  <select id="complete_config" onchange="configChange(this.value)">
+  </select><br/>
+
+  Client ID:
+  <select id="clientId_oauth">
+  </select><br/>
+
+  Clover Server URL:
+  <select id="cloverUrl_oauth">
+  </select><br/>
   <br/>
   <button id="checkOauth" onclick="checkOAuth()">Authenticate to Clover</button>
 </div>
@@ -198,9 +267,11 @@
   function checkOAuth() {
     var newConfig = {
       clientId: document.getElementById("clientId_oauth").value, // this is the app id
-      domain: document.getElementById("cloverUrl_oauth").value // this is the url to the clover domain (http://www.clover.com)
+      domain: document.getElementById("cloverUrl_oauth").value, // this is the url to the clover domain (http://www.clover.com)
+      configName: document.getElementById("complete_config").value
     };
     var cloverOAuth = new CloverOAuth(newConfig);
+    Clover.writeConfigurationToCookie(newConfig);
     cloverOAuth.getAccessToken();
   }
 
