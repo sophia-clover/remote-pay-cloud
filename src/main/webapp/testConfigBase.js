@@ -24,17 +24,6 @@ var exampleConfigurations =
 };
 var defaultConfigurationName = "sandboxdev"
 var defaultConfiguration = exampleConfigurations[defaultConfigurationName];
-function copyConfig() {
-    return {
-        "clientId" : defaultConfiguration.clientId,
-        "oauthToken" : defaultConfiguration.oauthToken,
-        "domain" : defaultConfiguration.domain,
-        "merchantId" : defaultConfiguration.merchantId,
-        "deviceSerialId" : defaultConfiguration.deviceSerialId,
-        "deviceURL" : defaultConfiguration["deviceURL"],
-        "configName" : defaultConfiguration["configName"]
-    };
-}
 
 /**
  * An example of a custom handler for dealing with incomplete configuration.
