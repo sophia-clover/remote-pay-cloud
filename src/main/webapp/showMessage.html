@@ -21,6 +21,8 @@
   on the device screen.
 </p>
 
+<div id="config_ui"><div>
+
 <div id="message_config">
   Message: <textarea id="messageText">Custom Message</textarea>
   <div id="sendMessageBtns" style="display:none">
@@ -31,9 +33,13 @@
 </div>
 
 <script>
-
   // Create the Clover object to communicate with the device
   var clover = new Clover();
+  // Following will try to handle when incomplete configurations are encountered.
+  clover.incompleteConfiguration = function (message, configuration, callback) {
+    var resultDisplay = exampleIncompleteConfigurationHandlerDIVBuilder(configuration);
+    document.getElementById("config_ui").innerHTML = resultDisplay;
+  }
 
   // Pass the function that should be called when the device is ready.
   clover.initDeviceConnection(deviceReady);

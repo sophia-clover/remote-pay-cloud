@@ -125,13 +125,15 @@ function Clover(configuration) {
      * @private
      * @type {{action: string, transactionType: string, taxAmount: number, cardEntryMethods: *, disableRestartTransactionWhenFailed: boolean, remotePrint: boolean}}
      */
-    this.refund_payIntentTemplate = {
-        "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
-        "transactionType": "CREDIT",
-        "taxAmount": 0, // tax amount is included in the amount
-        "cardEntryMethods": CardEntryMethods.ALL,
-        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
-        "remotePrint": this.configuration.remotePrint
+    this.refund_payIntentTemplate = function() {
+        return {
+            "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+            "transactionType": "CREDIT",
+            "taxAmount": 0, // tax amount is included in the amount
+            "cardEntryMethods": CardEntryMethods.ALL,
+            "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+            "remotePrint": this.configuration.remotePrint
+        };
     };
 
     //****************************************
@@ -249,7 +251,16 @@ function Clover(configuration) {
                 // We need the access token, the domain and the merchantId in order to get the devices
                 // We already know that we have the token, but we need to check for the
                 // domain and merchantId.
-                if (this.configuration.domain && this.configuration.merchantId) {
+                if(!this.configuration.merchantId) {
+                    this.configuration.merchantId = this.cloverOAuth.getURLParams()["merchant_id"];
+                }
+                if(!this.configuration.merchantId) {
+                    // We do not have enough info to initialize.  Error out
+                    this.incompleteConfiguration("Incomplete init info, missing 'merchantId'", this.configuration,
+                        callBackOnDeviceReady);
+                    return;
+                }
+                if (this.configuration.domain) {
                     // We need the device id of the device we will contact.
                     // Either we have it...
                     var xmlHttpSupport = new XmlHttpSupport();
@@ -382,7 +393,7 @@ function Clover(configuration) {
                     }
                 } else {
                     // We do not have enough info to initialize.  Error out
-                    this.incompleteConfiguration("Incomplete init info.", this.configuration,
+                    this.incompleteConfiguration("Incomplete init info, missing 'domain'.", this.configuration,
                         callBackOnDeviceReady);
                     return;
                 }
@@ -393,6 +404,7 @@ function Clover(configuration) {
                 if (this.configuration.clientId && this.configuration.domain) {
                     this.cloverOAuth = new CloverOAuth(this.configuration);
                     // This may cause a redirect
+                    this.persistConfiguration();
                     this.configuration.oauthToken = this.cloverOAuth.getAccessToken();
                     // recurse
                     this.initDeviceConnectionInternal(callBackOnDeviceReady);
@@ -419,7 +431,7 @@ function Clover(configuration) {
         // We have no configuration at all.  Try to get it from a cookie
         if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
         this.configuration = Clover.loadConfigurationFromCookie(this.configurationName);
-        if (!this.configuration) {
+        if (!this.configuration || Object.keys(this.configuration).length == 0) {
             // fire up a gui to get the values?
             // This could be some server call back or other too.
             this.incompleteConfiguration("No initialization info found in cookie", this.configuration, callback);
@@ -459,7 +471,8 @@ function Clover(configuration) {
         // If this is used to obtain the configuration information, then the
         // configuration should be updated, and then the 'initDeviceConnection'
         // should be called again to connect to the device.
-        var error = new CloverError(CloverError.INCOMPLETE_CONFIGURATION, message);
+        var error = new CloverError(CloverError.INCOMPLETE_CONFIGURATION,
+            message + ". Configuration is " + JSON.stringify(configuration, null, 4));
         if (callback) {
             callback(error);
         } else {
@@ -1523,6 +1536,15 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
     }
     return configuration;
 }
+
+Clover.minimalConfigurationPossibilities = [
+    ["deviceURL"],
+    ["clientId", "domain", "deviceSerialId"],
+    ["clientId", "domain", "deviceId"]
+];
+
+
+
 
 
 /**
