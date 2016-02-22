@@ -85,7 +85,7 @@
 
     // Call the device to take payment, after the payment is complete, call the
     // 'mySaleResult' function
-    clover.sale(mySale, authCallback);
+    clover.preAuth(mySale, authCallback);
     disable("doAuthID");
   }
   function authCallback(error, resultData) {

@@ -95,7 +95,7 @@
     var resultDisplay = "";
     if(error) {
       resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
-    } else if(resultData.code = "SUCCESS" && canTipAdjust(resultData.payment)) {
+    } else if(resultData.code = "SUCCESS" && resultData["payment"] && canTipAdjust(resultData.payment)) {
       saleResult = resultData;
       enable("adjustTipID");
     }
