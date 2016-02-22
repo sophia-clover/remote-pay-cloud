@@ -31,6 +31,9 @@
 
   // Create the Clover object to communicate with the device
   var config = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
+  if (!config) {
+    config = {};
+  }
   config.disableRestartTransactionWhenFailed= true;
   var clover = new Clover(config);
   // Following will try to handle when incomplete configurations are encountered.

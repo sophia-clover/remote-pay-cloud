@@ -39,6 +39,9 @@
 
   // Create the Clover object to communicate with the device
   var config = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
+  if (!config) {
+    config = {};
+  }
   config.remotePrint = true;  // This is an odd flag.  'Remote' in this case is from the standpoint of the device,
                               // so 'local' from the standpoint of this web page.
   var clover = new Clover(config);
