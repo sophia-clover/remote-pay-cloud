@@ -27,8 +27,9 @@
 <script>
 
   // Create the Clover object to communicate with the device
-  var config = copyConfig();
-  var clover = new Clover(config);
+  var clover = new Clover();
+  // Following will try to handle when incomplete configurations are encountered.
+  clover.incompleteConfiguration = exampleIncompleteConfigurationHandler;
 
   imageIsLoaded = false
   // Make sure the image is fully loaded.
@@ -48,9 +49,8 @@
 
   function deviceReady(error) {
     if(error) {
-      var resultDisplay = "";
-      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
-      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+      var resultDisplay = JSON.stringify(error, null, 4);
+      alert(resultDisplay);
     } else {
       deviceIsReady = true;
       if (imageIsLoaded) {

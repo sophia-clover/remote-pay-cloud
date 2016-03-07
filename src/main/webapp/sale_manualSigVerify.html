@@ -31,9 +31,14 @@
 <script>
 
   // Create the Clover object to communicate with the device
-  var config = copyConfig();
+  var config = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
+  if (!config) {
+    config = {};
+  }
   config.autoVerifySignature = false;
   var clover = new Clover(config);
+  // Following will try to handle when incomplete configurations are encountered.
+  clover.incompleteConfiguration = exampleIncompleteConfigurationHandler;
 
   // Since we set the 'autoVerifySignature' flag in the configuration, add a callback to verify the signature.
   // This function *may* be called during the sale process, depending on the type of payment taken.
