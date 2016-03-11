@@ -40,25 +40,31 @@
   clover.device.once(LanMethod.VERIFY_SIGNATURE,
       function (message) {
         try {
-          // Get the message
+          // First get the payload of the message
           var payload = JSON.parse(message.payload);
-          // Get the payment from the raw message
-          var payment = JSON.parse(payload.payment);
-          // Get the signature from the payload of the message
+          // Get the payment from the raw message if you want to inspect it for criteria
+          // used in determining whether to accept the signature or not.  This is
+          // business rule specific - for example smaller amounts may be approved
+          // quickly, while larger payments come under greater scrutiny
+          // var payment = JSON.parse(payload.payment);
+
+          // Get the signature from the payload of the message.
+          // The signature is a collection of strokes.  To
+          // see an example of rendering the signature, see
+          // cloud_index.html#displaySignature(signature)
           signature = payload.signature;
 
           if(confirm("Verify Signature?")) {
-            clover.device.sendSignatureVerified(payment);
+            clover.acceptSignature(payload);
           } else {
-            clover.device.sendSignatureRejected(payment);
+            clover.rejectSignature(payload);
           }
         } catch (error) {
           var cloverError = new CloverError(LanMethod.VERIFY_SIGNATURE,
               "Failure attempting to send signature verification", error);
           resultCallback(cloverError, {
             "code": "ERROR",
-            "signature": signature,
-            "request": txnInfo
+            "signature": signature
           });
         }
       }
