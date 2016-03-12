@@ -236,15 +236,6 @@ function RemoteMessageBuilder(defaultPackageName) {
     }
 
     /**
-     * Builds a message to send to the device to make it show the receipt screen from the last order processed
-     *
-     * @returns {json} the constructed message
-     */
-    this.buildShowReceiptScreen = function () {
-        return this.buildRemoteMessage(LanMethod.SHOW_RECEIPT_SCREEN, RemoteMessageBuilder.COMMAND);
-    }
-
-    /**
      * Builds a message to drive the device to show an order on the screen
      *
      * @param {json} payload - an order object
@@ -350,8 +341,6 @@ LanMethod.TERMINAL_MESSAGE = "TERMINAL_MESSAGE";
 LanMethod.SHOW_WELCOME_SCREEN = "SHOW_WELCOME_SCREEN";
 /** The show thank you screen method type */
 LanMethod.SHOW_THANK_YOU_SCREEN = "SHOW_THANK_YOU_SCREEN";
-/** The show last order receipt screen method type */
-LanMethod.SHOW_RECEIPT_SCREEN = "SHOW_RECEIPT_SCREEN";
 /** The show order screen method type */
 LanMethod.SHOW_ORDER_SCREEN = "SHOW_ORDER_SCREEN";
 /** The break method type */

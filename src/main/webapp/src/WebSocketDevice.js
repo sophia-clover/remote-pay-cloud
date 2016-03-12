@@ -1065,23 +1065,6 @@ WebSocketDevice.prototype.sendShowWelcomeScreen = function(ackId) {
 }
 
 /**
- * Send a message to show the receipt screen from the last order
- *
- * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
- *  A "ACK" message will be returned with this identifier as the message id if this
- *  parameter is included.  This "ACK" message will be in addition to any other message
- *  that may be generated as a result of this message being sent.
- */
-WebSocketDevice.prototype.sendShowReceiptScreen = function(ackId) {
-    var lanMessage = this.messageBuilder.buildShowReceiptScreen();
-    // If an id is included, then an "ACK" message will be sent for this message
-    if(ackId) lanMessage.id = ackId;
-
-    this.sendMessage(lanMessage);
-}
-
-/**
  * Send a message to show a custom message on the screen
  *
  * @param {string} message - the message to display
