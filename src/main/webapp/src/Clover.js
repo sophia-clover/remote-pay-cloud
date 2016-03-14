@@ -933,6 +933,7 @@ function Clover(configuration) {
     }
 
     /**
+     * Request a VOID on a previous payment.
      *
      * @param {Payment} payment - the payment information returned from a call to 'sale'.
      *  this can be truncated to be only { "id": paymentId, "order": {"id": orderId}}
@@ -1154,14 +1155,6 @@ function Clover(configuration) {
     }
 
     /**
-     * Not yet implemented
-     * @param {requestCallback} completionCallback
-     */
-    this.saleWithCashback = function (saleInfo, completionCallback) {
-        completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
-    }
-
-    /**
      * Sends an escape code to the device.  The behavior of the device when this is called is
      * dependant on the current state of the device.
      * @param {requestCallback} [completionCallback]
@@ -1219,7 +1212,9 @@ function Clover(configuration) {
     }
 
     /**
-     * @param {TipAdjustRequest} tipAdjustRequest - the refund request
+     * Adjust an auth with a tip amount.
+     *
+     * @param {TipAdjustRequest} tipAdjustRequest - the request
      * @param {requestCallback} completionCallback
      */
     this.tipAdjust = function (tipAdjustRequest, completionCallback) {
@@ -1728,6 +1723,14 @@ Clover.isInt = function(value) {
     return (x | 0) === x;
 }
 
+/**
+ * Utility function to set a cookie in the browser. Used for
+ * default configuration persistance.
+ *
+ * @param cname
+ * @param cvalue
+ * @param exdays
+ */
 Clover.setCookie = function(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -1735,6 +1738,13 @@ Clover.setCookie = function(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + "; " + expires;
 }
 
+/**
+ * Utility function to get a cookie in the browser. Used for
+ * default configuration persistance.
+ *
+ * @param cname
+ * @returns {*}
+ */
 Clover.getCookie = function(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -1746,6 +1756,13 @@ Clover.getCookie = function(cname) {
     return "";
 }
 
+/**
+ * Utility function to write configuration to a browser
+ * cookie.
+ *
+ * @param configuration
+ * @param saveURL
+ */
 Clover.writeConfigurationToCookie = function (configuration, saveURL) {
     var cvalue = JSON.stringify(configuration);
     var jsonValue = JSON.parse(cvalue);
@@ -1759,6 +1776,13 @@ Clover.writeConfigurationToCookie = function (configuration, saveURL) {
     Clover.setCookie(this.configurationName, cvalue, exdays);
 }
 
+/**
+ * Utility function to read configuration to a browser
+ * cookie.
+ *
+ * @param configurationName
+ * @returns {*}
+ */
 Clover.loadConfigurationFromCookie = function (configurationName) {
     // We have no configuration at all.  Try to get it from a cookie
     var configuration = null;
@@ -1769,10 +1793,26 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
     return configuration;
 }
 
+/**
+ * An array that lists minimal configuration sets required for the
+ * library to connect to and operate with a device.  These sets can
+ * be used to handle the case where an incomplete configuration (or
+ * even no configuration) is specified.
+ */
 Clover.minimalConfigurationPossibilities = [
-    ["deviceURL"],
-    ["clientId", "domain", "deviceSerialId"],
-    ["clientId", "domain", "deviceId"]
+    [{"name":"deviceURL", "description": "the fully qualified websocket URL to connect to the device."}],
+    [
+        {"name":"clientId", "description": "the App ID for the app being used to connect to."},
+        {"name":"domain", "description": "the Clover base server url.  Typically https://www.clover.com/"},
+        {"name":"deviceSerialId", "description": "the serial id of the device to connect to.  " +
+            "This can be obtained from the device settings->About Mini->Status->Serial number"}
+    ],
+    [
+        {"name":"clientId", "description": "the App ID for the app being used to connect to."},
+        {"name":"domain", "description": "the Clover base server url.  Typically https://www.clover.com/"},
+        {"name":"deviceId", "description": "the clover device id to connect to.  This is be obtained with " +
+        "a call to the REST service to list devices."}
+    ]
 ];
 
 
@@ -2014,4 +2054,8 @@ Clover.minimalConfigurationPossibilities = [
  * @property {boolean} [remotePrint] - if set to true, then when the user selects "print" on the print receipt
  *  screen after a transaction, a PRINT_PAYMENT message will be sent from the device to the API.  To get the
  *  message, a listener must be registered via Clover.device.on(LanMethod.PRINT_PAYMENT, ...)
+ * @property {boolean} [allowOvertakeConnection] - if set to true, then the connection to a device that already
+ *  has another terminal connected may forcibly overtake the connection.
+ * @property {string} [friendlyId] - a string ID used to identify this connection to other terminals
+ *  that attempt to communicate with the device.
  */
