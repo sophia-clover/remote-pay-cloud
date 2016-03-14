@@ -194,9 +194,825 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id=".minimalConfigurationPossibilities"><span class="type-signature">(static) </span>minimalConfigurationPossibilities<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    An array that lists minimal configuration sets required for the
+library to connect to and operate with a device.  These sets can
+be used to handle the case where an incomplete configuration (or
+even no configuration) is specified.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1802">line 1802</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getCookie"><span class="type-signature">(static) </span>getCookie<span class="signature">(cname)</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Utility function to get a cookie in the browser. Used for
+default configuration persistance.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cname</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1748">line 1748</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".loadConfigurationFromCookie"><span class="type-signature">(static) </span>loadConfigurationFromCookie<span class="signature">(configurationName)</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Utility function to read configuration to a browser
+cookie.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>configurationName</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1786">line 1786</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".setCookie"><span class="type-signature">(static) </span>setCookie<span class="signature">(cname, cvalue, exdays)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Utility function to set a cookie in the browser. Used for
+default configuration persistance.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cname</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cvalue</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>exdays</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1734">line 1734</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".writeConfigurationToCookie"><span class="type-signature">(static) </span>writeConfigurationToCookie<span class="signature">(configuration, saveURL)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Utility function to write configuration to a browser
+cookie.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>configuration</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>saveURL</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1766">line 1766</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="acceptSignature"><span class="type-signature"></span>acceptSignature<span class="signature">(signatureVerifyRequest, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Sends a message to accept the passed signature on the payment.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>signatureVerifyRequest</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#SignatureVerifyRequest">SignatureVerifyRequest</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the signature verification request.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1463">line 1463</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
             
@@ -327,7 +1143,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line624">line 624</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line636">line 636</a>
     </li></ul></dd>
     
 
@@ -499,7 +1315,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1286">line 1286</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1304">line 1304</a>
     </li></ul></dd>
     
 
@@ -581,7 +1397,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line167">line 167</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line169">line 169</a>
     </li></ul></dd>
     
 
@@ -730,7 +1546,852 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1323">line 1323</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1341">line 1341</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="displayOrder"><span class="type-signature"></span>displayOrder<span class="signature">(order, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Display the passed order.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayOrder">DisplayOrder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1531">line 1531</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="displayOrderDiscountAdded"><span class="type-signature"></span>displayOrderDiscountAdded<span class="signature">(order, discount, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Tells the device to redisplay the passed order, and that a discount
+has been added to it.  The discount should already be incorperated
+to the order before calling this function.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayOrder">DisplayOrder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the order to display</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>discount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayDiscount">DisplayDiscount</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the discount that has been added to the order</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1593">line 1593</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="displayOrderDiscountRemoved"><span class="type-signature"></span>displayOrderDiscountRemoved<span class="signature">(order, discount, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Tells the device to redisplay the passed order, and that a discount
+has been removed from it.  The discount should already be disincorperated
+from the order before calling this function.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayOrder">DisplayOrder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the order to display</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>discount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayDiscount">DisplayDiscount</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the discount that has been removed from the order</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1608">line 1608</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="displayOrderLineItemAdded"><span class="type-signature"></span>displayOrderLineItemAdded<span class="signature">(order, lineItem, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Tells the device to redisplay the passed order, and that a lineItem
+has been added to it.  The lineItem should already be incorperated
+to the order before calling this function.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayOrder">DisplayOrder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the order to display</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineItem</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayLineItem">DisplayLineItem</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the line item that has been added to the order</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1563">line 1563</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="displayOrderLineItemRemoved"><span class="type-signature"></span>displayOrderLineItemRemoved<span class="signature">(order, lineItem, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Tells the device to redisplay the passed order, and that a lineItem
+has been removed from it.  The lineItem should already be disincorperated
+from the order before calling this function.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayOrder">DisplayOrder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the order to display</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineItem</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayLineItem">DisplayLineItem</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the line item that has been removed to the order</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1578">line 1578</a>
     </li></ul></dd>
     
 
@@ -861,7 +2522,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1229">line 1229</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1247">line 1247</a>
     </li></ul></dd>
     
 
@@ -1071,7 +2732,7 @@ the call to Clover.initDeviceConnection.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line458">line 458</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line469">line 469</a>
     </li></ul></dd>
     
 
@@ -1222,7 +2883,7 @@ the call to Clover.initDeviceConnection.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line208">line 208</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line209">line 209</a>
     </li></ul></dd>
     
 
@@ -1452,7 +3113,7 @@ configuration from a server or even a UI.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line418">line 418</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line429">line 429</a>
     </li></ul></dd>
     
 
@@ -1648,7 +3309,7 @@ configuration from a server or even a UI.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1175">line 1175</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1191">line 1191</a>
     </li></ul></dd>
     
 
@@ -1732,7 +3393,7 @@ server or some other type of cloud persistence.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line436">line 436</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line447">line 447</a>
     </li></ul></dd>
     
 
@@ -1887,7 +3548,7 @@ server or some other type of cloud persistence.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line645">line 645</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line657">line 657</a>
     </li></ul></dd>
     
 
@@ -2084,7 +3745,7 @@ server or some other type of cloud persistence.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1024">line 1024</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1048">line 1048</a>
     </li></ul></dd>
     
 
@@ -2256,7 +3917,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1084">line 1084</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1108">line 1108</a>
     </li></ul></dd>
     
 
@@ -2428,7 +4089,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1113">line 1113</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1137">line 1137</a>
     </li></ul></dd>
     
 
@@ -2572,7 +4233,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1049">line 1049</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1073">line 1073</a>
     </li></ul></dd>
     
 
@@ -2726,7 +4387,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line660">line 660</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line672">line 672</a>
     </li></ul></dd>
     
 
@@ -2880,7 +4541,156 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line947">line 947</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line971">line 971</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="rejectSignature"><span class="type-signature"></span>rejectSignature<span class="signature">(signatureVerifyRequest, completionCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Sends a message to reject the passed signature on the payment.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>signatureVerifyRequest</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#SignatureVerifyRequest">SignatureVerifyRequest</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the signature verification request.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1497">line 1497</a>
     </li></ul></dd>
     
 
@@ -3035,7 +4845,7 @@ width of the image is 384 pixals.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line603">line 603</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line615">line 615</a>
     </li></ul></dd>
     
 
@@ -3081,137 +4891,6 @@ width of the image is 384 pixals.
 </dl>
 
     
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="saleWithCashback"><span class="type-signature"></span>saleWithCashback<span class="signature">(completionCallback)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Not yet implemented
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>completionCallback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#requestCallback">requestCallback</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1137">line 1137</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -3333,7 +5012,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1146">line 1146</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1162">line 1162</a>
     </li></ul></dd>
     
 
@@ -3507,7 +5186,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1360">line 1360</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1378">line 1378</a>
     </li></ul></dd>
     
 
@@ -3650,7 +5329,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1416">line 1416</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1434">line 1434</a>
     </li></ul></dd>
     
 
@@ -3793,7 +5472,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1388">line 1388</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1406">line 1406</a>
     </li></ul></dd>
     
 
@@ -3829,6 +5508,10 @@ dependant on the current state of the device.
     
 
 
+
+<div class="description">
+    Adjust an auth with a tip amount.
+</div>
 
 
 
@@ -3879,7 +5562,7 @@ dependant on the current state of the device.
 
             
 
-            <td class="description last">the refund request</td>
+            <td class="description last">the request</td>
         </tr>
 
     
@@ -3943,7 +5626,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1202">line 1202</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1220">line 1220</a>
     </li></ul></dd>
     
 
@@ -4074,7 +5757,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1257">line 1257</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1275">line 1275</a>
     </li></ul></dd>
     
 
@@ -4110,6 +5793,10 @@ dependant on the current state of the device.
     
 
 
+
+<div class="description">
+    Request a VOID on a previous payment.
+</div>
 
 
 
@@ -4248,7 +5935,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line919">line 919</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line943">line 943</a>
     </li></ul></dd>
     
 
@@ -4428,7 +6115,7 @@ dependant on the current state of the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1577">line 1577</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1923">line 1923</a>
     </li></ul></dd>
     
 
@@ -4474,7 +6161,7 @@ dependant on the current state of the device.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Feb 18 2016 13:25:25 GMT-0700 (MST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Mon Mar 14 2016 12:59:52 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>

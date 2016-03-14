@@ -20,6 +20,11 @@ var exampleConfigurations =
         "clientId" : "TQCACCW9EDGX2",
         "domain" : "https://sandboxdev.dev.clover.com/",
         "configName" : "sandboxdev"
+    },
+    "stg1" : {
+        "clientId" : "NWMR4BMTX22WA",
+        "domain" : "https://stg1.dev.clover.com/",
+        "configName" : "stg1"
     }
 };
 var defaultConfigurationName = "sandboxdev"
@@ -58,16 +63,18 @@ var exampleIncompleteConfigurationHandler = function (message, configuration, ca
             var possibleConfig = Clover.minimalConfigurationPossibilities[configIdx];
             configComplete = false;
 
+            var options = possibleConfig.map(function(a) {return a.name;});
+
             if(confirm("Option set #" + (configIdx+1) + ". To complete this set, you will to " +
-                    "enter values for these options - " + possibleConfig.join(', ') + ".\n" +
+                    "enter values for these options - " + options.join(', ') + ".\n" +
                     "\n" +
                     "To complete this option set, click 'OK', or cancel to see the next configuration option.")) {
                 var configComplete = true;
                 for (var itemIdx = 0; itemIdx < possibleConfig.length; itemIdx++) {
                     if (!this.configuration[possibleConfig[itemIdx]]) {
-                        var value = prompt("Please enter a value for " + possibleConfig[itemIdx]);
+                        var value = prompt("Please enter a value for " + possibleConfig[itemIdx].description);
                         if (value) {
-                            this.configuration[possibleConfig[itemIdx]] = value;
+                            this.configuration[possibleConfig[itemIdx].name] = value;
                         } else {
                             configComplete = false;
                             break;
@@ -119,15 +126,18 @@ var exampleIncompleteConfigurationHandlerDIVBuilder = function (configuration) {
 
         for (var itemIdx = 0; itemIdx < possibleConfig.length; itemIdx++) {
             var id_build_in = id_build.slice(0);
-            id_build_in.push(possibleConfig[itemIdx]);
+            id_build_in.push(possibleConfig[itemIdx].name);
 
             content += "<div id='"+id_build_in.join('_')+"'>";
-            content += possibleConfig[itemIdx] + ": "
+            content += possibleConfig[itemIdx].name + ": "
 
-            var value = configuration[possibleConfig[itemIdx]];
+            var value = configuration[possibleConfig[itemIdx].name];
             if(!value)value="";
             id_build_in.push("input");
-            content += "<input type='text' name='"+possibleConfig[itemIdx]+"' id='"+id_build_in.join('_')+"' value='"+value+"'/>";
+            content += "<input type='text' name='"+possibleConfig[itemIdx].name+"' id='"+id_build_in.join('_')+"' value='"+value+"'/>";
+            content += "<p>";
+            content += possibleConfig[itemIdx].description;
+            content += "</p>";
             content += "</div>";
         }
         content += "</form>";

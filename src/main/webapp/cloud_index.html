@@ -182,7 +182,7 @@
 
     <button onclick="device.sendKeyPress(KeyPress.ESC)">Send a Cancel</button>
 
-    <button onclick="device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, CloverID.guid())">Void the last payment
+    <button onclick="doLastPaymentVoid()">Void the last payment
       we saw.
     </button>
 
@@ -805,6 +805,14 @@
       device.sendSignatureRejected(payment);
       // Add some ui feedback
       document.getElementById("signaturePane").style.display = 'none';
+    }
+
+    function doLastPaymentVoid() {
+      if(lastPaymentDetails) {
+        device.sendVoidPayment(lastPaymentDetails, VoidReason.USER_CANCEL, CloverID.guid());
+      } else {
+        displayUIFeedBack("We do not have a last payment reference to void yet.  You need to run a payment first.");
+      }
     }
   }
 

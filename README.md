@@ -12,7 +12,7 @@ This produces a runnable jar that will serve a web application. There are severa
 1.  [Create a Clover developer account](https://docs.clover.com/build/#first-create-your-developer-account) if you do not already have one.
 7.  After claiming your account, [create a web app](https://docs.clover.com/build/web-apps/#step-1-create-your-clover-web-app) on your developer dashboard. Make sure to expand the "Web App" 'App Type' section and enter the Site URL and [CORS domain](https://docs.clover.com/build/web-apps/cors/) of your app.
 
-### Webhook Example
+### Webhook Example (optional)
 If you want to use the embedded webhook example, you will need to run the example on a public facing web server.  You 
 will need to run the example before you can perform the verification of the webhook. The default address of the webhook
 in the example is ```http://<yourserver>/webhook```.  The default server used in the webhook example is
@@ -101,7 +101,6 @@ function makeASale(error) {
 }
 ```
 
-<a href="./src/main/webapp/sale.html#L47" target="_blank">Example of function to handle device initialization and invoke an operation</a>
 #####Here we define the error-first callback that we pass in to the Clover.sale function above.  If an error occurs, it will be the first parameter.
 ```
 function mySaleResult(error, saleResult) {
@@ -109,14 +108,10 @@ function mySaleResult(error, saleResult) {
 }
 ```
 
-<a href="./src/main/webapp/sale.html#L69" target="_blank">Example of function to handle result of an operation</a>
 ####Start communicating with the device and tell the device to call your program when it is ready
 ```
 clover.initDeviceConnection(makeASale);
 ```
-
-<a href="./src/main/webapp/sale.html#L44" target="_blank">Example of initializing the device connection</a>
-
 
 View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 
 details of the JS SDK protocol for showing order details, starting a transaction, and getting a payment response back 
