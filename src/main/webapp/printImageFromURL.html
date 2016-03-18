@@ -1,0 +1,87 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
+  <script src="src/cloverCloud-min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body onbeforeunload="clover.close()">
+
+<p>
+  This is an example of the Clover High Level Cloud API. It assumes that the Clover device is running the
+  Cloud Pay Display app. It uses the Clover device ID to identify the device and an authorization token that was
+  previously obtained. It makes a connection to a device and prints an image from a url.
+</p>
+
+<div>
+  <img id="rct_img" src="http://192.168.1.123:8080/img/booker.png" alt="Clover"/><br/>
+  URL: <input type="text" id="imageURLText" size="100"/><br/>
+  <button id="loadImageBTN"  style="display:none" onclick="loadImage()">Load Image</button>
+  <button id="printImageBTN" style="display:none" onclick="printImg()">Print Image</button>
+</div>
+
+<script>
+
+  // Create the Clover object to communicate with the device
+  var clover = new Clover();
+
+  imageIsLoaded = false;
+  // Make sure the image is fully loaded.
+  document.getElementById("rct_img").addEventListener("load", function() { imageLoaded(); });
+
+  // Start communication
+  deviceIsReady = false;
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(deviceReady);
+
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function loadImage() {
+    disable("printImageBTN");
+    var imageURL = document.getElementById("imageURLText").value;
+    document.getElementById("rct_img").src = imageURL;
+  }
+
+  function imageLoaded() {
+    var theImgUrl = document.getElementById("rct_img").src;
+    document.getElementById("imageURLText").value = theImgUrl;
+    if(deviceIsReady) enable("printImageBTN");
+    imageIsLoaded = true;
+  }
+
+  function deviceReady(error) {
+    if(error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      alert(resultDisplay);
+    } else {
+      deviceIsReady = true;
+      enable("printImageBTN");
+      enable("loadImageBTN");
+    }
+  }
+
+  // This will be called when the device is ready
+  function printImg() {
+    var theImgUrl = document.getElementById("rct_img").src;
+    clover.printImageFromURL(theImgUrl);
+  }
+</script>
+
+</body>
+</html>

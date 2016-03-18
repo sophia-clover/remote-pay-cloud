@@ -1,0 +1,123 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
+
+  <script src="src/xmlHttpSupport.js"></script>
+  <script src="src/CardEntryMethods.js"></script>
+  <script src="src/CloverOAuth.js"></script>
+  <script src="src/CloverError.js"></script>
+  <script src="src/Clover.js"></script>
+  <script src="src/WebSocketDevice.js"></script>
+  <script src="src/Endpoints.js"></script>
+  <script src="src/CloverID.js"></script>
+  <script src="src/eventemitter3_v1_1_1.js"></script>
+  <script src="src/RemoteMessageBuilder.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body>
+
+<p>
+  This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
+  Cloud Pay Display app.
+  <br/>
+</p>
+
+<div id="identityBlock">
+<button onclick="startTest()">Accept Identity</button><input type="text" id="terminalId"/><br/>
+</div>
+
+<button onclick="forceConnect()">Force Connect</button>
+<button onclick="askForConnect()">Ask for connection</button>
+<button onclick="getLastMessage()">Get Last Message</button>
+
+
+<!-- this is a place to talk about what is happening while the example is being run -->
+<div id="uiFeedback" style="height: 400px;">
+</div>
+
+<script>
+
+  document.getElementById("terminalId").value = CloverID.getNewId();
+  var clover = null;
+
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function startTest(){
+    disable("identityBlock");
+    // Create the Clover object to communicate with the device
+    var configuration = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
+    // configuration.allowOvertakeConnection = true;
+    configuration.friendlyId = document.getElementById("terminalId").value;
+    clover = new Clover(configuration);
+
+    clover.device.on(WebSocketDevice.CONNECTION_STOLEN, function (message) {
+      var resultDisplay = message.friendlyId + " stole the connection";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    });
+  }
+
+  function forceConnect() {
+    clover.device.allowOvertakeConnection = true;
+    clover.initDeviceConnection(putAMessageOnDevice)
+  }
+
+  function askForConnect() {
+    clover.device.allowOvertakeConnection = false;
+    clover.initDeviceConnection(putAMessageOnDevice)
+  }
+
+
+  // This will be called when the device is ready
+  function putAMessageOnDevice(error) {
+    if(error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      clover.showMessage("Terminal " + document.getElementById("terminalId").value + " connected.");
+      var resultDisplay = "";
+      resultDisplay += "<pre>" + document.getElementById("terminalId").value + " connected." + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    }
+  }
+
+
+  // This will be called when the device is ready
+  function getLastMessage() {
+    clover.getLastMessage(resultCallback);
+  }
+
+  /**
+   *
+   * @param saleResult - adheres to the node.js style of error first callbacks.
+   * @see http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/
+   */
+  function resultCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+
+</script>
+
+</body>
+</html>
