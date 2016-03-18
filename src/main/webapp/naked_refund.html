@@ -7,7 +7,7 @@
 
     <!-- following for testing only -->
    <script src="testConfigBase.js"></script>
-    <script src="src/cloverCloud-min.js"></script>
+  <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -28,8 +28,9 @@
 <script>
 
   // Create the Clover object to communicate with the device
-  var config = copyConfig();
-  var clover = new Clover(config);
+  var clover = new Clover();
+  // Following will try to handle when incomplete configurations are encountered.
+  clover.incompleteConfiguration = exampleIncompleteConfigurationHandler;
 
   // Start communication
   // Pass the function that should be called when the device is ready.

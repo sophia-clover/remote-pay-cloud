@@ -10,9 +10,35 @@
   <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
+
+  <script>
+    function displayConfig() {
+      var configuration = Clover.loadConfigurationFromCookie("CLOVER_DEFAULT");
+      if (!configuration || Object.keys(configuration).length == 0) {
+        disable("config_erase");
+        document.getElementById("uiFeedback").innerHTML = "";
+      } else {
+        var resultDisplay = "";
+        resultDisplay += "<pre>" + JSON.stringify(configuration, null, 4) + "</pre>";
+        document.getElementById("uiFeedback").innerHTML = resultDisplay;
+        enable("config_erase");
+      }
+    }
+
+    // UI Stuff
+    function enable(id) {
+      document.getElementById(id).style.display = 'block';
+    }
+
+    // UI Stuff
+    function disable(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+  </script>
 </head>
 
-<body>
+<body onload="displayConfig()">
 <h1>Cloud API Examples</h1>
 
 <a href="./docs">Developer documents</a><br/>
@@ -23,25 +49,15 @@
     <li>a merchant may need to log in to the Clover server</li>
     <li>an oauth token may be used</li>
     <li>a saved configuration may be loaded from a persistent store (example stores information in a cookie)
-      <button id="save_cfg_btn" onclick="Clover.writeConfigurationToCookie(defaultConfiguration, true)">Save Configuration</button>
     </li>
   </ul>
 </p>
 
-<ul>
-  <!-- Table until security issue can be resolved -->
-  <!--
-  <li>Local Network</li>
-  <ul>
-    <li><a href="./lan_index.html">Local Network Example</a><br/></li>
-
-    <li><a href="LAN_index.html">Simple Example - Local Network Pay Display using deviceURL</a><br/></li>
-
-    <li><a href="high_levelLAN_printImage.html">Simple Example - Local Network Pay Display using deviceURL. Print Image on receipt</a><br/></li>
-
-    <li><a href="high_levelLAN_sale_withPaymentID.html">Sale with external payment ID</a><br/></li>
-  </ul>
-  -->
+<div id="config_erase" style="display:none">
+  <p>Current Configuration</p>
+  <div id="uiFeedback"></div>
+  <button id="save_cfg_btn" onclick="Clover.writeConfigurationToCookie({});displayConfig()">Remove saved configuration</button>
+</div>
 
   <li>Cloud</li>
   <ul>
@@ -102,6 +118,8 @@
     <li><a href="closeout.html">Request a closeout</a><br/></li>
 
     <li><a href="showMessage.html">Display messages on the device screen</a><br/></li>
+
+    <li><a href="orderAddDeleteLineItems.html">Display an order, add and delete items from it</a><br/></li>
 
   </ul>
 </ul>

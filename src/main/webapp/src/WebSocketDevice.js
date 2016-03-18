@@ -610,7 +610,7 @@ WebSocketDevice.DEVICE_CLOSE = WebSocketDevice.LOCAL_EVENT + "_DEVICE_CLOSE";
 // Send an update to the order to the device.  No idea what the update is,
 // this is just the comms
 /**
- * Sends an update to the order to the device, and causes it to display the change.
+ * TElls the device to display the passed order.
  *
  * @param {json} order - the entire order json object
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
@@ -622,6 +622,109 @@ WebSocketDevice.DEVICE_CLOSE = WebSocketDevice.LOCAL_EVENT + "_DEVICE_CLOSE";
 WebSocketDevice.prototype.sendShowOrderScreen = function(order, ackId) {
     var payload = {
         "order": JSON.stringify(order)
+    };
+    var lanMessage = this.messageBuilder.buildShowOrderScreen(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * @typedef {Object} Operation
+ * @property {string} orderId - the id of the order the operation is on
+ * @property {StringArray} ids - a array container of ids for the order operation
+ */
+
+/**
+ * @typedef {Object} StringArray
+ * @property {string[]} elements - string elements
+ */
+
+/**
+ * Sends an update to the order to the device, and causes it to display the change.
+ *
+ * @param {json} order - the entire order json object
+ * @param {Operation} lineItemsAddedOperation
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendShowOrderLineItemAdded = function(order, lineItemsAddedOperation, ackId) {
+    var payload = {
+        "order": JSON.stringify(order),
+        "lineItemsAddedOperation": JSON.stringify(lineItemsAddedOperation)
+    };
+    var lanMessage = this.messageBuilder.buildShowOrderScreen(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * Sends an update to the order to the device, and causes it to display the change.
+ *
+ * @param {json} order - the entire order json object
+ * @param {Operation} lineItemsDeletedOperation
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendShowOrderLineItemRemoved = function(order, lineItemsDeletedOperation, ackId) {
+    var payload = {
+        "order": JSON.stringify(order),
+        "lineItemsDeletedOperation": JSON.stringify(lineItemsDeletedOperation)
+    };
+    var lanMessage = this.messageBuilder.buildShowOrderScreen(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * Sends an update to the order to the device, and causes it to display the change.
+ *
+ * @param {json} order - the entire order json object
+ * @param {Operation} discountsAddedOperation
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendShowOrderDiscountAdded = function(order, discountsAddedOperation, ackId) {
+    var payload = {
+        "order": JSON.stringify(order),
+        "discountsAddedOperation": JSON.stringify(discountsAddedOperation)
+    };
+    var lanMessage = this.messageBuilder.buildShowOrderScreen(payload);
+    // If an id is included, then an "ACK" message will be sent for this message
+    if(ackId) lanMessage.id = ackId;
+
+    this.sendMessage(lanMessage);
+}
+
+/**
+ * Sends an update to the order to the device, and causes it to display the change.
+ *
+ * @param {json} order - the entire order json object
+ * @param {Operation} discountsDeletedOperation
+ * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
+ *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
+ *  A "ACK" message will be returned with this identifier as the message id if this
+ *  parameter is included.  This "ACK" message will be in addition to any other message
+ *  that may be generated as a result of this message being sent.
+ */
+WebSocketDevice.prototype.sendShowOrderDiscountRemoved = function(order, discountsDeletedOperation, ackId) {
+    var payload = {
+        "order": JSON.stringify(order),
+        "discountsDeletedOperation": JSON.stringify(discountsDeletedOperation)
     };
     var lanMessage = this.messageBuilder.buildShowOrderScreen(payload);
     // If an id is included, then an "ACK" message will be sent for this message
@@ -652,6 +755,7 @@ WebSocketDevice.prototype.sendKeyPress = function(keyCode, ackId) {
  * Send a message to start a transaction.  This will make the device display the payment screen
  *
  * @param {json} payIntent - the payment intention object
+ * @param {boolean} suppressOnScreenTips
  * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
  *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
  *  A "ACK" message will be returned with this identifier as the message id if this
@@ -954,23 +1058,6 @@ WebSocketDevice.prototype.sendShowThankYouScreen = function(ackId) {
  */
 WebSocketDevice.prototype.sendShowWelcomeScreen = function(ackId) {
     var lanMessage = this.messageBuilder.buildShowWelcomeScreen();
-    // If an id is included, then an "ACK" message will be sent for this message
-    if(ackId) lanMessage.id = ackId;
-
-    this.sendMessage(lanMessage);
-}
-
-/**
- * Send a message to show the receipt screen from the last order
- *
- * @param {string} [ackId] - an optional identifier that can be used to track an acknowledgement
- *  to this message.  This should be a unique identifier, but this is NOT enforced in any way.
- *  A "ACK" message will be returned with this identifier as the message id if this
- *  parameter is included.  This "ACK" message will be in addition to any other message
- *  that may be generated as a result of this message being sent.
- */
-WebSocketDevice.prototype.sendShowReceiptScreen = function(ackId) {
-    var lanMessage = this.messageBuilder.buildShowReceiptScreen();
     // If an id is included, then an "ACK" message will be sent for this message
     if(ackId) lanMessage.id = ackId;
 

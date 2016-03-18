@@ -50,6 +50,8 @@
   // Create the Clover object to communicate with the device.. Since no information is passed
   // to the Clover object, it reads a cookie to get the information needed to communicate.
   var clover = new Clover();
+  // Following will try to handle when incomplete configurations are encountered.
+  clover.incompleteConfiguration = exampleIncompleteConfigurationHandler;
 
   // Start communication
   // Pass the function that should be called when the device is ready.

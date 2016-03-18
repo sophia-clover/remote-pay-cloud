@@ -125,13 +125,15 @@ function Clover(configuration) {
      * @private
      * @type {{action: string, transactionType: string, taxAmount: number, cardEntryMethods: *, disableRestartTransactionWhenFailed: boolean, remotePrint: boolean}}
      */
-    this.refund_payIntentTemplate = {
-        "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
-        "transactionType": "CREDIT",
-        "taxAmount": 0, // tax amount is included in the amount
-        "cardEntryMethods": CardEntryMethods.ALL,
-        "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
-        "remotePrint": this.configuration.remotePrint
+    this.refund_payIntentTemplate = function() {
+        return {
+            "action": "com.clover.remote.protocol.action.START_REMOTE_PROTOCOL_PAY",
+            "transactionType": "CREDIT",
+            "taxAmount": 0, // tax amount is included in the amount
+            "cardEntryMethods": CardEntryMethods.ALL,
+            "disableRestartTransactionWhenFailed": this.configuration.disableRestartTransactionWhenFailed,
+            "remotePrint": this.configuration.remotePrint
+        };
     };
 
     //****************************************
@@ -173,7 +175,6 @@ function Clover(configuration) {
             this.device.disconnectFromDevice();
         }
     }
-
 
     /**
      * Called to initialize the device for communications.
@@ -249,7 +250,16 @@ function Clover(configuration) {
                 // We need the access token, the domain and the merchantId in order to get the devices
                 // We already know that we have the token, but we need to check for the
                 // domain and merchantId.
-                if (this.configuration.domain && this.configuration.merchantId) {
+                if(!this.configuration.merchantId) {
+                    this.configuration.merchantId = this.cloverOAuth.getURLParams()["merchant_id"];
+                }
+                if(!this.configuration.merchantId) {
+                    // We do not have enough info to initialize.  Error out
+                    this.incompleteConfiguration("Incomplete init info, missing 'merchantId'", this.configuration,
+                        callBackOnDeviceReady);
+                    return;
+                }
+                if (this.configuration.domain) {
                     // We need the device id of the device we will contact.
                     // Either we have it...
                     var xmlHttpSupport = new XmlHttpSupport();
@@ -382,7 +392,7 @@ function Clover(configuration) {
                     }
                 } else {
                     // We do not have enough info to initialize.  Error out
-                    this.incompleteConfiguration("Incomplete init info.", this.configuration,
+                    this.incompleteConfiguration("Incomplete init info, missing 'domain'.", this.configuration,
                         callBackOnDeviceReady);
                     return;
                 }
@@ -393,6 +403,7 @@ function Clover(configuration) {
                 if (this.configuration.clientId && this.configuration.domain) {
                     this.cloverOAuth = new CloverOAuth(this.configuration);
                     // This may cause a redirect
+                    this.persistConfiguration();
                     this.configuration.oauthToken = this.cloverOAuth.getAccessToken();
                     // recurse
                     this.initDeviceConnectionInternal(callBackOnDeviceReady);
@@ -419,7 +430,7 @@ function Clover(configuration) {
         // We have no configuration at all.  Try to get it from a cookie
         if (!this.configurationName)this.configurationName = "CLOVER_DEFAULT";
         this.configuration = Clover.loadConfigurationFromCookie(this.configurationName);
-        if (!this.configuration) {
+        if (!this.configuration || Object.keys(this.configuration).length == 0) {
             // fire up a gui to get the values?
             // This could be some server call back or other too.
             this.incompleteConfiguration("No initialization info found in cookie", this.configuration, callback);
@@ -459,7 +470,8 @@ function Clover(configuration) {
         // If this is used to obtain the configuration information, then the
         // configuration should be updated, and then the 'initDeviceConnection'
         // should be called again to connect to the device.
-        var error = new CloverError(CloverError.INCOMPLETE_CONFIGURATION, message);
+        var error = new CloverError(CloverError.INCOMPLETE_CONFIGURATION,
+            message + ". Configuration is " + JSON.stringify(configuration, null, 4));
         if (callback) {
             callback(error);
         } else {
@@ -695,6 +707,15 @@ function Clover(configuration) {
                 "if paymentInfo has 'tipAmount', the value must be an integer"));
             return;
         }
+        if (txnInfo.hasOwnProperty("taxAmount")) {
+            if(!Clover.isInt(txnInfo.taxAmount)) {
+                txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
+                    "if paymentInfo has 'taxAmount', the value must be an integer"));
+                return;
+            } else {
+                payIntent.taxAmount = txnInfo.taxAmount;
+            }
+        }
         if (txnInfo.hasOwnProperty("tippableAmount")) {
             if (!Clover.isInt(txnInfo.tippableAmount)) {
                 txnRequestCallback(new CloverError(CloverError.INVALID_DATA,
@@ -865,7 +886,7 @@ function Clover(configuration) {
      *  @return the unique identifier that should be used when sending the message for which a ACK
      *      message is desired.
      */
-    this.genericAcknowledgedCall = function (callbackPayload, completionCallback) {
+    this.genericAcknowledgedCall = function (callbackPayload, completionCallback, returnToWelcomeScreen) {
         // Reserve a reference to this object
         var me = this;
         // We will generate a uuid to use in a callback
@@ -897,7 +918,9 @@ function Clover(configuration) {
                 } catch (err) {
                     console.log(err);
                 }
-                me.device.sendShowWelcomeScreen();
+                if(returnToWelcomeScreen) {
+                    me.device.sendShowWelcomeScreen();
+                }
             }
         };
         // Generate the uuid so we can filter properly
@@ -910,6 +933,7 @@ function Clover(configuration) {
     }
 
     /**
+     * Request a VOID on a previous payment.
      *
      * @param {Payment} payment - the payment information returned from a call to 'sale'.
      *  this can be truncated to be only { "id": paymentId, "order": {"id": orderId}}
@@ -926,7 +950,7 @@ function Clover(configuration) {
             }
         }
 
-        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        var uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback, true);
         try {
             this.device.sendVoidPayment(payment, voidReason, uuid);
         } catch (error) {
@@ -1025,7 +1049,7 @@ function Clover(configuration) {
         var callbackPayload = {"request": textLines};
         var uuid = null;
         if (completionCallback) {
-            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback, true);
         }
         try {
             this.device.sendPrintText(textLines, uuid);
@@ -1085,7 +1109,7 @@ function Clover(configuration) {
         var callbackPayload = {"request": {"img": {"src": img.src}}};
         var uuid = null;
         if (completionCallback) {
-            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback, true);
         }
         try {
             this.device.sendPrintImage(img, uuid);
@@ -1114,7 +1138,7 @@ function Clover(configuration) {
         var callbackPayload = {"request":{"img":{"url": img }}};
         var uuid = null;
         if(completionCallback) {
-            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback, true);
         }
         try {
             this.device.sendPrintImageFromURL(img, uuid);
@@ -1131,14 +1155,6 @@ function Clover(configuration) {
     }
 
     /**
-     * Not yet implemented
-     * @param {requestCallback} completionCallback
-     */
-    this.saleWithCashback = function (saleInfo, completionCallback) {
-        completionCallback(new CloverError(CloverError.NOT_IMPLEMENTED, "Not yet implemented"));
-    }
-
-    /**
      * Sends an escape code to the device.  The behavior of the device when this is called is
      * dependant on the current state of the device.
      * @param {requestCallback} [completionCallback]
@@ -1149,7 +1165,7 @@ function Clover(configuration) {
         var callbackPayload = {"request": "cancel"};
         var uuid = null;
         if (completionCallback) {
-            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback, true);
         }
         try {
             this.device.sendKeyPress(KeyPress.ESC, uuid);
@@ -1178,7 +1194,7 @@ function Clover(configuration) {
         var callbackPayload = {"request": {"reason": reason}};
         var uuid = null;
         if (completionCallback) {
-            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback, true);
         }
         try {
             this.device.sendOpenCashDrawer(reason, uuid);
@@ -1196,7 +1212,9 @@ function Clover(configuration) {
     }
 
     /**
-     * @param {TipAdjustRequest} tipAdjustRequest - the refund request
+     * Adjust an auth with a tip amount.
+     *
+     * @param {TipAdjustRequest} tipAdjustRequest - the request
      * @param {requestCallback} completionCallback
      */
     this.tipAdjust = function (tipAdjustRequest, completionCallback) {
@@ -1222,6 +1240,7 @@ function Clover(configuration) {
     }
 
     /**
+     * Retreive the last transactional message made to the device.
      *
      * @param {requestCallback} completionCallback
      */
@@ -1277,6 +1296,7 @@ function Clover(configuration) {
     }
 
     /**
+     * Capture a previously made preauthorization.
      *
      * @param {CapturePreAuthRequest} request
      * @param completionCallback
@@ -1312,6 +1332,8 @@ function Clover(configuration) {
     }
 
     /**
+     *
+     * Send a closeout request to the device.
      *
      * @param {CloseoutRequest} request
      * @param completionCallback
@@ -1432,6 +1454,228 @@ function Clover(configuration) {
         }
     }
 
+    /**
+     * Sends a message to accept the passed signature on the payment.
+     *
+     * @param {SignatureVerifyRequest} signatureVerifyRequest - the signature verification request.
+     * @param completionCallback
+     */
+    this.acceptSignature = function (signatureVerifyRequest, completionCallback) {
+        // Get the payment from the raw message
+        var payment = JSON.parse(signatureVerifyRequest.payment);
+
+        // For reference, this is how you can get the signature from
+        // the payload of the message
+        // signature = signatureVerifyRequest.signature;
+
+        var callbackPayload = {"request": signatureVerifyRequest};
+        var uuid = null;
+        if (completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendSignatureVerified(payment, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SIGNATURE_VERIFIED,
+                "Failure attempting to verify signature", error);
+            if (completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
+    /**
+     * Sends a message to reject the passed signature on the payment.
+     *
+     * @param {SignatureVerifyRequest} signatureVerifyRequest - the signature verification request.
+     * @param completionCallback
+     */
+    this.rejectSignature = function (signatureVerifyRequest, completionCallback) {
+        // Get the payment from the raw message
+        var payment = JSON.parse(signatureVerifyRequest.payment);
+
+        // For reference, this is how you can get the signature from
+        // the payload of the message
+        // signature = signatureVerifyRequest.signature;
+
+        var callbackPayload = {"request": signatureVerifyRequest};
+        var uuid = null;
+        if (completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendSignatureRejected(payment, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SIGNATURE_VERIFIED,
+                "Failure attempting to reject signature", error);
+            if (completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
+    /**
+     * Display the passed order.
+     *
+     * @param {DisplayOrder} order
+     * @param completionCallback
+     */
+    this.displayOrder = function (order, completionCallback) {
+        var callbackPayload = {"request": order};
+        var uuid = null;
+        if (completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            this.device.sendShowOrderScreen(order);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SHOW_ORDER_SCREEN,
+                "Failure attempting to display order", error);
+            if (completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
+    // Expects that the lineitem has already been set on the order...
+    // this is consistent with the windows api.
+    /**
+     * Tells the device to redisplay the passed order, and that a lineItem
+     * has been added to it.  The lineItem should already be incorperated
+     * to the order before calling this function.
+     *
+     * @param {DisplayOrder} order - the order to display
+     * @param {DisplayLineItem} lineItem - the line item that has been added to the order
+     * @param completionCallback
+     */
+    this.displayOrderLineItemAdded = function (order, lineItem, completionCallback) {
+        this.displayOrderInternal(order, "lineItem", lineItem,
+            this.device.sendShowOrderLineItemAdded.bind(this.device),
+            completionCallback);
+    }
+
+    /**
+     * Tells the device to redisplay the passed order, and that a lineItem
+     * has been removed from it.  The lineItem should already be disincorperated
+     * from the order before calling this function.
+     *
+     * @param {DisplayOrder} order - the order to display
+     * @param {DisplayLineItem} lineItem - the line item that has been removed to the order
+     * @param completionCallback
+     */
+    this.displayOrderLineItemRemoved = function (order, lineItem, completionCallback) {
+        this.displayOrderInternal(order, "lineItem", lineItem,
+            this.device.sendShowOrderLineItemRemoved.bind(this.device),
+            completionCallback);
+    }
+
+    /**
+     * Tells the device to redisplay the passed order, and that a discount
+     * has been added to it.  The discount should already be incorperated
+     * to the order before calling this function.
+     *
+     * @param {DisplayOrder} order - the order to display
+     * @param {DisplayDiscount} discount - the discount that has been added to the order
+     * @param completionCallback
+     */
+    this.displayOrderDiscountAdded = function (order, discount, completionCallback) {
+        this.displayOrderInternal(order, "discount", discount,
+            this.device.sendShowOrderDiscountAdded.bind(this.device),
+            completionCallback);
+    }
+
+    /**
+     * Tells the device to redisplay the passed order, and that a discount
+     * has been removed from it.  The discount should already be disincorperated
+     * from the order before calling this function.
+     *
+     * @param {DisplayOrder} order - the order to display
+     * @param {DisplayDiscount} discount - the discount that has been removed from the order
+     * @param completionCallback
+     */
+    this.displayOrderDiscountRemoved = function (order, discount, completionCallback) {
+        this.displayOrderInternal(order, "discount", discount,
+            this.device.sendShowOrderDiscountRemoved.bind(this.device),
+            completionCallback);
+    }
+
+    /**
+     * Does common functionality to display modified orders
+     *
+     * @private
+     * @param order
+     * @param orderComponentName
+     * @param orderComponent
+     * @param deviceFunction
+     * @param completionCallback
+     */
+    this.displayOrderInternal = function (order,
+                                      orderComponentName,
+                                      orderComponent,
+                                      deviceFunction,
+                                      completionCallback) {
+        var callbackPayload = {"request": {"order": order, orderComponentName: orderComponent}};
+        var uuid = null;
+        if (completionCallback) {
+            uuid = this.genericAcknowledgedCall(callbackPayload, completionCallback);
+        }
+        try {
+            var cloverError = null;
+            if (order == null) {
+                var cloverError = new CloverError(CloverError.INVALID_DATA,
+                    "DisplayOrder object cannot be null. ");
+            }
+            if (order.id == null) {
+                var cloverError = new CloverError(CloverError.INVALID_DATA,
+                    "DisplayOrder id cannot be null. " + order);
+            }
+            if (orderComponent == null) {
+                var cloverError = new CloverError(CloverError.INVALID_DATA,
+                    orderComponentName + " cannot be null. ");
+            }
+            if (cloverError) {
+                if (completionCallback) {
+                    completionCallback(cloverError, {
+                        "code": "ERROR",
+                        "request": callbackPayload
+                    });
+                }
+                return;
+            }
+            // The operation
+            var operation = {};
+            operation.orderId = order.id;
+            operation.ids = {};
+            operation.ids.elements = [];
+            operation.ids.elements.push(orderComponent.id);
+
+            // this.device.sendShowOrderDiscountRemoved(order);
+            deviceFunction(order, operation, uuid);
+        } catch (error) {
+            var cloverError = new CloverError(LanMethod.SHOW_ORDER_SCREEN,
+                "Failure attempting to display order", error);
+            if (completionCallback) {
+                completionCallback(cloverError, {
+                    "code": "ERROR",
+                    "request": callbackPayload
+                });
+            }
+            console.log(cloverError);
+        }
+    }
+
     //////////
 
     ///**
@@ -1479,6 +1723,14 @@ Clover.isInt = function(value) {
     return (x | 0) === x;
 }
 
+/**
+ * Utility function to set a cookie in the browser. Used for
+ * default configuration persistance.
+ *
+ * @param cname
+ * @param cvalue
+ * @param exdays
+ */
 Clover.setCookie = function(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -1486,6 +1738,13 @@ Clover.setCookie = function(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + "; " + expires;
 }
 
+/**
+ * Utility function to get a cookie in the browser. Used for
+ * default configuration persistance.
+ *
+ * @param cname
+ * @returns {*}
+ */
 Clover.getCookie = function(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -1497,6 +1756,13 @@ Clover.getCookie = function(cname) {
     return "";
 }
 
+/**
+ * Utility function to write configuration to a browser
+ * cookie.
+ *
+ * @param configuration
+ * @param saveURL
+ */
 Clover.writeConfigurationToCookie = function (configuration, saveURL) {
     var cvalue = JSON.stringify(configuration);
     var jsonValue = JSON.parse(cvalue);
@@ -1510,6 +1776,13 @@ Clover.writeConfigurationToCookie = function (configuration, saveURL) {
     Clover.setCookie(this.configurationName, cvalue, exdays);
 }
 
+/**
+ * Utility function to read configuration to a browser
+ * cookie.
+ *
+ * @param configurationName
+ * @returns {*}
+ */
 Clover.loadConfigurationFromCookie = function (configurationName) {
     // We have no configuration at all.  Try to get it from a cookie
     var configuration = null;
@@ -1520,6 +1793,83 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
     return configuration;
 }
 
+/**
+ * An array that lists minimal configuration sets required for the
+ * library to connect to and operate with a device.  These sets can
+ * be used to handle the case where an incomplete configuration (or
+ * even no configuration) is specified.
+ */
+Clover.minimalConfigurationPossibilities = [
+    [{"name":"deviceURL", "description": "the fully qualified websocket URL to connect to the device."}],
+    [
+        {"name":"clientId", "description": "the App ID for the app being used to connect to."},
+        {"name":"domain", "description": "the Clover base server url.  Typically https://www.clover.com/"},
+        {"name":"deviceSerialId", "description": "the serial id of the device to connect to.  " +
+            "This can be obtained from the device settings->About Mini->Status->Serial number"}
+    ],
+    [
+        {"name":"clientId", "description": "the App ID for the app being used to connect to."},
+        {"name":"domain", "description": "the Clover base server url.  Typically https://www.clover.com/"},
+        {"name":"deviceId", "description": "the clover device id to connect to.  This is be obtained with " +
+        "a call to the REST service to list devices."}
+    ]
+];
+
+
+/**
+ * An object used to control an order display on the device.
+ *
+ * @typedef {Object} DisplayOrder
+ * @property {string} id - identifier for the order
+ * @property {DisplayDiscountArray} discounts
+ * @property {DisplayLineItemArray} lineItems
+ * @property {string} tax - the formatted tax amount to display
+ * @property {string} subtotal - the formatted subtotal amount to display
+ * @property {string} total - the formatted total (subtotal+tax) to display
+ */
+
+/**
+ * A container object used when serializing a collection of display discount items
+ *
+ * @typedef {Object} DisplayDiscountArray
+ * @property {DisplayDiscount[]} elements - the array of items
+ */
+
+/**
+ * A discount applied to a line item on the order.
+ *
+ * @typedef {Object} DisplayDiscount
+ * @property {string} id - identifier for the discount
+ * @property {string} lineItemId - identifier for the line item this applies to
+ * @property {string} name - name of the discount
+ * @property {string} amount - amount of the discount
+ * @property {string} percentage - percentage of the discount
+ */
+
+/**
+ * A container object used when serializing a collection of display line items
+ *
+ * @typedef {Object} DisplayLineItemArray
+ * @property {DisplayLineItem[]} elements - the array of items
+ */
+
+/**
+ *
+ * @typedef {Object} DisplayLineItem
+ * @property {string} id - identifier for the discount
+ * @property {string} orderId - identifier for the order this applies to
+ * @property {string} name - name of the discount
+ * @property {string} price - the price of the item
+ * @property {string} quantity - number of items
+ * @property {DisplayDiscountArray} discounts - number of items
+ * @property {string} discountAmount - the formatted discount total to display
+ */
+
+/**
+ * @typedef {Object} SignatureVerifyRequest
+ * @property {string} payment - the payment information, serialized to a sting
+ * @property {Signature} signature - the signature
+ */
 
 /**
  * This callback type is called `requestCallback` and is displayed as a global symbol.  This type
@@ -1704,4 +2054,8 @@ Clover.loadConfigurationFromCookie = function (configurationName) {
  * @property {boolean} [remotePrint] - if set to true, then when the user selects "print" on the print receipt
  *  screen after a transaction, a PRINT_PAYMENT message will be sent from the device to the API.  To get the
  *  message, a listener must be registered via Clover.device.on(LanMethod.PRINT_PAYMENT, ...)
+ * @property {boolean} [allowOvertakeConnection] - if set to true, then the connection to a device that already
+ *  has another terminal connected may forcibly overtake the connection.
+ * @property {string} [friendlyId] - a string ID used to identify this connection to other terminals
+ *  that attempt to communicate with the device.
  */

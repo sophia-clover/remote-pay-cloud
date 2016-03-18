@@ -21,6 +21,13 @@
   below.
 </p>
 
+<div id="void_config">
+  Order ID: <input type="text" id="orderIdText"/><br/>
+  Payment ID: <input type="text" id="paymentIdText"/><br/>
+
+  <button id="doVoid" style="display:none" onclick="doVoid()">Do Void</button>
+</div>
+
 <!-- this is a place to talk about what is happening while the example is being run -->
 <div id="uiFeedback" style="height: 400px;">
 </div>
@@ -28,44 +35,61 @@
 <script>
 
   // Create the Clover object to communicate with the device
-  var config = copyConfig();
-  var clover = new Clover(config);
+  var clover = new Clover();
+  // Following will try to handle when incomplete configurations are encountered.
+  clover.incompleteConfiguration = exampleIncompleteConfigurationHandler;
 
   // Start communication
   // Pass the function that should be called when the device is ready.
-  clover.initDeviceConnection(makeAVoid);
+  clover.initDeviceConnection(deviceReady);
 
-  // This will be called when the device is ready
-  function makeAVoid(error) {
+  function deviceReady(error) {
     if (error) {
       var resultDisplay = "";
       resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
       document.getElementById("uiFeedback").innerHTML = resultDisplay;
     } else {
-      // Voids are time sensitive, allow user to enter a payment id.
-      var paymentId = prompt("Please enter the payment id", "KP018Z3H2AF1W");
-      if (paymentId) {
-        var orderId = prompt("Please enter the order id", "YCMFN69R55ZS0");
-        if (orderId) {
-          var payment = {
-            "id": paymentId,
-            "order": {
-              "id": orderId
-            }
+      enable("doVoid");
+    }
+  }
+
+  // UI Stuff
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
+  // UI Stuff
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  /**
+   * The call to do the refund.
+   *
+   */
+  function doVoid() {
+    var paymentId = document.getElementById("paymentIdText").value;
+    if (paymentId) {
+      var orderId = document.getElementById("orderIdText").value;
+      if (orderId) {
+        var payment = {
+          "id": paymentId,
+          "order": {
+            "id": orderId
           }
+        };
 
-          // Call the device to take payment, after the payment is complete, call the
-          // 'mySaleResult' function
-          clover.voidTransaction(payment, VoidReason.USER_CANCEL, resultCallback);
+        // Call the device to take payment, after the payment is complete, call the
+        // 'mySaleResult' function
+        clover.voidTransaction(payment, VoidReason.USER_CANCEL, resultCallback);
 
-        } else {
-          resultDisplay = "User canceled test";
-          document.getElementById("uiFeedback").innerHTML = resultDisplay;
-        }
       } else {
         resultDisplay = "User canceled test";
         document.getElementById("uiFeedback").innerHTML = resultDisplay;
       }
+    } else {
+      resultDisplay = "User canceled test";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
     }
   }
 
