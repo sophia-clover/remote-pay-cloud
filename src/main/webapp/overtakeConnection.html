@@ -7,18 +7,7 @@
 
   <!-- following for testing only -->
   <script src="testConfigBase.js"></script>
-
-  <script src="src/xmlHttpSupport.js"></script>
-  <script src="src/CardEntryMethods.js"></script>
-  <script src="src/CloverOAuth.js"></script>
-  <script src="src/CloverError.js"></script>
-  <script src="src/Clover.js"></script>
-  <script src="src/WebSocketDevice.js"></script>
-  <script src="src/Endpoints.js"></script>
-  <script src="src/CloverID.js"></script>
-  <script src="src/eventemitter3_v1_1_1.js"></script>
-  <script src="src/RemoteMessageBuilder.js"></script>
-
+  <script src="src/cloverCloud-min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="appStyle.css">
 </head>
@@ -66,6 +55,8 @@
     // configuration.allowOvertakeConnection = true;
     configuration.friendlyId = document.getElementById("terminalId").value;
     clover = new Clover(configuration);
+    // Following will try to handle when incomplete configurations are encountered.
+    clover.incompleteConfiguration = exampleIncompleteConfigurationHandler;
 
     clover.device.on(WebSocketDevice.CONNECTION_STOLEN, function (message) {
       var resultDisplay = message.friendlyId + " stole the connection";

@@ -687,7 +687,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line370">line 370</a>
+        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line424">line 424</a>
     </li></ul></dd>
     
 
@@ -972,7 +972,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line352">line 352</a>
+        <a href="RemoteMessageBuilder.js.html">RemoteMessageBuilder.js</a>, <a href="RemoteMessageBuilder.js.html#line406">line 406</a>
     </li></ul></dd>
     
 
@@ -997,6 +997,194 @@
         <h3 class="subsection-title">Type Definitions</h3>
 
         
+                
+<h4 class="name" id="CapturePreAuthRequest">CapturePreAuthRequest</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>paymentId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the id of the payment to capture</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>amount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the final amount ofthe payment less any included tip</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tipAmount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the amount of the tip.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1946">line 1946</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
                 
 <h4 class="name" id="CardTransaction">CardTransaction</h4>
 
@@ -1288,7 +1476,138 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1299">line 1299</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1987">line 1987</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="CloseoutRequest">CloseoutRequest</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>allowOpenTabs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">if true, indicates that a closeout can proceed, even if open tabs are
+ present.  Defaults to false.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1931">line 1931</a>
     </li></ul></dd>
     
 
@@ -1318,7 +1637,7 @@ be configured for proper access to the device.
 <p>
     Possible configurations:<br/>
     <ol>
-         <li>deviceURL (Only valid when device is in Local Pay Display app configuration)</li>
+         <li>deviceURL</li>
          <li>oauthToken, domain, merchantId, deviceSerialId</li>
          <li>clientId, domain, merchantId, deviceId (Requires log in to Clover server)</li>
          <li>clientId, domain, merchantId, deviceSerialId (Requires log in to Clover server)</li>
@@ -1653,6 +1972,70 @@ be configured for proper access to the device.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>allowOvertakeConnection</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">if set to true, then the connection to a device that already
+ has another terminal connected may forcibly overtake the connection.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>friendlyId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">a string ID used to identify this connection to other terminals
+ that attempt to communicate with the device.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1688,7 +2071,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1338">line 1338</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line2026">line 2026</a>
     </li></ul></dd>
     
 
@@ -1973,7 +2356,1111 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1283">line 1283</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1971">line 1971</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="DisplayDiscount">DisplayDiscount</h4>
+
+
+
+
+<div class="description">
+    A discount applied to a line item on the order.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">identifier for the discount</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineItemId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">identifier for the line item this applies to</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">name of the discount</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>amount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">amount of the discount</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>percentage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">percentage of the discount</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1838">line 1838</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="DisplayDiscountArray">DisplayDiscountArray</h4>
+
+
+
+
+<div class="description">
+    A container object used when serializing a collection of display discount items
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>elements</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#DisplayDiscount">DisplayDiscount</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the array of items</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1831">line 1831</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="DisplayLineItem">DisplayLineItem</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">identifier for the discount</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>orderId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">identifier for the order this applies to</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">name of the discount</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>price</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the price of the item</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>quantity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">number of items</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>discounts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayDiscountArray">DisplayDiscountArray</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">number of items</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>discountAmount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the formatted discount total to display</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1856">line 1856</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="DisplayLineItemArray">DisplayLineItemArray</h4>
+
+
+
+
+<div class="description">
+    A container object used when serializing a collection of display line items
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>elements</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#DisplayLineItem">DisplayLineItem</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the array of items</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1849">line 1849</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="DisplayOrder">DisplayOrder</h4>
+
+
+
+
+<div class="description">
+    An object used to control an order display on the device.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">identifier for the order</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>discounts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayDiscountArray">DisplayDiscountArray</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineItems</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DisplayLineItemArray">DisplayLineItemArray</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tax</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the formatted tax amount to display</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>subtotal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the formatted subtotal amount to display</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>total</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the formatted total (subtotal+tax) to display</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1819">line 1819</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Operation">Operation</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>orderId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the id of the order the operation is on</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ids</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#StringArray">StringArray</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a array container of ids for the order operation</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line633">line 633</a>
     </li></ul></dd>
     
 
@@ -2287,7 +3774,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1272">line 1272</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1960">line 1960</a>
     </li></ul></dd>
     
 
@@ -2430,7 +3917,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1331">line 1331</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line2019">line 2019</a>
     </li></ul></dd>
     
 
@@ -2620,7 +4107,7 @@ be configured for proper access to the device.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1256">line 1256</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1937">line 1937</a>
     </li></ul></dd>
     
 
@@ -2797,7 +4284,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1200">line 1200</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1874">line 1874</a>
     </li></ul></dd>
     
 
@@ -2981,7 +4468,270 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1317">line 1317</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line2005">line 2005</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="SignatureVerifyRequest">SignatureVerifyRequest</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>payment</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the payment information, serialized to a sting</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Signature">Signature</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the signature</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1868">line 1868</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="StringArray">StringArray</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>elements</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">string elements</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WebSocketDevice.js.html">WebSocketDevice.js</a>, <a href="WebSocketDevice.js.html#line639">line 639</a>
     </li></ul></dd>
     
 
@@ -3105,7 +4855,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1326">line 1326</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line2014">line 2014</a>
     </li></ul></dd>
     
 
@@ -3248,7 +4998,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1293">line 1293</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1981">line 1981</a>
     </li></ul></dd>
     
 
@@ -3414,7 +5164,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1265">line 1265</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1953">line 1953</a>
     </li></ul></dd>
     
 
@@ -3671,6 +5421,37 @@ can still be returned in the other arguments as well, but generally the error is
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>isPreAuth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">valid for auth calls.  If set, the payment will be made as a pre authorization.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -3706,7 +5487,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1220">line 1220</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1894">line 1894</a>
     </li></ul></dd>
     
 
@@ -3958,7 +5739,7 @@ can still be returned in the other arguments as well, but generally the error is
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1237">line 1237</a>
+        <a href="Clover.js.html">Clover.js</a>, <a href="Clover.js.html#line1912">line 1912</a>
     </li></ul></dd>
     
 
@@ -3994,7 +5775,7 @@ can still be returned in the other arguments as well, but generally the error is
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Thu Dec 10 2015 09:38:29 GMT-0700 (MST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Mon Mar 14 2016 12:59:52 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>

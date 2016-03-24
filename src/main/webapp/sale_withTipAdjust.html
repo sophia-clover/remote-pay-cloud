@@ -29,7 +29,7 @@
 </p>
 
 <button onclick="clover.sendCancel(resultCallback)">Send a Cancel</button>
-<button onclick="doTipAdjust()" id="adjustTipID" style="display:none">Adjust the auth with a $1 tip</button>
+  <button onclick="doTipAdjust()" id="adjustTipID" style="display:none">Adjust the auth with a $1 tip</button>
 
 <!-- this is a place to talk about what is happening while the example is being run -->
 <div id="uiFeedback" style="height: 400px;">
@@ -39,6 +39,8 @@
 
   // Create the Clover object to communicate with the device
   var clover = new Clover();
+  // Following will try to handle when incomplete configurations are encountered.
+  clover.incompleteConfiguration = exampleIncompleteConfigurationHandler;
 
   // Start communication
   // Pass the function that should be called when the device is ready.

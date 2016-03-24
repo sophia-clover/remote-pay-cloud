@@ -1,0 +1,306 @@
+<html>
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <!-- following for testing only -->
+  <script src="testConfigBase.js"></script>
+
+  <script src="src/cloverCloud-min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="appStyle.css">
+</head>
+
+<body onbeforeunload="clover.close()">
+
+<p>
+  This is an example of the Clover High Level Cloud API.  It relies on the device to be running the
+  Cloud Pay Display app.  It uses the device id to identify the device, and a authorization token that was
+  previously obtained.  It makes a connection to a device, and allows you to add and remove line items from
+  an order, then checkout (complete the sale).
+
+  The display area will show the current structure of the local order object as you make changes, and
+  will display the result of the sale operation.
+  <br/>
+</p>
+
+<div id="orderButtons" style="display:none">
+  <button id="addLineItemButton" onclick="addLineItem()">Add a line item to the order</button>
+  <button id="removeLineItemButton" onclick="removeFirstLineItem()">Remove a line item from the order</button><br/>
+  <button id="setDiscountButton" onclick="setOrderDiscount()">Set a 10% discount on the order</button>
+  <button id="removeOrderDiscountButton" onclick="removeOrderDiscount()">Remove the discount from the order</button><br/>
+  <button id="setDiscountLineItemButton" onclick="setDiscountOnLastLineItem()">Set the discount on a line item</button><br/>
+  <button id="clearButton" onclick="clearOrder()">Clear the order</button>
+  <button id="doSale" onclick="doSale()">Checkout</button>
+</div>
+
+<!-- this is a place to talk about what is happening while the example is being run -->
+<div id="uiFeedback" style="height: 400px;">
+</div>
+
+
+<script>
+
+  // Create the Clover object to communicate with the device
+  var clover = new Clover();
+  // Create an order object to track what we are doing.
+  var currentOrder = null;
+
+  // Create properties for formatting numbers as currency
+  var currency_props = {
+    style: "currency",
+    currency: "USD"
+  };
+  // Create properties for help in formatting percentages
+  var percent_props = {
+    "minimumIntegerDigits" : 2
+  }
+
+  // The tax rate (chosen arbitrarily)
+  var TAX = .0825;
+
+  // Start communication
+  // Pass the function that should be called when the device is ready.
+  clover.initDeviceConnection(deviceIsReady);
+
+  // Simple function to reinitialize our local order object.  For
+  // the example, we also set the device to the welcome screen when we clear it.
+  function clearOrder() {
+    currentOrder = {"id":CloverID.getNewId(), "title":"Order Test"};
+    resultCallback(null, currentOrder);
+    clover.showWelcomeScreen();
+  }
+
+  // Called when the device reports it is ready (or has an error initializing)
+  function deviceIsReady(error) {
+    if (error) {
+      var resultDisplay = "";
+      resultDisplay += "<pre>" + JSON.stringify(error, null, 4) + "</pre>";
+      document.getElementById("uiFeedback").innerHTML = resultDisplay;
+    } else {
+      clearOrder();
+      enable("orderButtons");
+    }
+  }
+
+  // Sets a discount for the order.  In this example, only one order level discount is allowed.
+  function setOrderDiscount() {
+    // If there is a discount on the order, remove it.
+    removeOrderDiscount(setNewDiscount);
+  }
+
+  // Sets a discount on the last line item in the order
+  function setDiscountOnLastLineItem() {
+    if(currentOrder["lineItems"] && currentOrder.lineItems["elements"].length > 0) {
+      var theLineItem = currentOrder.lineItems["elements"][currentOrder.lineItems["elements"].length - 1];
+      setNewDiscount(theLineItem.id);
+    }
+  }
+
+  // Does the work of setting up a discount
+  function setNewDiscount(lineItemId) {
+    var discountID = CloverID.getNewId();
+
+    var discountPercentageAmount = 10 ;//Math.round(Math.random() * 10) + 5; // amount without decimal
+    var discount = {
+      "percentage" : "%" + discountPercentageAmount.toLocaleString("en", percent_props),
+      "rawpercentage" : discountPercentageAmount/100, // Note, this field is only used in the example,
+                                                      // as a convenience
+      "id" : discountID
+    }
+    if(lineItemId) {
+      discount.name = "Test Line Item Discount";
+      // If the line item id was included, then the discount is to be applied to a line item only.
+      discount.lineItemId = lineItemId;  // set the id on the discount
+      // Find the line item - if we do not find it, we will just silently exit.
+      for (var i=0, tot=currentOrder.lineItems["elements"].length; i < tot; i++) {
+        if(currentOrder.lineItems["elements"][i].id === lineItemId) {
+          // Set up the discount on the line item
+          if (!currentOrder.lineItems["elements"][i].hasOwnProperty("discounts")) {
+            // Set up the discounts container
+            currentOrder.lineItems["elements"][i].discounts = {};
+            currentOrder.lineItems["elements"][i].discounts["elements"] = [];
+            // Set up the display of the discount amount.  Format it locally
+            discount["amount"] = (currentOrder.lineItems["elements"][i].rawamount/(discountPercentageAmount*100)).toLocaleString("en", currency_props);
+            currentOrder.lineItems["elements"][i].discountAmount = discount["amount"];
+            currentOrder.lineItems["elements"][i].discounts["elements"].push(discount);
+          } else {
+            // Only allow one discount on a line item, and only allow it to be set once in the demo.
+            var resultDisplay = "";
+            resultDisplay += "<pre>Line item already has discount applied, in this limited " +
+                "demo you will have to delete the line item and re add it with a new discount.</pre>";
+            document.getElementById("uiFeedback").innerHTML = resultDisplay;
+            return;
+          }
+        }
+      }
+    } else {
+      discount.name = "Test Order Discount";
+      // Set up the discounts container for the order
+      if (!currentOrder.hasOwnProperty("discounts")) {
+        currentOrder.discounts = {};
+        currentOrder.discounts["elements"] = [];
+      }
+      // Set the discount amount, but it will be overridden when we 'updateOrderTotals'
+      discount["amount"] = (currentOrder.rawamount/(discountPercentageAmount*100)).toLocaleString("en", currency_props);
+      currentOrder.discounts["elements"].push(discount);
+    }
+    // Recalculate the amounts for the order
+    updateOrderTotals();
+    // Send the device the updated order
+    resultCallback(null, currentOrder);
+    clover.displayOrderDiscountAdded(currentOrder, discount);
+  }
+
+  // Remove the order discount from the order
+  function removeOrderDiscount(callback) {
+    if(!callback)callback = function(){};
+    if (currentOrder.hasOwnProperty("discounts")) {
+      if (currentOrder.discounts.hasOwnProperty("elements")) {
+        if(currentOrder.discounts.elements.length > 0) {
+          var removedItem = currentOrder.discounts.elements.shift();
+          updateOrderTotals();
+          resultCallback(null, currentOrder);
+          clover.displayOrderDiscountRemoved(currentOrder, removedItem, callback);
+          return;
+        }
+      }
+    }
+    // If we did NOT remove a discount (there was not one) still invoke the callback.
+    callback();
+  }
+
+  // Adda line item to the order
+  function addLineItem() {
+    // Use the id of the lineitem in the name to make it easier to
+    // see unique items
+    var lineitemId = CloverID.getNewId();
+
+    // Some amount to charge
+    var itemAmount = 1010; // amounts are without decimal
+    var itemDisplayAmount = itemAmount/100; // display amount
+    var lineItem = {
+      "rawamount": itemAmount,// hold this locally.  This will not be read on the peer
+      "price": itemDisplayAmount.toLocaleString("en", currency_props), // How the amount is displayed
+      "name": "Custom Item " + lineitemId,
+      "quantity": "1",
+      "id":lineitemId
+    };
+    // ensure the lineitems container is set up properly
+    if (!currentOrder.hasOwnProperty("lineItems")) {
+      currentOrder.lineItems = {};
+      currentOrder.lineItems["elements"] = [];
+    }
+    currentOrder.lineItems["elements"].push(lineItem);
+    // Recalculate the amounts for the order
+    updateOrderTotals();
+    // Send the device the updated order
+    resultCallback(null, currentOrder);
+    clover.displayOrderLineItemAdded(currentOrder, lineItem);
+  }
+
+  // Remove the first line item in the order
+  function removeFirstLineItem() {
+    // If there are any lineitems, then remove the first one in the array.
+    // This makes the add/remove fifo
+    if (currentOrder.hasOwnProperty("lineItems")) {
+      if (currentOrder.lineItems.hasOwnProperty("elements")) {
+        if(currentOrder.lineItems.elements.length > 0) {
+          var removedItem = currentOrder.lineItems.elements.shift();
+          updateOrderTotals();
+          resultCallback(null, currentOrder);
+          clover.displayOrderLineItemAdded(currentOrder, removedItem);
+        }
+      }
+    }
+  }
+
+  // Recalculate the order totals.
+  // The device does NOT do calculations on the order.  It just displays the values provided on the
+  // DisplayOrder object.
+  function updateOrderTotals() {
+    var rawOrderTotal = 0;
+    // First do the calculations for the line items.
+    // This includes summing up the line items for the order total
+    for (var i=0, tot=currentOrder.lineItems["elements"].length; i < tot; i++) {
+      // Take any line item discounts into account
+      if(currentOrder.lineItems["elements"][i]["discounts"] &&
+          currentOrder.lineItems["elements"][i].discounts["elements"] &&
+          currentOrder.lineItems["elements"][i].discounts["elements"].length > 0) {
+        // Only do one order discount for simplicity
+        rawOrderTotal += Math.round(currentOrder.lineItems["elements"][i].rawamount *
+            (1 - currentOrder.lineItems["elements"][i].discounts["elements"][0].rawpercentage));
+      } else {
+        // No discount
+        rawOrderTotal += currentOrder.lineItems["elements"][i].rawamount;
+      }
+    }
+    // The order subtotal is the sum of the line items without tax or discount applied.
+    var orderDisplaySubtotal = rawOrderTotal/100;
+    currentOrder["subtotal"] = orderDisplaySubtotal.toLocaleString("en", currency_props); // How the amount is displayed;
+
+    // Figure the discount that is to be applied to the entire order, then apply it
+    var discountAmount = 0;
+    if(currentOrder["discounts"] && currentOrder.discounts["elements"] && currentOrder.discounts["elements"].length > 0) {
+      // Only do one order discount for simplicity
+      var subTotal = rawOrderTotal;
+      // Take the discount
+      rawOrderTotal = Math.round(rawOrderTotal * (1 - currentOrder.discounts["elements"][0].rawpercentage));
+      // Get the actual value of the discount
+      discountAmount = (subTotal - rawOrderTotal)/100;
+      // Set the discount amount display using the adjusted amount.
+      currentOrder.discounts["elements"][0]["amount"] = (discountAmount).toLocaleString("en", currency_props)
+    }
+    // Figure tax
+    var orderDisplayTaxTotal = Math.round(rawOrderTotal * TAX)/100;
+    // Figure the final order amount
+    var orderDisplayTotal = (orderDisplaySubtotal - discountAmount) + orderDisplayTaxTotal;
+    // This 'rawamount' field is not used outside of this client.  It is used to
+    // allow us to pass the correct value when making payment see 'doSale()' below.
+    currentOrder.rawamount = Math.round(orderDisplayTotal * 100);
+
+    // Format the tax amount
+    currentOrder["tax"] = orderDisplayTaxTotal.toLocaleString("en", currency_props); // How the amount is displayed;
+    // Format the total amount
+    currentOrder["total"] = orderDisplayTotal.toLocaleString("en", currency_props); // How the amount is displayed;
+  }
+
+  // Take payment based on the amount of the order.
+  function doSale() {
+    var taxAmount = Math.round(currentOrder["rawamount"] * TAX);
+    var mySale = {
+      "amount": currentOrder["rawamount"],
+      "taxAmount" : taxAmount,
+      "autoVerifySignature" : true
+    };
+    clover.sale(mySale, onSaleComplete);
+  }
+
+  // Callback for when the sale completes
+  function onSaleComplete(error, resultData) {
+    clearOrder();
+    resultCallback(error, resultData);
+  }
+
+  // Generic function used to display feedback messages
+  function resultCallback(error, resultData) {
+    // do something with this.
+    var resultDisplay = "";
+    if(error)resultDisplay += "<pre>"+JSON.stringify(error, null, 4) + "</pre>";
+    if(resultData)resultDisplay += "<pre>"+JSON.stringify(resultData, null, 4) + "</pre>";
+    document.getElementById("uiFeedback").innerHTML = resultDisplay;
+  }
+  // Generic function used to adjust UI elements
+  function enable(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+  // Generic function used to adjust UI elements
+  function disable(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
