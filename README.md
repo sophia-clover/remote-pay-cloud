@@ -116,3 +116,7 @@ clover.initDeviceConnection(makeASale);
 View our [documentation](https://rawgit.com/clover/remote-pay-cloud/master/src/main/webapp/docs/index.html) to see the 
 details of the JS SDK protocol for showing order details, starting a transaction, and getting a payment response back 
 from the Clover device.
+
+##Disclaimer
+
+This is a beta release and will not be supported long term. There may be breaking changes in the general release, which is coming soon. 
